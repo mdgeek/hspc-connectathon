@@ -69,7 +69,7 @@ public class DemoConfigController extends PluginController {
      * Demonstration Configuration Helper Class.
      */
     public static void show() {
-        PopupDialog.popup("~./org/hspconsortium/cwf/ui/democonfig/demoConfigWin.zul", true, true, true);
+        PopupDialog.popup("~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfigWin.zul", true, true, true);
     }
     
     public DemoConfigController(Bootstrapper bootstrapper) {

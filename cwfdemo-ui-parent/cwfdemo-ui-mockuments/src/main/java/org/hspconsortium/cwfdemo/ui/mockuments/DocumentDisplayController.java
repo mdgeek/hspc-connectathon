@@ -112,7 +112,7 @@ public class DocumentDisplayController extends FrameworkController {
                 String ctype = content.getContentType();
                 
                 if (ctype.startsWith(QUESTIONNAIRE_CONTENT_TYPE)) {
-                    String zul = "~./org/hspconsortium/cwf/ui/mockuments/"
+                    String zul = "~./org/hspconsortium/cwfdemo/ui/mockuments/"
                             + ctype.substring(QUESTIONNAIRE_CONTENT_TYPE.length()) + ".zul"; // Hack - need to register these somehow
                     Include include = new Include();
                     include.setAttribute("document", document);
