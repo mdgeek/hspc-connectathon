@@ -1,0 +1,51 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:w="http://www.zkoss.org/2005/zk/client"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<panel id="panel" height="100%" width="100%">
+		<toolbar align="center">
+			<span id="options" style="float:left">
+				<label id="lblFilter" sclass="z-panel-header" visible="false" style="font-size:12px;padding-right:15px;border:none; background:none"/>
+				<combobox id="cboFilter" readonly="true"
+					text="All Categories" width="15em"
+					tooltiptext="Restrict displayed documents by category.">
+					<comboitem label="${cboFilter.text}"
+						tooltiptext="${cboFilter.tooltiptext}" />	
+					<comboitem id="cbiSeparator" style="line-height:0" disabled="true">
+						<html><hr/></html>	
+					</comboitem>
+				</combobox>
+				<datepicker id="dateRangePicker" allowCustom="true"
+					width="11em"
+					tooltiptext="Restrict to documents within this date range." />
+			</span>
+			<span style="float:right">
+				<button id="btnNew" label="New Document" />
+			</span>
+			<label id="lblInfo" style="font-size:12px; font-weight:bold"/>
+		</toolbar>
+		<panelchildren>
+			<div height="100%" width="100%">
+				<label id="lblMessage" visible="false" />
+				<listbox id="listBox" sizedByContent="false"
+					hflex="1" vflex="1"
+					sclass="cwf-mockuments-lstList"
+					oddRowSclass="cwf-mockuments-oddRow">
+					<listhead sizable="true">
+						<listheader width="15%" label="Date"
+							id="DateTime" />
+						<listheader width="25%" label="Title"
+							id="Title" />
+						<listheader width="25%" label="Source"
+							id="LocationName" />
+						<listheader width="25%" label="Author"
+							id="AuthorName" />
+						<listheader width="10%" label="Status"
+							id="Status" />
+					</listhead>
+				</listbox>
+			</div>
+		</panelchildren>
+	</panel>
+</zk>

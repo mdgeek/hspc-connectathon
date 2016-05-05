@@ -1,0 +1,54 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:w="http://www.zkoss.org/2005/zk/client"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<splitterview apply="${cwfMockumentsMainController}" height="100%" width="100%"
+		horizontal="false">
+		<splitterpane relativeSize="30">
+			<include id="documentList" height="100%" width="100%"
+				src="~./org/hspconsortium/cwfdemo/ui/mockuments/documentsList.zul" />
+		</splitterpane>
+		<splitterpane relativeSize="70">
+			<include id="documentDisplay" height="100%" width="100%"
+				src="~./org/hspconsortium/cwfdemo/ui/mockuments/documentsDisplay.zul" />
+		</splitterpane>
+	</splitterview>
+
+	<style>
+		.cwf-mockuments-oddRow {
+			background-color: #E4EBF8;
+		}
+
+		.cwf-mockuments * {
+			cursor: default !important;
+		}
+
+		.cwf-mockuments-lstDisplay tr.z-listitem-over,
+		.cwf-mockuments-lstDisplay tr.z-listitem-seld,
+		.cwf-mockuments-lstDisplay tr.z-listitem-over-seld {
+			background-image: none;
+		}
+		
+		.cwf-mockuments-lstDisplay tr.z-listitem-over,
+		.cwf-mockuments-lstDisplay tr.z-listitem-over-seld {
+			background-color: ivory;
+		}
+		
+		.cwf-mockuments-lstDisplay tr.z-listitem-over .z-listcell,
+		.cwf-mockuments-lstDisplay tr.z-listitem-over-seld .z-listcell {
+			border: 1px solid gray;
+		}
+
+		.cwf-mockuments-sep {
+			background-color: gray;
+    		height: 3px;
+    		margin: 10px 0 10px 0;
+    	}
+
+    	.z-listitem:first-child .cwf-mockuments-sep {
+    		display: none;
+    	}
+
+	</style>
+</zk>

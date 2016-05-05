@@ -1,0 +1,100 @@
+<?init class="org.carewebframework.ui.zk.Composition" arg0="~./org/carewebframework/ui/sharedforms/captionedForm.zul"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<div self="@define(sharedFormsCaptioned)" width="100%" height="100%"
+		apply="${cwfMessageboxMainController}" sclass="cwfMessagebox">
+		<borderlayout width="100%" height="100%">
+			<center>
+				<listbox id="lstMessages" vflex="1"
+					style="border:none" checkmark="true">
+					<listhead>
+						<listheader width="32px" align="right" />
+						<listheader id="getUrgency" align="center"
+							width="30px" image="${iconUrgency}" />
+						<listheader id="isActionable" align="center"
+							width="30px" image="${iconType}" />
+						<listheader id="getPatientName" hflex="2">
+							<radiogroup id="rgFilter"
+								orient="horizontal">
+								<radio id="radAll"
+									label="${labels.cwfmessagebox.main.button.all.label}"
+									renderdefer="1" />
+								<separator orient="vertical" />
+								<radio id="radPatient" selected="true"
+									renderdefer="1" />
+							</radiogroup>
+						</listheader>
+						<listheader id="getSender" hflex="2" 
+							label="${labels.cwfmessagebox.main.header.sender}" />
+						<listheader id="getSubject" hflex="3"
+							label="${labels.cwfmessagebox.main.header.subject}" />
+						<listheader id="getDeliveryDate" width="150px"
+							label="${labels.cwfmessagebox.main.header.delivered}" />
+					</listhead>
+				</listbox>
+			</center>
+			<east width="120px">
+				<div vflex="1">
+					<groupbox closable="false"
+						sclass="cwfMessagebox-legend"
+						title="${labels.cwfmessagebox.main.group.legend.caption}">
+						<a image="${iconUrgency}" disabled="true"
+							label="${labels.cwfmessagebox.main.legend.urgency}" />
+						<vlayout>
+							<a image="${iconUrgencyHigh}" disabled="true"
+								label="${labels.cwfmessagebox.urgency.label.HIGH}" />
+							<a image="${iconUrgencyMedium}" disabled="true"
+								label="${labels.cwfmessagebox.urgency.label.MEDIUM}" />
+							<a image="${iconUrgencyLow}" disabled="true"
+								label="${labels.cwfmessagebox.urgency.label.LOW}" />
+							<space />
+						</vlayout>
+						<a image="${iconType}" disabled="true"
+							label="${labels.cwfmessagebox.main.legend.type}" />
+						<vlayout>
+							<a image="${iconInfoOnly}" disabled="true"
+								label="${labels.cwfmessagebox.main.legend.infoonly}" />
+							<a image="${iconActionable}" disabled="true"
+								label="${labels.cwfmessagebox.main.legend.actionable}" />
+						</vlayout>
+					</groupbox>
+					<space vflex="1" />
+					<groupbox closable="false"
+						title="${labels.cwfmessagebox.main.group.options.caption}">
+						<div align="center" sclass="btn-group-vertical" width="100%">
+							<button id="btnSchedule" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.schedule.label}" />
+							<button id="btnRefresh" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.refresh.label}" />
+						</div>
+					</groupbox>
+					<groupbox closable="false"
+						title="${labels.cwfmessagebox.main.group.process.caption}">
+						<div align="center" sclass="btn-group-vertical" width="100%">
+							<button id="btnAll" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.all.label}" />
+							<button id="btnSelected" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.selected.label}" />
+							<button id="btnInfoAll" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.infoonly.label}" />
+							<button id="btnForward" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.forward.label}" />
+							<button id="btnDelete" zclass="btn" sclass="btn-default btn-sm"
+								label="${labels.cwfmessagebox.main.button.delete.label}" />
+						</div>
+					</groupbox>
+				</div>
+			</east>
+		</borderlayout>
+		<image id="imgIndicator" src="${iconIndicator}"
+			style="position:absolute;left:0" visible="false" />
+	</div>
+	
+	<menuitem self="@define(sharedFormsMenu)" id="mnuRefresh"
+		label="${labels.cwf.btn.refresh.label}" />
+	
+</zk>

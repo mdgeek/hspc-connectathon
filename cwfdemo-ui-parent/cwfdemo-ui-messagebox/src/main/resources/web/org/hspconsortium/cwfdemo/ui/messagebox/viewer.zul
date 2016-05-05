@@ -1,0 +1,33 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<window mode="overlapped" width="500px" mold="bootstrap"
+		sclass="panel-primary panel-sm"
+		apply="${cwfMessageboxViewerController}" visible="false"
+		position="center">
+		<caption id="caption" label="${labels.cwfmessagebox.viewer.title}" />
+		<vlayout hflex="1">
+			<label id="lblHeader" style="font-weight:bold" />
+			<textbox id="txtMessage" readonly="true" multiline="true" 
+				vflex="min" hflex="1" style="max-height:250px"/>
+			<toolbar align="center" style="border-top: 1px solid lightgray">
+				<label value="${labels.cwfmessagebox.viewer.action.select}" 
+					style="display:block"/>
+				<button id="btnDelete" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.delete.label}" />
+				<button id="btnSkip" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.skip.label}" />
+				<button id="btnCancel" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.cancel.label}" />
+				<button id="btnDeleteAll" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.deleteall.label}" />
+				<button id="btnSkipAll" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.skipall.label}" />
+				<button id="btnView" zclass="btn" sclass="btn-sm btn-default"
+					label="${labels.cwfmessagebox.viewer.button.view.label}" />
+			</toolbar>
+		</vlayout>
+	</window>
+</zk>

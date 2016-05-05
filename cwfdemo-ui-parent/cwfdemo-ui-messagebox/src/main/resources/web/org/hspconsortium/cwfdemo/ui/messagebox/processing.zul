@@ -1,0 +1,14 @@
+<zk>
+	<window sclass="panel-info panel-sm" 
+		apply="${cwfMessageboxProcessingController}" mode="overlapped"
+		position="right,bottom" mold="bootstrap" visible="false">
+		<caption id="caption" />
+		<div align="center">
+			<button id="btnNext" zclass="btn"
+				sclass="btn-success btn-xs"
+				label="${labels.cwfmessagebox.processing.button.next.label}" />
+			<button id="btnStop" zclass="btn" sclass="btn-danger btn-xs"
+				label="${labels.cwfmessagebox.processing.button.stop.label}" />
+		</div>
+	</window>
+</zk>

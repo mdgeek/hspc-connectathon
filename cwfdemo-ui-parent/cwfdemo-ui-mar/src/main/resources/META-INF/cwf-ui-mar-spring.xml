@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:cwp="http://www.carewebframework.org/schema/plugin"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+		http://www.carewebframework.org/schema/plugin http://www.carewebframework.org/schema/plugin/plugin-extensions.xsd">
+
+<!-- This profile is processed during web server startup -->
+	
+	<beans profile="root">
+		
+		<!-- This is the sample definition for a CareWeb plugin -->
+		<cwp:plugin id="cwfMar" name="Medication Administration" 
+			url="~./org/hspconsortium/cwfdemo/ui/mar/main.zul">
+			<cwp:serialization>
+				<cwp:property name="Banner" id="banner" type="text" description="This is my new custom banner property"/>
+				<cwp:property name="Color" id="color" type="color" description="This is my new custom color property"/>
+			</cwp:serialization>
+		</cwp:plugin>
+		
+	</beans>
+	
+<!-- This profile is processed for each managed desktop. -->
+
+	<beans profile="desktop">
+		<bean id="cwfMarMainController" scope="prototype"
+			class="org.hspconsortium.cwfdemo.ui.mar.controller.MainController">
+			<constructor-arg ref="cwfEPSService" />
+			<constructor-arg ref="fhirMedicationService" />
+		</bean>
+		
+		<bean id="cwfMarAdminController" scope="prototype"
+			class="org.hspconsortium.cwfdemo.ui.mar.controller.SimpleMedicationAdministrationController">
+			<constructor-arg ref="cwfEPSService" />
+			<constructor-arg ref="fhirMedicationService" />
+		</bean>
+	</beans>
+	
+</beans>

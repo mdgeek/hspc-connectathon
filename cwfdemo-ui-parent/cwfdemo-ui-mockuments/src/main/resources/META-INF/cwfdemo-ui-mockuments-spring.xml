@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cwp="http://www.carewebframework.org/schema/plugin"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.carewebframework.org/schema/plugin
+		 http://www.carewebframework.org/schema/plugin/plugin-extensions.xsd">
+
+	<beans profile="root">
+
+		<cwp:plugin
+			url="~./org/hspconsortium/cwfdemo/ui/mockuments/documents.zul"
+			id="cwfMockuments" name="Mock Documents Display">
+			<cwp:resource>
+				<cwp:help-resource module="cwfMockumentsHelp" />
+			</cwp:resource>
+
+			<cwp:serialization>
+				<cwp:property name="Fixed Category" id="fixedFilter" type="enum" 
+					description="To restrict documents to a specific category, set this to the category name." >
+					<cwp:config>
+						<cwp:entry key="bean">documentTypeEnumerator</cwp:entry>
+					</cwp:config>
+				</cwp:property>
+			</cwp:serialization>
+
+			<cwp:security requiresAll="false">
+			</cwp:security>
+		</cwp:plugin>
+
+	</beans>
+
+	<beans profile="desktop">
+
+		<!-- Presentation Layer -->
+		<bean id="cwfMockumentsDocumentListRenderer"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.DocumentListRenderer" />
+
+		<!-- Controllers -->
+		<bean id="cwfMockumentsMainController"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.DocumentMainController"
+			scope="prototype">
+			<property name="listController" ref="cwfMockumentsListController" />
+			<property name="displayController" ref="cwfMockumentsDisplayController" />
+		</bean>
+
+		<bean id="cwfMockumentsListController"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.DocumentListController"
+			scope="prototype">
+			<constructor-arg ref="fhirDocumentService" />
+			<property name="itemRenderer" ref="cwfMockumentsDocumentListRenderer" />
+		</bean>
+
+		<bean id="cwfMockumentsDisplayController"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController"
+			scope="prototype">
+		</bean>
+
+		<bean id="cwfMockumentsQuestionnaireController"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.QuestionnaireController"
+			scope="prototype">
+			<constructor-arg ref="fhirDocumentService" />
+		</bean>
+
+	</beans>
+</beans>

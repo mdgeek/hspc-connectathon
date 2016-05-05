@@ -1,0 +1,30 @@
+@CHARSET "UTF-8";
+
+/* CSS for printing of clinical documents. */
+
+* {
+	width: 100% !important;
+	overflow: visible !important;
+	border: none !important;
+}
+
+.z-listbox, .z-listbox-body {
+	height: auto !important;
+}
+
+.z-listitem-seld {
+	background-image: none!important;
+}
+
+.cwf-mockuments-sep {
+	page-break-before: always;
+	background-color: black;
+	height: 3px;
+	margin: 10px 0 10px 0;
+}
+
+.z-listitem:first-child .cwf-mockuments-sep,
+.cwf-mockuments-lstList tbody>tr>td:first-child,
+.cwf-mockuments-lstList tbody>tr>th:first-child {
+    display: none;
+}

@@ -1,0 +1,21 @@
+@CHARSET "UTF-8";
+
+.cwfMessagebox .z-east .z-groupbox > div {
+	border-left: none;
+	border-right: none;
+	border-bottom: none;
+}
+
+.cwfMessagebox-legend .z-vlayout {
+	margin-left: 20px;
+	border-top: 1px solid lightgray;
+	padding-top: 5px;
+}
+
+.cwfMessagebox-legend img {
+	margin-right: 5px;
+}
+
+.cwfMessagebox-legend .z-a[disabled] {
+	color: black;
+}

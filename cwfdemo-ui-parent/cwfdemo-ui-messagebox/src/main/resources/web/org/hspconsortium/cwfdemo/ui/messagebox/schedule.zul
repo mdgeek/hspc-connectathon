@@ -1,0 +1,48 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<window title="Schedule a Message" mode="modal" height="500px" width="500px"
+		apply="${cwfMessageboxScheduleController}" mold="bootstrap">
+		<vlayout hflex="1" vflex="1" style="padding: 10px">
+			<hlayout id="pnlAssociate">
+				<checkbox id="chkAssociate" />
+				<label value="${labels.cwfmessagebox.schedule.input.associate.label}" />
+				<label id="lblPatient" />
+			</hlayout>
+			<separator />
+			<hbox hflex="1" spacing="20px">
+				<cell hflex="2">
+					<label value="${labels.cwfmessagebox.schedule.input.deliver.label}" />
+				</cell>
+				<cell hflex="1">
+					<label value="${labels.cwfmessagebox.schedule.input.urgency.label}" />
+				</cell>
+			</hbox>
+			<hbox hflex="1" spacing="20px">
+				<cell hflex="2">
+					<datetimebox id="dtbDelivery" requireTime="true" hflex="1" />
+				</cell>
+				<cell hflex="1">
+					<combobox id="cboUrgency" readonly="true" hflex="1" />
+				</cell>
+			</hbox>
+			<label value="${labels.cwfmessagebox.schedule.input.subject.label}" />
+			<textbox id="txtSubject" hflex="1" focus="true" />
+			<label value="${labels.cwfmessagebox.schedule.input.recipients.label}" />
+			<hlayout>
+				<textbox id="txtRecipients" readonly="true" hflex="1" />
+				<button id="btnRecipients" zclass="btn" sclass="btn-default btn-xs" label="..." />
+			</hlayout>
+			<label value="${labels.cwfmessagebox.schedule.input.message.label}" />
+			<textbox id="txtMessage" multiline="true" hflex="1" vflex="1" />
+			<toolbar align="end">
+				<button id="btnOK" zclass="btn" sclass="btn-sm btn-success" 
+					label="${labels.cwfmessagebox.schedule.button.ok.label}" />
+				<button id="btnCancel" zclass="btn" sclass="btn-sm btn-danger"
+					label="${labels.cwfmessagebox.schedule.button.cancel.label}" forward="onClick=onClose" />
+			</toolbar>
+		</vlayout>
+	</window>
+</zk>

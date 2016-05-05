@@ -1,0 +1,75 @@
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:w="http://www.zkoss.org/2005/zk/client"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul
+		http://www.zkoss.org/2005/zul/zul.xsd">
+	<window title="${labels.marplugin.button.medadmin.label}"
+		width="400" height="250" mode="modal" mold="bootstrap"
+		apply="${cwfMarAdminController}" sclass="panel-primary cwf-demoConfig">
+		<div id="medEntryForm">
+			<grid hflex="min">
+				<columns>
+					<column hflex="min" align="right" />
+					<column hflex="min" />
+					<column hflex="min" align="right" />
+					<column hflex="min" />
+				</columns>
+				<rows>
+					<row style="background:#FFFFFF;">
+						<label value="Dispensable:" />
+						<cell colspan="3">
+							<combobox id="medSelector" readonly="true"
+								tooltiptext="Ordered medications" hflex="1"
+								constraint="no empty: Please select medication">
+								<template name="model">
+									<comboitem label="${each}" />
+								</template>
+							</combobox>
+						</cell>
+					</row>
+					<row style="background:#FFFFFF;">
+						<label value="Dose Quantity:" />
+						<decimalbox id="doseQuantity"
+							constraint="no empty: Please add dose" />
+						<label value="Dose Unit" />
+						<combobox id="doseUnitSelector" readonly="true"
+							tooltiptext="Dose unit"
+							constraint="no empty: Please select unit">
+							<template name="model">
+								<comboitem label="${each}" />
+							</template>
+						</combobox>
+					</row>
+					<row style="background:#FFFFFF;">
+						<label value="Route:" />
+						<combobox id="routeOfAdminSelector"
+							readonly="true"
+							tooltiptext="Route of administration"
+							constraint="no empty">
+							<template name="model">
+								<comboitem label="${each}" />
+							</template>
+						</combobox>
+						<cell colspan="2"></cell>
+					</row>
+					<row style="background:#FFFFFF;">
+						<label value="Administration Notes:" />
+						<cell colspan="3">
+							<textbox id="txReason" rows="5" cols="60" />
+						</cell>
+					</row>
+					<row style="background:#FFFFFF;">
+						<cell colspan="4">
+							<span style="float:right;">
+								<button id="btnMarAdminister"
+									label="${labels.marplugin.button.administer.label}"
+									tooltiptext="${labels.marplugin.button.administer.tooltip}" />
+							</span>
+						</cell>
+					</row>
+				</rows>
+			</grid>
+		</div>
+	</window>
+</zk>

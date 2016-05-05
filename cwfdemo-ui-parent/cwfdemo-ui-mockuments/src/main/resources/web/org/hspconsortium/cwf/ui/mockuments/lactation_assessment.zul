@@ -1,0 +1,226 @@
+<idspace sclass="cwf-radio-wrap" height="100%" width="100%" 
+	apply="${cwfMockumentsQuestionnaireController}">
+	<custom-attributes 
+		generated_resource="QuestionnaireResponse"
+		questionnaire_reference="Questionnaire/questionnaire-breastfeeding-readiness-assessment"
+	/>
+	<style>
+	  	.cwf-radio-wrap .z-radio > .z-radio-content {
+	  		display:inline; 
+	  		padding-left:2px
+	  	}
+  	</style>
+  
+	<radiogroup id="rg1"/>
+	<radiogroup id="rg2"/>
+	<radiogroup id="rg3"/>
+
+	<grid sizedByContent="true" width="100%">
+		<columns>
+			<column align="right"/>
+			<column/>
+			<column/>
+			<column hflex="1"/>
+		</columns>
+		<rows>
+			<row style="text-align:left!important">
+				<label id="lblPatientName" value="Patient: Last, First" style="font-weight:bold"/>
+				<labeledelement label="Location:">
+					<combobox id="cboLocation" width="80%" readonly="true">
+						<comboitem label="Recovery Room"/>
+					</combobox>
+				</labeledelement>
+				<labeledelement label="Effective D&amp;T:">
+					<datebox id="datEffective"/>
+				</labeledelement>
+			</row>
+			<row>
+				<label id="rg1_0" value="Breast Feeding Intention:" style="font-weight:bold"/>
+				<cell colspan="3">
+					<radio id="rg1_1" radiogroup="rg1" 
+						label="Mother wants to provide breast milk exclusively">
+						<custom-attributes 
+							linkId="breast-feeding-intention" 
+							text="${rg1_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-intention"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg1_2" radiogroup="rg1" 
+						label="Mother does not want to provide breast milk exclusively">
+						<custom-attributes 
+							linkId="breast-feeding-intention" 
+							text="${rg1_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-intention"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg1_3" radiogroup="rg1" 
+						label="Mother wants to provide formula exclusively">
+						<custom-attributes 
+							linkId="breast-feeding-intention" 
+							text="${rg1_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-intention"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg1_4" radiogroup="rg1" 
+						label="Mother does not want to provide breast milk exclusively">
+						<custom-attributes 
+							linkId="breast-feeding-intention" 
+							text="${rg1_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-intention"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg1_5" radiogroup="rg1" 
+						label="Unknown">
+						<custom-attributes 
+							linkId="breast-feeding-intention" 
+							text="${rg1_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-intention"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<label id="rg2_0" value="Answer if not exclusive BM:" style="font-weight:bold"/>
+				<cell colspan="3">
+					<radio id="rg2_1" radiogroup="rg2" 
+						label="Mother given comprehensive education per protocol">
+						<custom-attributes 
+							linkId="breast-feeding-education" 
+							text="${rg2_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-education"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg2_2" radiogroup="rg2" 
+						label="Mother not given comprehensive education per protocol">
+						<custom-attributes 
+							linkId="breast-feeding-education" 
+							text="${rg2_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-education"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<label id="rg3_0" value="Exclusion Criteria:" style="font-weight:bold"/>
+				<cell colspan="3">
+					<radio id="rg3_1" radiogroup="rg3" 
+						label="Infant positive for galactosemia-1">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg3_2" radiogroup="rg3" 
+						label="Mother has active herpetic lesions on both breasts">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg3_3" radiogroup="rg3" 
+						label="Maternal use of drugs of abuse, antimetabolites, chemotherapeutic agents, or radioisotopes">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg3_4" radiogroup="rg3" 
+						label="Mother has human T-cell lymphotropic virus type I or type II">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg3_5" radiogroup="rg3" 
+						label="Mother has HIV">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+			<row>
+				<div/>
+				<cell colspan="3">
+					<radio id="rg3_6" radiogroup="rg3" 
+						label="Other">
+						<custom-attributes 
+							linkId="breast-feeding-exclusion" 
+							text="${rg3_0.value}"
+							display="${self.label}"
+							system="http://example.org/codesystem-breastfeeding-exclusion"
+						/>
+					</radio>
+				</cell>
+			</row>
+		</rows>
+	</grid>
+	<toolbar id="toolbar" visible="false">
+		<button id="btnSave" zclass="btn" sclass="btn-success btn-xs" label="Save Draft"/>
+		<button id="btnDelete" zclass="btn" sclass="btn-danger btn-xs" label="Delete"/>
+		<button id="btnSign" zclass="btn" sclass="btn-primary btn-xs" label="Sign"/>
+	</toolbar>
+</idspace>

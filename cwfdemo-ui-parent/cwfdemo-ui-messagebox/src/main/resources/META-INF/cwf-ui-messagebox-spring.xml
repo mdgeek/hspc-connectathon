@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cwp="http://www.carewebframework.org/schema/plugin" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.carewebframework.org/schema/plugin
+		 http://www.carewebframework.org/schema/plugin/plugin-extensions.xsd">
+
+	<beans profile="root">
+
+		<cwp:plugin url="~./org/hspconsortium/cwfdemo/ui/messagebox/main.zul"
+			id="cwfMessagebox" name="Message Viewer" lazyLoad="false">
+			<cwp:serialization>
+				<cwp:property id="caption" name="Title Caption" type="text"
+					description="Text for the title caption." />
+				<cwp:property id="color1" name="Caption Color 1" type="color"
+					description="Starting color for caption gradient." />
+				<cwp:property id="color2" name="Caption Color 2" type="color"
+					description="Ending color for caption gradient." />
+				<cwp:property id="captionStyle" name="Caption Style"
+					type="enum" description="Style of caption.">
+					<cwp:config>
+						<cwp:entry key="class">org.carewebframework.ui.sharedforms.CaptionedForm$CaptionStyle</cwp:entry>
+					</cwp:config>
+				</cwp:property>
+				<cwp:property id="color" name="Background Color" type="color"
+					description="Background color." />
+				<cwp:property id="alertDuration" name="Alert Duration" type="integer"
+					description="How long (in seconds) a message alert will persist.">
+					<cwp:config>
+						<cwp:entry key="min">1</cwp:entry>
+						<cwp:entry key="max">99999</cwp:entry>
+					</cwp:config>
+				</cwp:property>
+				<cwp:property id="alertThreshold" name="Alert Threshold"
+					type="enum" 
+					description="You will be alerted of new messages with priorities at or above this threshold.">
+					<cwp:config>
+						<cwp:entry key="class">org.hspconsortium.cwf.api.ucs.Urgency</cwp:entry>
+					</cwp:config>
+				</cwp:property>
+				<cwp:property id="showAll" name="Show All Messages"
+					type="boolean"
+					description="If true, all messages are shown.  If false, only those associated with the current patient are shown" />
+			</cwp:serialization>
+			<cwp:resource>
+				<cwp:help-resource module="cwfMessageboxHelp" />
+				<cwp:css-resource url="~./org/hspconsortium/cwfdemo/ui/messagebox/messagebox.css" />
+			</cwp:resource>
+		</cwp:plugin>
+
+	</beans>
+
+	<beans profile="desktop">
+
+		<bean id="cwfMessageboxMainController" class="org.hspconsortium.cwfdemo.ui.messagebox.MainController"
+			scope="prototype">
+			<property name="messageService" ref="cwfMessageService" />
+		</bean>
+
+		<bean id="cwfMessageboxSchedulingController" class="org.hspconsortium.cwfdemo.ui.messagebox.SchedulingController"
+			scope="prototype">
+			<property name="messageService" ref="cwfMessageService" />
+		</bean>
+
+		<bean id="cwfMessageboxScheduleController" class="org.hspconsortium.cwfdemo.ui.messagebox.ScheduleController"
+			scope="prototype">
+			<property name="messageService" ref="cwfMessageService" />
+		</bean>
+
+		<bean id="cwfMessageboxViewerController" class="org.hspconsortium.cwfdemo.ui.messagebox.ViewerController"
+			scope="prototype" />
+
+		<bean id="cwfMessageboxRecipientsController" class="org.hspconsortium.cwfdemo.ui.messagebox.RecipientsController"
+			scope="prototype">
+			<property name="messageService" ref="cwfMessageService" />
+		</bean>
+
+		<bean id="cwfMessageboxProcessingController" class="org.hspconsortium.cwfdemo.ui.messagebox.ProcessingController"
+			scope="prototype" />
+
+	</beans>
+
+</beans>
