@@ -143,6 +143,7 @@
 			<artifactId>cwf-ui-procedures</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<!-- Demo Components -->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-messagebox</artifactId>
