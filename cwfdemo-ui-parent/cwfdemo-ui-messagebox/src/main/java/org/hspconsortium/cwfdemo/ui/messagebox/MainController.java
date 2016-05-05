@@ -58,10 +58,10 @@ import org.zkoss.zul.event.ListDataListener;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
-import org.hspconsortium.cwf.api.ucs.MessageService;
-import org.hspconsortium.cwf.api.ucs.MessageWrapper;
-import org.hspconsortium.cwf.api.ucs.Urgency;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
+import org.hspconsortium.cwfdemo.api.ucs.MessageService;
+import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
+import org.hspconsortium.cwfdemo.api.ucs.Urgency;
 import org.socraticgrid.hl7.services.uc.model.Message;
 import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
 

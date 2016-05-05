@@ -48,10 +48,10 @@ import org.zkoss.zul.Window;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
-import org.hspconsortium.cwf.api.ucs.MessageService;
-import org.hspconsortium.cwf.api.ucs.ScheduledMessage;
-import org.hspconsortium.cwf.api.ucs.Urgency;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
+import org.hspconsortium.cwfdemo.api.ucs.MessageService;
+import org.hspconsortium.cwfdemo.api.ucs.ScheduledMessage;
+import org.hspconsortium.cwfdemo.api.ucs.Urgency;
 import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
 
 /**

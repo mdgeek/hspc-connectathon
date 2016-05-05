@@ -59,10 +59,10 @@ import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Quantity;
 import org.hl7.fhir.dstu3.model.Timing;
 import org.hl7.fhir.dstu3.model.Timing.TimingRepeatComponent;
-import org.hspconsortium.cwf.api.eps.EPSService;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.medication.MedicationService;
+import org.hspconsortium.cwfdemo.api.eps.EPSService;
 import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
 
 /**

@@ -34,8 +34,8 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 
-import org.hspconsortium.cwf.api.ucs.MessageService;
-import org.hspconsortium.cwf.api.ucs.ScheduledMessage;
+import org.hspconsortium.cwfdemo.api.ucs.MessageService;
+import org.hspconsortium.cwfdemo.api.ucs.ScheduledMessage;
 
 /**
  * Controller for viewing scheduled messages.

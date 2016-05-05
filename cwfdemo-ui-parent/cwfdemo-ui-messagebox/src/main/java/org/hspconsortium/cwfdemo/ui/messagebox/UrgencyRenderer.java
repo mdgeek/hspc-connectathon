@@ -21,7 +21,7 @@ package org.hspconsortium.cwfdemo.ui.messagebox;
 
 import org.carewebframework.common.StrUtil;
 
-import org.hspconsortium.cwf.api.ucs.Urgency;
+import org.hspconsortium.cwfdemo.api.ucs.Urgency;
 
 /**
  * Helper methods for rendering urgency.

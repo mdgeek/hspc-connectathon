@@ -37,7 +37,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 
-import org.hspconsortium.cwf.api.ucs.MessageService;
+import org.hspconsortium.cwfdemo.api.ucs.MessageService;
 import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
 
 /**

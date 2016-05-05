@@ -22,7 +22,7 @@ package org.hspconsortium.cwfdemo.ui.messagebox;
 import org.carewebframework.ui.icons.IconUtil;
 import org.carewebframework.ui.zk.ZKUtil;
 
-import org.hspconsortium.cwf.api.ucs.Urgency;
+import org.hspconsortium.cwfdemo.api.ucs.Urgency;
 
 public class Constants {
     

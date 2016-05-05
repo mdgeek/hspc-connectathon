@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cwf="http://www.carewebframework.org/schema/spring" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.carewebframework.org/schema/spring
+		 http://www.carewebframework.org/schema/spring/spring-extensions.xsd">
+
+	<beans profile="root">
+
+		<bean id="cwfEPSService" init-method="init" destroy-method="destroy"
+			class="org.hspconsortium.cwfdemo.api.eps.EPSService">
+			<constructor-arg ref="fhirContext" />
+			<constructor-arg value="${org.socraticgrid.hl7.eps.endpoint}" />
+		</bean>
+		
+	</beans>
+
+	<beans profile="desktop">
+
+		<!-- globalEventDispatcher: Mediates communications between the local and 
+			the global event manager, in this case an EPS server. -->
+		<bean id="globalEventDispatcher" init-method="init"
+			destroy-method="destroy" cwf:override="always"
+			class="org.hspconsortium.cwfdemo.api.eps.GlobalEventDispatcher">
+			<constructor-arg ref="cwfEPSService" />
+			<property name="localEventDispatcher" ref="eventManager" />
+		</bean>
+
+	</beans>
+</beans>

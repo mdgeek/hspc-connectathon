@@ -70,18 +70,6 @@
 			<artifactId>log4j</artifactId>
 		</dependency>
 		<!-- HSPC Services -->
-		<!--
-		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwf-api-eps</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		-->
-		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwf-api-ucs</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwf-ui-smart</artifactId>
@@ -144,6 +132,16 @@
 			<version>${project.parent.version}</version>
 		</dependency>
 		<!-- Demo Components -->
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-api-eps</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-api-ucs</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-messagebox</artifactId>

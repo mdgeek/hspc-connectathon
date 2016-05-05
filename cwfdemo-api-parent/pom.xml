@@ -13,6 +13,8 @@
 
 	<modules>
 		<module>cwfdemo-api-core</module>
+		<module>cwfdemo-api-eps</module>
+		<module>cwfdemo-api-ucs</module>
 	</modules>
 	
 	<dependencyManagement>

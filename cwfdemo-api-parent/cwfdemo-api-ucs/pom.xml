@@ -1,29 +1,31 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
+	
 	<parent>
 		<groupId>org.hspconsortium.carewebframework</groupId>
-		<artifactId>cwfdemo-ui-parent</artifactId>
+		<artifactId>cwfdemo-api-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	
-	<artifactId>cwfdemo-ui-mar</artifactId>
-	<name>Medication Administration Record</name>
-
+	<artifactId>cwfdemo-api-ucs</artifactId>
+	<name>Unified Communication Service Support</name>
+	
 	<dependencies>
 		<dependency>
-			<groupId>org.carewebframework</groupId>
-			<artifactId>org.carewebframework.shell</artifactId>
-		</dependency>
-		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwf-ui-reporting</artifactId>
+			<artifactId>cwf-api-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-api-eps</artifactId>
-			<version>${project.parent.version}</version>
+			<groupId>org.socraticgrid.hl7</groupId>
+			<artifactId>ucs-nifi-api</artifactId>
+			<version>${ucs-nifi.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>logback-classic</artifactId>
+					<groupId>ch.qos.logback</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

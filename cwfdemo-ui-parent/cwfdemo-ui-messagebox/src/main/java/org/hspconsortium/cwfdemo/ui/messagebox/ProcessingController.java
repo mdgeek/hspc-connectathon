@@ -40,7 +40,7 @@ import org.zkoss.zul.Window;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
-import org.hspconsortium.cwf.api.ucs.MessageWrapper;
+import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
 import org.hspconsortium.cwfdemo.ui.messagebox.ViewerController.Action;
 import org.hspconsortium.cwfdemo.ui.messagebox.ViewerController.ActionEvent;
 

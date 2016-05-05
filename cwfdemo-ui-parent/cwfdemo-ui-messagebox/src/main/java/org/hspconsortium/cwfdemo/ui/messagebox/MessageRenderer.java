@@ -24,7 +24,7 @@ import org.carewebframework.ui.zk.AbstractListitemRenderer;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zul.Listitem;
 
-import org.hspconsortium.cwf.api.ucs.MessageWrapper;
+import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
 
 public class MessageRenderer extends AbstractListitemRenderer<MessageWrapper, Object> {
     

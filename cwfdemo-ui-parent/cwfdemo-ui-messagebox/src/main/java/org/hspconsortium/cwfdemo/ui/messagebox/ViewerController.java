@@ -35,7 +35,7 @@ import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
 
-import org.hspconsortium.cwf.api.ucs.MessageWrapper;
+import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
 
 /**
  * Controller for individual message display.
@@ -139,7 +139,8 @@ public class ViewerController extends FrameworkController {
      * Delete the message.
      */
     public void onClick$btnDelete() {
-        if (PromptDialog.confirm(StrUtil.formatMessage("@cwfmessagebox.viewer.delete.confirm.prompt", message.getSubject()))) {
+        if (PromptDialog
+                .confirm(StrUtil.formatMessage("@cwfmessagebox.viewer.delete.confirm.prompt", message.getSubject()))) {
             onAction(Action.DELETE);
         }
     }

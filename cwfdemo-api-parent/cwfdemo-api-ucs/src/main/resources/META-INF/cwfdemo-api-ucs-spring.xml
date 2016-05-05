@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cwf="http://www.carewebframework.org/schema/spring" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans 
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.carewebframework.org/schema/spring
+		 http://www.carewebframework.org/schema/spring/spring-extensions.xsd">
+
+	<beans profile="root">
+
+		<bean id="cwfMessageService" init-method="init" destroy-method="destroy"
+			class="org.hspconsortium.cwfdemo.api.ucs.MessageService">
+			<constructor-arg ref="propertyService" />
+			<constructor-arg>
+				<bean class="org.hspconsortium.cwfdemo.api.ucs.MessageServiceConfigurator" />
+			</constructor-arg>
+		</bean>
+		
+	</beans>
+
+</beans>
