@@ -3,12 +3,12 @@
 	
 	<parent>
 		<groupId>org.hspconsortium.carewebframework</groupId>
-		<artifactId>cwf-webapp-parent</artifactId>
+		<artifactId>cwfdemo-webapp-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	
 	<name>Web App Demo</name>
-	<artifactId>cwf-webapp-montreal</artifactId>
+	<artifactId>cwfdemo-webapp-montreal</artifactId>
 	<packaging>war</packaging>
 	
 	<description>

@@ -11,7 +11,7 @@
 				hint="Refresh patient data."
 				label="Refresh" />
 			<menuitem
-				action="zscript:org.hspconsortium.cwf.ui.democonfig.controller.DemoConfigController.show();"
+				action="zscript:org.hspconsortium.cwfdemo.ui.democonfig.controller.DemoConfigController.show();"
 				hint="Configure demo data."
 				label="Configure Demo" />
 		</menuitem>

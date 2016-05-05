@@ -11,6 +11,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>cwf-webapp-montreal</module>
+		<module>cwfdemo-webapp-montreal</module>
 	</modules>
 </project>
