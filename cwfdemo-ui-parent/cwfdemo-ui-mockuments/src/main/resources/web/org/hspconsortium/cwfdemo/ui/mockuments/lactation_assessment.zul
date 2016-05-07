@@ -1,7 +1,7 @@
 <idspace sclass="cwf-radio-wrap" height="100%" width="100%" 
 	apply="${cwfMockumentsQuestionnaireController}">
 	<custom-attributes 
-		handler_id="questionnaire-response"
+		handler_id="questionnaire-response,risk-assessment"
 		questionnaire_reference="Questionnaire/questionnaire-breastfeeding-readiness-assessment"
 	/>
 	<style>
@@ -41,7 +41,8 @@
 							linkId="breast-feeding-intention" 
 							text="${rg1_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-intention"
+							code="169643005"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>
@@ -55,7 +56,8 @@
 							linkId="breast-feeding-intention" 
 							text="${rg1_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-intention"
+							code="169641007"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>
@@ -69,7 +71,8 @@
 							linkId="breast-feeding-intention" 
 							text="${rg1_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-intention"
+							code="169644004"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>
@@ -78,26 +81,13 @@
 				<div/>
 				<cell colspan="3">
 					<radio id="rg1_4" radiogroup="rg1" 
-						label="Mother does not want to provide breast milk exclusively">
-						<custom-attributes 
-							linkId="breast-feeding-intention" 
-							text="${rg1_0.value}"
-							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-intention"
-						/>
-					</radio>
-				</cell>
-			</row>
-			<row>
-				<div/>
-				<cell colspan="3">
-					<radio id="rg1_5" radiogroup="rg1" 
 						label="Unknown">
 						<custom-attributes 
 							linkId="breast-feeding-intention" 
 							text="${rg1_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-intention"
+							code="169641007"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>
@@ -111,7 +101,8 @@
 							linkId="breast-feeding-education" 
 							text="${rg2_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-education"
+							code="438650006"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>
@@ -125,7 +116,8 @@
 							linkId="breast-feeding-education" 
 							text="${rg2_0.value}"
 							display="${self.label}"
-							system="http://example.org/codesystem-breastfeeding-education"
+							code="262008008"
+							system="http://snomed.info/sct"
 						/>
 					</radio>
 				</cell>

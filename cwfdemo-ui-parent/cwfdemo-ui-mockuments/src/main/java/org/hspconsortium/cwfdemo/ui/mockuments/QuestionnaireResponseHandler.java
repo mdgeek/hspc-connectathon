@@ -71,7 +71,8 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
                     answer.setValue(coding);
                     coding.setSystem((String) target.getAttribute("system"));
                     coding.setDisplay((String) target.getAttribute("display"));
-                    coding.setCode(value);
+                    String code = (String) target.getAttribute("code");
+                    coding.setCode(code == null ? value : code);
                 }
             };
         });

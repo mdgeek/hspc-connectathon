@@ -44,6 +44,10 @@
 		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.ProcedureRequestHandler">
 			<constructor-arg ref="fhirDocumentService" />
 		</bean>
+		
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.RiskAssessmentHandler">
+			<constructor-arg ref="fhirDocumentService" />
+		</bean>
 	</beans>
 
 	<beans profile="desktop">
