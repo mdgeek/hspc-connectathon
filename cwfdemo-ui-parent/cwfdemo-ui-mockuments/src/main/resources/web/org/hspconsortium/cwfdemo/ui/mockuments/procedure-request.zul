@@ -1,7 +1,7 @@
 <idspace sclass="cwf-radio-wrap" height="100%" width="100%" 
 	apply="${cwfMockumentsQuestionnaireController}">
 	<custom-attributes 
-		generated_resource="ProcedureRequest"
+		handler_id="procedure-request"
 	/>
   
 	<grid sizedByContent="true" width="100%">

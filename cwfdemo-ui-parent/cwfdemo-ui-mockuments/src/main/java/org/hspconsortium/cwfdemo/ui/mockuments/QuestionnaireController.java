@@ -19,7 +19,9 @@
  */
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.carewebframework.common.MiscUtil;
 import org.carewebframework.common.XMLUtil;
@@ -37,18 +39,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 
-import org.hl7.fhir.dstu3.model.Annotation;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Patient;
-import org.hl7.fhir.dstu3.model.ProcedureRequest;
-import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
-import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestStatus;
-import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
-import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent;
-import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
-import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.FhirTerminology;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
@@ -69,19 +60,6 @@ public class QuestionnaireController extends FrameworkController implements IDoc
     
     private static final long serialVersionUID = 1L;
     
-    private interface IResponseProcessor {
-        
-        
-        void process(String value, Component target);
-    }
-    
-    //@formatter:off
-    private enum GeneratedResource {
-        QUESTIONNAIRERESPONSE,
-        PROCEDUREREQUEST
-    };
-    //@formatter:on
-    
     private Label lblPatientName;
     
     private Component toolbar;
@@ -90,14 +68,17 @@ public class QuestionnaireController extends FrameworkController implements IDoc
     
     private Document document;
     
-    private GeneratedResource generatedResource;
+    private final List<IQuestionnaireHandler> questionnaireHandlers = new ArrayList<>();
     
     private DocumentDisplayController controller;
     
     private boolean modified;
     
-    public QuestionnaireController(DocumentService service) {
+    final QuestionnaireHandlerRegistry registry;
+    
+    public QuestionnaireController(DocumentService service, QuestionnaireHandlerRegistry registry) {
         this.service = service;
+        this.registry = registry;
     }
     
     @Override
@@ -106,10 +87,19 @@ public class QuestionnaireController extends FrameworkController implements IDoc
         
         if (!"draft".equalsIgnoreCase(document.getStatus())) {
             disableAll();
-            generatedResource = null;
         } else {
-            String gr = (String) comp.getAttribute("generated_resource");
-            generatedResource = gr == null ? null : GeneratedResource.valueOf(gr.toUpperCase());
+            String questionnaireIds = (String) comp.getAttribute("handler_id");
+            
+            if (questionnaireIds != null) {
+                for (String id : questionnaireIds.split("\\,")) {
+                    IQuestionnaireHandler questionnaireHandler = registry.get(id);
+                    
+                    if (questionnaireHandler != null) {
+                        questionnaireHandlers.add(questionnaireHandler);
+                    }
+                }
+            }
+            
             ZKUtil.wireChangeEvents(comp, comp, "onChanged");
             controller.setDocumentOperation(this);
             
@@ -238,102 +228,10 @@ public class QuestionnaireController extends FrameworkController implements IDoc
         }
     }
     
-    private void createResource(org.w3c.dom.Document responses) {
-        if (generatedResource == null) {
-            return;
+    private void invokeHandlers(org.w3c.dom.Document responses) {
+        for (IQuestionnaireHandler handler : questionnaireHandlers) {
+            handler.processResponses(document, root, responses);
         }
-        
-        IBaseResource resource = null;
-        
-        switch (generatedResource) {
-            case QUESTIONNAIRERESPONSE:
-                resource = buildQuestionnaireResponse(responses);
-                break;
-            
-            case PROCEDUREREQUEST:
-                resource = buildProcedureRequest(responses);
-                break;
-            
-        }
-        
-        if (resource != null) {
-            service.createResource(resource);
-        }
-    }
-    
-    private void processResponses(org.w3c.dom.Document responses, IResponseProcessor processor) {
-        NodeList nodeList = responses.getElementsByTagName("response");
-        
-        for (int i = 0; i < nodeList.getLength(); i++) {
-            Node response = nodeList.item(i);
-            NamedNodeMap attr = response.getAttributes();
-            String value = attr.getNamedItem("value").getNodeValue();
-            String id = attr.getNamedItem("target").getNodeValue();
-            Component target = root.getFellowIfAny(id);
-            processor.process(value, target);
-        }
-    }
-    
-    private QuestionnaireResponse buildQuestionnaireResponse(org.w3c.dom.Document responses) {
-        final QuestionnaireResponse qr = new QuestionnaireResponse();
-        //String ref = (String) root.getAttribute("questionnaire_reference");
-        //qr.setQuestionnaire(ref == null ? null : new Reference(ref));
-        qr.setSubject(document.getReference().getSubject());
-        qr.setAuthor(FhirUtil.getFirst(document.getReference().getAuthor()));
-        qr.setStatus(QuestionnaireResponseStatus.COMPLETED);
-        qr.setAuthored(new Date());
-        
-        processResponses(responses, new IResponseProcessor() {
-            
-            
-            @Override
-            public void process(String value, Component target) {
-                if (target.hasAttribute("linkId")) {
-                    QuestionnaireResponseItemComponent item = new QuestionnaireResponseItemComponent();
-                    qr.addItem(item);
-                    item.setLinkId((String) target.getAttribute("linkId"));
-                    item.setText((String) target.getAttribute("text"));
-                    QuestionnaireResponseItemAnswerComponent answer = new QuestionnaireResponseItemAnswerComponent();
-                    item.addAnswer(answer);
-                    Coding coding = new Coding();
-                    answer.setValue(coding);
-                    coding.setSystem((String) target.getAttribute("system"));
-                    coding.setDisplay((String) target.getAttribute("display"));
-                    coding.setCode(value);
-                }
-            };
-        });
-        
-        return qr;
-    }
-    
-    private ProcedureRequest buildProcedureRequest(org.w3c.dom.Document responses) {
-        final ProcedureRequest pr = new ProcedureRequest();
-        pr.setSubject(document.getReference().getSubject());
-        pr.setStatus(ProcedureRequestStatus.REQUESTED);
-        pr.setOrderedOn(new Date());
-        processResponses(responses, new IResponseProcessor() {
-            
-            
-            @Override
-            public void process(String value, Component target) {
-                String type = (String) target.getAttribute("type");
-                
-                if ("coding".equals(type)) {
-                    String[] pcs = value.split("\\|", 3);
-                    CodeableConcept code = FhirUtil.createCodeableConcept(pcs[0], pcs[1], pcs[2]);
-                    pr.setCode(code);
-                } else if ("priority".equals(type)) {
-                    pr.setPriority(ProcedureRequestPriority.valueOf(value.toUpperCase()));
-                } else if ("notes".equals(type)) {
-                    Annotation annotation = new Annotation().setText(value);
-                    pr.addNotes(annotation);
-                }
-            }
-            
-        });
-        
-        return pr;
     }
     
     private void setPatient(Patient patient) {
@@ -361,7 +259,7 @@ public class QuestionnaireController extends FrameworkController implements IDoc
                 .setDocStatus(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, "status-signed", "Signed"));
         org.w3c.dom.Document responses = getResponses();
         saveResponses(responses);
-        createResource(responses);
+        invokeHandlers(responses);
     }
     
     public void onChanged() {

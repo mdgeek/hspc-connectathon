@@ -25,7 +25,10 @@ import java.util.List;
 import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
+
+import ca.uhn.fhir.model.api.Tag;
 
 public class DemoUtils {
     
@@ -33,7 +36,7 @@ public class DemoUtils {
     /**
      * Identifier used to locate demo resources for bulk deletes.
      */
-    public static final Identifier DEMO_GROUP_IDENTIFIER = createIdentifier("demo", "gen");
+    public static final Tag DEMO_GROUP_TAG = new Tag("urn:cogmedsys:hsp:model:demo", "gen", "Demo Data");
     
     /**
      * Convenience method for creating identifiers in local system.
@@ -112,14 +115,15 @@ public class DemoUtils {
      */
     public static Identifier getMainIdentifier(DomainResource resource) {
         List<Identifier> identifiers = FhirUtil.getIdentifiers(resource);
-        
-        for (Identifier identifier : identifiers) {
-            if (!identifier.equalsShallow(DEMO_GROUP_IDENTIFIER)) {
-                return identifier;
-            }
-        }
-        
-        return null;
+        return FhirUtil.getFirst(identifiers);
     }
     
+    /**
+     * Adds the demo tag to a resource for bulk deletes.
+     * 
+     * @param resource The resource.
+     */
+    public static void addDemoTag(IBaseResource resource) {
+        FhirUtil.addTag(DEMO_GROUP_TAG, resource);
+    }
 }

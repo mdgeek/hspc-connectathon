@@ -1,7 +1,7 @@
 <idspace sclass="cwf-radio-wrap" height="100%" width="100%" 
 	apply="${cwfMockumentsQuestionnaireController}">
 	<custom-attributes 
-		generated_resource="QuestionnaireResponse"
+		handler_id="questionnaire-response,newborn-admission"
 		questionnaire_reference="Questionnaire/questionnaire-newborn-admission"
 	/>
 	<style>

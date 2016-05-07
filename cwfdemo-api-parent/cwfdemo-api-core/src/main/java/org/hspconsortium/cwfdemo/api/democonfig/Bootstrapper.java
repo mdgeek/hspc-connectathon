@@ -62,9 +62,9 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 public class Bootstrapper {
     
     
-    private static final String IMAGE_PATH = "web/org/hspconsortium/cwf/ui/democonfig/images/";
+    private static final String IMAGE_PATH = "org/hspconsortium/cwfdemo/ui/democonfig/images/";
     
-    private static final String NOTE_PATH = "web/org/hspconsortium/cwf/ui/democonfig/notes/";
+    private static final String NOTE_PATH = "org/hspconsortium/cwfdemo/ui/democonfig/notes/";
     
     private static final String[] STREETS = { "123 Yellowbrick Road", "325 Emory Lane", "1201 Regenstrief Blvd",
             "353 Intermountain Street" };
@@ -128,7 +128,7 @@ public class Bootstrapper {
      * @return The list of fetched resources.
      */
     private <D extends DomainResource> List<D> fetchByType(Class<D> clazz) {
-        List<D> list = fhirService.searchResourcesByIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER, clazz);
+        List<D> list = fhirService.searchResourcesByTag(DemoUtils.DEMO_GROUP_TAG, clazz);
         resourceCache.put(clazz, list);
         return list;
     }
@@ -185,7 +185,7 @@ public class Bootstrapper {
      */
     private <D extends DomainResource> int deleteByType(Class<D> clazz) {
         getCachedResources(clazz).clear();
-        return fhirService.deleteResourcesByIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER, clazz);
+        return fhirService.deleteResourcesByTag(DemoUtils.DEMO_GROUP_TAG, clazz);
     }
     
     // ------------- General operations -------------
@@ -263,7 +263,7 @@ public class Bootstrapper {
     private Patient buildPatient(int idnum, String name, int dobOffset, AdministrativeGender gender, String photo) {
         Patient patient = new Patient();
         patient.addIdentifier(DemoUtils.createIdentifier("patient", idnum).setType(IDENT_MRN));
-        patient.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(patient);
         patient.addName(FhirUtil.parseName(name));
         patient.setGender(gender);
         patient.setBirthDate(DemoUtils.createDateWithDayOffset(dobOffset));
@@ -345,7 +345,7 @@ public class Bootstrapper {
                                                                    Date effectiveDate) {
         MedicationAdministration medAdmin = new MedicationAdministration();
         medAdmin.addIdentifier(DemoUtils.createIdentifier("medadmin", idnum, patient));
-        medAdmin.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(medAdmin);
         medAdmin.setPatient(new Reference(patient));
         medAdmin.setMedication(medicationList.get(medCode));
         medAdmin.setEffectiveTime(new DateTimeType(effectiveDate));
@@ -452,7 +452,7 @@ public class Bootstrapper {
         MedicationOrder medOrder = new MedicationOrder();
         medOrder.setPatient(new Reference(patient));
         medOrder.addIdentifier(DemoUtils.createIdentifier("medorder", idnum, patient));
-        medOrder.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(medOrder);
         medOrder.setMedication(medicationList.get(medCode));
         medOrder.setDateWritten(dateWritten);
         medOrder.addDosageInstruction(dose);
@@ -542,7 +542,7 @@ public class Bootstrapper {
         Condition condition = new Condition();
         condition.setPatient(new Reference(patient));
         condition.addIdentifier(DemoUtils.createIdentifier("condition", idnum, patient));
-        condition.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(condition);
         condition.setDateRecorded(dateRecorded);
         condition.setCode(conditionList.get(conditionCode));
         condition.setClinicalStatus(status);
@@ -594,7 +594,7 @@ public class Bootstrapper {
         doc.setType(FhirUtil.createCodeableConcept(SYS_COGMED, type, description));
         doc.setSubject(new Reference(patient));
         doc.addIdentifier(DemoUtils.createIdentifier("document", idnum, patient));
-        doc.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(doc);
         doc.setCreated(DemoUtils.createDateWithDayOffset(createOffset));
         doc.addAuthor(new Reference(author));
         DocumentReferenceContentComponent content = doc.addContent();
@@ -638,7 +638,7 @@ public class Bootstrapper {
         Practitioner p = new Practitioner();
         p.addName(FhirUtil.parseName(name));
         p.addIdentifier(DemoUtils.createIdentifier("practitioner", idnum));
-        p.addIdentifier(DemoUtils.DEMO_GROUP_IDENTIFIER);
+        DemoUtils.addDemoTag(p);
         return p;
     }
     

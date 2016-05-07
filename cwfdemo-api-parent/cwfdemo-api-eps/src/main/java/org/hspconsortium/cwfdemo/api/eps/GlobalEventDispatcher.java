@@ -31,10 +31,9 @@ import org.carewebframework.api.event.AbstractGlobalEventDispatcher;
 import org.carewebframework.common.JSONUtil;
 import org.carewebframework.common.StrUtil;
 
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwfdemo.api.eps.EPSService.IEventCallback;
 import org.socraticgrid.hl7.services.eps.model.Message;
-
-import ca.uhn.fhir.model.api.IResource;
 
 public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
     
@@ -96,9 +95,8 @@ public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
     public void fireRemoteEvent(String eventName, Serializable eventData, String recipients) {
         String topic = StrUtil.piece(eventName, ".");
         
-        if (eventData instanceof IResource) {
-            IResource resource = (IResource) eventData;
-            epsService.publishResourceToTopic(topic, resource, eventName, "FHIR");
+        if (eventData instanceof IBaseResource) {
+            epsService.publishResourceToTopic(topic, (IBaseResource) eventData, eventName, "FHIR");
             return;
         }
         
@@ -132,9 +130,9 @@ public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
             String body = event.getMessageBodies().get(0).getBody();
             Object eventData;
             
-            if ("FHIR".equals(encoding)) {
+            if ("FHIR".equalsIgnoreCase(encoding)) {
                 eventData = epsService.getFhirContext().newJsonParser().parseResource(body);
-            } else if ("JSON".equals(encoding)) {
+            } else if ("JSON".equalsIgnoreCase(encoding)) {
                 eventData = JSONUtil.deserialize(body);
             } else {
                 eventData = body;

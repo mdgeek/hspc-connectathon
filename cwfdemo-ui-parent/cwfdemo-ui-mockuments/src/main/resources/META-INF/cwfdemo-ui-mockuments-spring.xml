@@ -30,6 +30,20 @@
 			</cwp:security>
 		</cwp:plugin>
 
+		<bean id="cwfQuestionnaireHandlerRegistry"
+			class="org.hspconsortium.cwfdemo.ui.mockuments.QuestionnaireHandlerRegistry" />
+		
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.QuestionnaireResponseHandler">
+			<constructor-arg ref="fhirDocumentService" />
+		</bean>
+		
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.NewbornAdmissionResponseHandler">
+			<constructor-arg ref="fhirDocumentService" />
+		</bean>
+		
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.ProcedureRequestHandler">
+			<constructor-arg ref="fhirDocumentService" />
+		</bean>
 	</beans>
 
 	<beans profile="desktop">
@@ -62,6 +76,7 @@
 			class="org.hspconsortium.cwfdemo.ui.mockuments.QuestionnaireController"
 			scope="prototype">
 			<constructor-arg ref="fhirDocumentService" />
+			<constructor-arg ref="cwfQuestionnaireHandlerRegistry" />
 		</bean>
 
 	</beans>
