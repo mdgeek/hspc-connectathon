@@ -49,8 +49,8 @@ import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentContent;
 import org.hspconsortium.cwf.fhir.document.DocumentListDataService;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.DocumentAction;
 import org.hspconsortium.cwf.ui.reporting.controller.AbstractListController;
+import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.DocumentAction;
 
 /**
  * Controller for the list-based display of clinical documents.
@@ -210,7 +210,7 @@ public class DocumentListController extends AbstractListController<Document, Doc
         itemNames.add("Lactation Assessment");
         items.add("lactation_assessment");
         itemNames.add("Newborn Admission");
-        items.add("lactation_assessment");
+        items.add("newborn-admission");
         itemNames.add("Procedure Request");
         items.add("procedure-request");
         String item = (String) PromptDialog.input("Select document type to create.", "New Document", null, itemNames, items);
