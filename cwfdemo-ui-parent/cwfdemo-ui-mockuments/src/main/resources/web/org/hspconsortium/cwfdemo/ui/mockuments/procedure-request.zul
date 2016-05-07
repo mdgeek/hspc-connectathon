@@ -14,9 +14,7 @@
 		<rows>
 			<row style="text-align:left!important">
 				<label id="lblPatientName" value="Patient: Last, First" style="font-weight:bold"/>
-				<combobox id="cboProcedureType" readonly="true">
-					<comboitem label="Consult"/>
-				</combobox>
+				<combobox id="cboProcedureType" readonly="true"/>
 				<combobox id="cboProcedureName" readonly="true">
 					<custom-attributes type="coding" />
 					<comboitem label="Lactation Education"

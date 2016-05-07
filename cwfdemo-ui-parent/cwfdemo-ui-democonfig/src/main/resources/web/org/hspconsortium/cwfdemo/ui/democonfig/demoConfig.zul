@@ -13,6 +13,7 @@
 				<tab id="tabAll" label="General" />
 				<tab id="tabPatients" label="Patients" />
 				<tab id="tabPractitioners" label="Practitioners" />
+				<tab id="tabLocations" label="Locations" />
 				<tab id="tabMedAdmins" label="Medication Administrations" />
 				<tab id="tabMedOrders" label="Medication Orders" />
 				<tab id="tabConditions" label="Conditions" />
@@ -54,6 +55,17 @@
 						<button id="btnDelPractitioners"
 							label="Delete demo practitioners" />
 						<label id="lblPractitioners" />
+					</vbox>
+				</tabpanel>
+				<tabpanel>
+					<vbox>
+						<label
+							value="${labels.cwfdemoconfig.locationtab.welcome.msg}" />
+						<button id="btnAddLocations" 
+							label="Add demo locations" />
+						<button id="btnDelLocations"
+							label="Delete demo locations" />
+						<label id="lblLocations" />
 					</vbox>
 				</tabpanel>
 				<tabpanel>

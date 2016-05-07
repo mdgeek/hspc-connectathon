@@ -190,6 +190,22 @@ public class DemoConfigController extends PluginController {
         showDeleted(bootstrapper.deletePractitioners());
     }
     
+    // --------------- Location Resources ---------------
+    
+    /**
+     * Adds demo locations to the FHIR server.
+     */
+    public void onClick$btnAddLocations() {
+        showAdded(bootstrapper.addLocations().size());
+    }
+    
+    /**
+     * Deletes demo locations from the FHIR server.
+     */
+    public void onClick$btnDelLocations() {
+        showDeleted(bootstrapper.deleteLocations());
+    }
+    
     // --------------- Medication Administration Resources ---------------
     
     /**

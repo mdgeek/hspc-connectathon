@@ -44,6 +44,7 @@ import org.hl7.fhir.dstu3.model.DocumentReference.DocumentReferenceContentCompon
 import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
 import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.MedicationAdministration.MedicationAdministrationDosageComponent;
 import org.hl7.fhir.dstu3.model.MedicationOrder;
@@ -73,7 +74,7 @@ public class Bootstrapper {
             "Sanibel,FL,33957" };
     
     private static final Class<?>[] DEMO_RESOURCE_TYPES = { Condition.class, MedicationOrder.class,
-            MedicationAdministration.class, DocumentReference.class, Patient.class, Practitioner.class };
+            MedicationAdministration.class, DocumentReference.class, Patient.class, Practitioner.class, Location.class };
     
     private static final Log log = LogFactory.getLog(Bootstrapper.class);
     
@@ -640,6 +641,35 @@ public class Bootstrapper {
         p.addIdentifier(DemoUtils.createIdentifier("practitioner", idnum));
         DemoUtils.addDemoTag(p);
         return p;
+    }
+    
+    // ------------- Location-related operations -------------
+    
+    public List<Location> addLocations() {
+        List<Location> list = new ArrayList<>();
+        
+        list.add(getOrCreate(buildLocation("Delivery Suite", "413964002")));
+        list.add(getOrCreate(buildLocation("Recovery Room", "398161000")));
+        list.add(getOrCreate(buildLocation("Post Recovery Room", "420280003")));
+        return list;
+    }
+    
+    /**
+     * Deletes all locations that share the given identifier.
+     * 
+     * @return
+     */
+    public int deleteLocations() {
+        return deleteByType(Location.class);
+    }
+    
+    private Location buildLocation(String name, String code) {
+        Location loc = new Location();
+        loc.setName(name);
+        Identifier identifier = FhirUtil.createIdentifier("http://snomed.info/sct", code);
+        loc.addIdentifier(identifier);
+        DemoUtils.addDemoTag(loc);
+        return loc;
     }
     
 }

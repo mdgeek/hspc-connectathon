@@ -39,6 +39,8 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Textbox;
 
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.fhir.common.FhirTerminology;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
@@ -62,6 +64,8 @@ public class QuestionnaireController extends FrameworkController implements IDoc
     
     private Label lblPatientName;
     
+    private Combobox cboLocation;
+    
     private Component toolbar;
     
     private final DocumentService service;
@@ -84,6 +88,17 @@ public class QuestionnaireController extends FrameworkController implements IDoc
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
+        
+        if (cboLocation != null) {
+            Bundle locations = service.getClient().search().forResource(Location.class).returnBundle(Bundle.class).execute();
+            
+            for (Location location : FhirUtil.getEntries(locations, Location.class)) {
+                Comboitem item = new Comboitem(location.getName());
+                item.setValue(location.getIdElement().asStringValue());
+                cboLocation.appendChild(item);
+            }
+            
+        }
         
         if (!"draft".equalsIgnoreCase(document.getStatus())) {
             disableAll();

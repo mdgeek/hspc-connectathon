@@ -26,9 +26,7 @@
 				<label id="lblPatientName" style="font-weight:bold"
 					value="Patient: Last, First"/>
 				<labeledelement label="Location:">
-					<combobox id="cboLocation" width="80%" readonly="true">
-						<comboitem label="Recovery Room"/>
-					</combobox>
+					<combobox id="cboLocation" width="80%" readonly="true"/>
 				</labeledelement>
 				<labeledelement label="Effective D&amp;T:">
 					<datebox id="datEffective"/>

@@ -25,8 +25,10 @@ import org.zkoss.zk.ui.Component;
 
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterClass;
+import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterState;
 import org.hl7.fhir.dstu3.model.Period;
+import org.hl7.fhir.dstu3.model.Reference;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
@@ -57,6 +59,9 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
             public void processResponse(String value, String targetId) {
                 if ("datEffective".equals(targetId)) {
                     encounter.getPeriod().setStart(new Date(Long.parseLong(value)));
+                } else if ("cboLocation".equals(targetId)) {
+                    EncounterLocationComponent loc = encounter.addLocation();
+                    loc.setLocation(new Reference(value));
                 }
                 
             }
