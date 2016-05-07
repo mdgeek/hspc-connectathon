@@ -53,7 +53,7 @@ public class DocumentDisplayController extends FrameworkController {
     }
     
     public enum DocumentAction {
-        SAVE, DISCARD, CANCEL
+        SAVE, DISCARD, CANCEL, DELETED
     };
     
     private static final long serialVersionUID = 1L;
@@ -69,6 +69,8 @@ public class DocumentDisplayController extends FrameworkController {
     private Document document;
     
     private IDocumentOperation documentOperation;
+    
+    private DocumentListController listController;
     
     /**
      * Sets the document to be displayed.
@@ -95,6 +97,10 @@ public class DocumentDisplayController extends FrameworkController {
                 
                 case CANCEL: // Cancel
                     return false;
+                
+                case DELETED:
+                    listController.refresh();
+                    break;
             }
         }
         
@@ -142,6 +148,10 @@ public class DocumentDisplayController extends FrameworkController {
         }
         
         return true;
+    }
+    
+    public void setListController(DocumentListController listController) {
+        this.listController = listController;
     }
     
     public void onClick$btnPrint() {

@@ -225,7 +225,7 @@ public class DocumentListController extends AbstractListController<Document, Doc
         ref.setCreated(new Date());
         ref.setType(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, item, displayName));
         ref.setDocStatus(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, "status-draft", "Draft"));
-        DocumentContent content = new DocumentContent("".getBytes(),
+        DocumentContent content = new DocumentContent("<responses/>".getBytes(),
                 DocumentDisplayController.QUESTIONNAIRE_CONTENT_TYPE + item);
         Document newDocument = new Document(ref, content);
         documentService.updateDocument(newDocument);

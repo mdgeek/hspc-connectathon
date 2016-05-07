@@ -247,10 +247,9 @@ public class QuestionnaireController extends FrameworkController implements IDoc
     public void onClick$btnDelete() {
         if (document.getReference().hasId()) {
             service.deleteResource(document.getReference());
-            controller.setDocument(null, DocumentAction.DISCARD);
         }
         
-        root.detach();
+        controller.setDocument(null, DocumentAction.DELETED);
     }
     
     public void onClick$btnSign() {

@@ -45,6 +45,7 @@ public class DocumentMainController extends PluginController {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         listController.setDisplayController(displayController);
+        displayController.setListController(listController);
         attachController(documentList, listController);
         attachController(documentDisplay, displayController);
     }

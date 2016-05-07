@@ -31,7 +31,7 @@
 					</combobox>
 				</labeledelement>
 				<labeledelement label="Effective D&amp;T:">
-					<datebox id="datEffective"/>
+					<datebox id="datEffective" />
 				</labeledelement>
 			</row>
 			<row>
