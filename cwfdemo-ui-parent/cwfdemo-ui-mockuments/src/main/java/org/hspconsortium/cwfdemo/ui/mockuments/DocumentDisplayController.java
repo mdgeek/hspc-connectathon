@@ -99,7 +99,7 @@ public class DocumentDisplayController extends FrameworkController {
                     return false;
                 
                 case DELETED:
-                    listController.refresh();
+                    refreshListController();
                     break;
             }
         }
@@ -168,6 +168,10 @@ public class DocumentDisplayController extends FrameworkController {
     
     protected void setDocumentOperation(IDocumentOperation documentOperation) {
         this.documentOperation = documentOperation;
+    }
+    
+    protected void refreshListController() {
+        listController.refresh();
     }
     
     private void moveComponents(Component source, Component target) {

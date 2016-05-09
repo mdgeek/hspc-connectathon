@@ -274,6 +274,7 @@ public class QuestionnaireController extends FrameworkController implements IDoc
         org.w3c.dom.Document responses = getResponses();
         saveResponses(responses);
         invokeHandlers(responses);
+        controller.refreshListController();
     }
     
     public void onChanged() {
