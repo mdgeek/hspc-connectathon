@@ -9,13 +9,22 @@
 	
 	<artifactId>cwfdemo-api-cds</artifactId>
 	<name>CDS support</name>
+	<description>
+		This is a configurator and launcher for the CDS engine when used in
+		embedded mode.
+	</description>
 	
 	<dependencies>
-		<!-- CDS -->
 		<dependency>
 	        <groupId>com.cognitivemedicine</groupId>
 	        <artifactId>CDS</artifactId>
 	        <version>0.0.1-SNAPSHOT</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>logback-classic</artifactId>
+					<groupId>ch.qos.logback</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>junit</groupId>

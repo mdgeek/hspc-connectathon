@@ -12,7 +12,7 @@
 	<packaging>war</packaging>
 	
 	<description>
-	Demonstration web application.
+		Demonstration web application.
 	</description>
 	
 	<properties>

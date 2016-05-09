@@ -453,8 +453,9 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      */
     public void onClick$btnDelete() {
         boolean silent = false;
+        Set<MessageWrapper> selected = new HashSet<>(model.getSelection());
         
-        LOOP: for (MessageWrapper message : model.getSelection()) {
+        LOOP: for (MessageWrapper message : selected) {
             String s = message.getDisplayText();
             
             if (message.canDelete()) {
