@@ -229,7 +229,7 @@ public class EPSService {
         SubscriptionServiceSE ss = new SubscriptionServiceSE();
         subscriberPort = ss.getSubscriptionPort();
         ((BindingProvider) subscriberPort).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-            serviceEndpoint + "subscription");
+            serviceEndpoint + "subscriptionService");
         
         BrokerServiceSE bs = new BrokerServiceSE();
         brokerPort = bs.getBrokerPort();
@@ -317,6 +317,7 @@ public class EPSService {
         
         MessageHeader header = event.getHeader();
         header.setMessageId(UUID.randomUUID().toString()); // Not sure we need to generate an Id
+        header.setTopicId(topic);
         header.setSubject(subject);
         header.setMessageCreatedTime(now);
         header.setMessagePublicationTime(now);
@@ -353,7 +354,7 @@ public class EPSService {
      */
     public String publishResourceToTopic(String topic, IBaseResource resource, String subject, String title) {
         String data = fhirContext.newJsonParser().encodeResourceToString(resource);
-        return publishEvent(topic, data, "application/json", subject, title);
+        return publishEvent(topic, data, "application/json+fhir", subject, title);
     }
     
     //**************************** Subscription *****************************

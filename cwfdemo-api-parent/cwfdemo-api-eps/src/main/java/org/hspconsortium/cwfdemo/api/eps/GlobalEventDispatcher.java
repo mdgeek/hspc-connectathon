@@ -34,6 +34,7 @@ import org.carewebframework.common.StrUtil;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwfdemo.api.eps.EPSService.IEventCallback;
 import org.socraticgrid.hl7.services.eps.model.Message;
+import org.socraticgrid.hl7.services.eps.model.MessageBody;
 
 public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
     
@@ -75,6 +76,7 @@ public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
             
             count += increment;
             count = count < 0 ? 0 : count;
+            subscriptions.put(topic, count);
             return count;
         }
     }
@@ -125,14 +127,15 @@ public class GlobalEventDispatcher extends AbstractGlobalEventDispatcher {
      */
     private void processEvent(Message event) {
         try {
-            String eventName = event.getHeader().getSubject();
-            String encoding = event.getTitle();
-            String body = event.getMessageBodies().get(0).getBody();
+            MessageBody messageBody = event.getMessageBodies().get(0);
+            String eventName = event.getHeader().getTopicId();
+            String encoding = messageBody.getType();
+            String body = messageBody.getBody();
             Object eventData;
             
-            if ("FHIR".equalsIgnoreCase(encoding)) {
+            if ("application/json+fhir".equalsIgnoreCase(encoding)) {
                 eventData = epsService.getFhirContext().newJsonParser().parseResource(body);
-            } else if ("JSON".equalsIgnoreCase(encoding)) {
+            } else if ("application/json".equalsIgnoreCase(encoding)) {
                 eventData = JSONUtil.deserialize(body);
             } else {
                 eventData = body;

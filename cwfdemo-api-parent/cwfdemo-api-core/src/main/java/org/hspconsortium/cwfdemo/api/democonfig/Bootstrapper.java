@@ -30,29 +30,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import org.hl7.fhir.dstu3.model.Address;
-import org.hl7.fhir.dstu3.model.Annotation;
-import org.hl7.fhir.dstu3.model.Attachment;
-import org.hl7.fhir.dstu3.model.CodeableConcept;
-import org.hl7.fhir.dstu3.model.Condition;
-import org.hl7.fhir.dstu3.model.DateTimeType;
-import org.hl7.fhir.dstu3.model.DocumentReference;
+import org.hl7.fhir.dstu3.model.*;
 import org.hl7.fhir.dstu3.model.DocumentReference.DocumentReferenceContentComponent;
-import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Enumerations.AdministrativeGender;
-import org.hl7.fhir.dstu3.model.Identifier;
-import org.hl7.fhir.dstu3.model.Location;
-import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.MedicationAdministration.MedicationAdministrationDosageComponent;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
 import org.hl7.fhir.dstu3.model.MedicationOrder.MedicationOrderDosageInstructionComponent;
-import org.hl7.fhir.dstu3.model.Patient;
-import org.hl7.fhir.dstu3.model.Practitioner;
-import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.SimpleQuantity;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 
@@ -73,8 +60,13 @@ public class Bootstrapper {
     private static final String[] CITIES = { "Los Angeles,CA,90001", "Indianapolis,IN,46202", "New York,NY,10010",
             "Sanibel,FL,33957" };
     
-    private static final Class<?>[] DEMO_RESOURCE_TYPES = { Condition.class, MedicationOrder.class,
-            MedicationAdministration.class, DocumentReference.class, Patient.class, Practitioner.class, Location.class };
+    private static final Class<?>[] ROOT_RESOURCE_TYPES = { Patient.class, Practitioner.class, Location.class };
+    
+    private static final Class<?>[] PATIENT_RESOURCE_TYPES = { Condition.class, MedicationOrder.class,
+            MedicationAdministration.class, DocumentReference.class, ProcedureRequest.class, QuestionnaireResponse.class,
+            Encounter.class, Observation.class };
+    
+    private static final Class<?>[] ALL_RESOURCE_TYPES = ArrayUtils.addAll(ROOT_RESOURCE_TYPES, PATIENT_RESOURCE_TYPES);
     
     private static final Log log = LogFactory.getLog(Bootstrapper.class);
     
@@ -115,7 +107,7 @@ public class Bootstrapper {
     public int fetchAll() {
         int count = 0;
         
-        for (Class<?> clazz : DEMO_RESOURCE_TYPES) {
+        for (Class<?> clazz : ALL_RESOURCE_TYPES) {
             count += fetchByType((Class<? extends DomainResource>) clazz).size();
         }
         
@@ -153,7 +145,7 @@ public class Bootstrapper {
     }
     
     @SuppressWarnings("unchecked")
-    private <D extends DomainResource> D getOrCreate(D resource) {
+    public <D extends DomainResource> D getOrCreate(D resource) {
         Identifier identifier = DemoUtils.getMainIdentifier(resource);
         List<D> list = (List<D>) getCachedResources(resource.getClass());
         
@@ -200,13 +192,14 @@ public class Bootstrapper {
         // @formatter:on
     }
     
+    @SuppressWarnings("unchecked")
     public int deleteAll(Patient patient) {
-        List<DomainResource> list = new ArrayList<>();
+        List<IBaseResource> list = new ArrayList<>();
         
-        list.addAll(fhirService.searchResourcesForPatient(patient, Condition.class));
-        list.addAll(fhirService.searchResourcesForPatient(patient, MedicationAdministration.class));
-        list.addAll(fhirService.searchResourcesForPatient(patient, MedicationOrder.class));
-        list.addAll(fhirService.searchResourcesForPatient(patient, DocumentReference.class));
+        for (Class<?> clazz : PATIENT_RESOURCE_TYPES) {
+            list.addAll(fhirService.searchResourcesForPatient(patient, (Class<? extends IBaseResource>) clazz));
+        }
+        
         fhirService.deleteResources(list);
         return list.size();
     }
@@ -220,25 +213,29 @@ public class Bootstrapper {
     public int deleteAll() {
         int count = 0;
         
-        for (Class<?> clazz : DEMO_RESOURCE_TYPES) {
+        for (Class<?> clazz : ALL_RESOURCE_TYPES) {
             count += deleteByType((Class<? extends DomainResource>) clazz);
         }
         
         return count;
     }
     
+    public void deleteResource(String id) {
+        fhirService.getClient().delete().resourceConditionalByUrl(id);
+    }
+    
     // ------------- Patient-related operations -------------
     
     /**
-     * Adds a demo patient. TODO Read from configuration file.
+     * Adds a demo patients. TODO Read from configuration file.
      * 
      * @return
      */
     public List<Patient> addPatients() {
-        int idnum = 0;
-        getOrCreate(buildPatient(++idnum, "LeMalade,Jacques", 365 * 56, AdministrativeGender.MALE, "male_adult.jpeg"));
-        getOrCreate(buildPatient(++idnum, "Intermountain,Jane", 365 * 26, AdministrativeGender.FEMALE, "female_adult.jpeg"));
-        getOrCreate(buildPatient(++idnum, "Intermountain,Jose", 1, AdministrativeGender.MALE, "male_newborn.jpeg"));
+        getOrCreate(buildPatient("pat1", "LeMalade,Jacques", 365 * 56, AdministrativeGender.MALE, "male_adult.jpeg"));
+        getOrCreate(
+            buildPatient("mother", "Intermountain,Jane", 365 * 26, AdministrativeGender.FEMALE, "female_adult.jpeg"));
+        getOrCreate(buildPatient("newborn", "Intermountain,Jose", 1, AdministrativeGender.MALE, "male_newborn.jpeg"));
         return getCachedResources(Patient.class);
     }
     
@@ -261,9 +258,9 @@ public class Bootstrapper {
      * @param photo
      * @return
      */
-    private Patient buildPatient(int idnum, String name, int dobOffset, AdministrativeGender gender, String photo) {
+    public Patient buildPatient(String id, String name, int dobOffset, AdministrativeGender gender, String photo) {
         Patient patient = new Patient();
-        patient.addIdentifier(DemoUtils.createIdentifier("patient", idnum).setType(IDENT_MRN));
+        patient.addIdentifier(DemoUtils.createIdentifier("patient", id).setType(IDENT_MRN));
         DemoUtils.addDemoTag(patient);
         patient.addName(FhirUtil.parseName(name));
         patient.setGender(gender);
@@ -342,8 +339,8 @@ public class Bootstrapper {
      * @param prescription
      * @return
      */
-    private MedicationAdministration buildMedicationAdministration(int idnum, Patient patient, String medCode, int tabCount,
-                                                                   Date effectiveDate) {
+    public MedicationAdministration buildMedicationAdministration(int idnum, Patient patient, String medCode, int tabCount,
+                                                                  Date effectiveDate) {
         MedicationAdministration medAdmin = new MedicationAdministration();
         medAdmin.addIdentifier(DemoUtils.createIdentifier("medadmin", idnum, patient));
         DemoUtils.addDemoTag(medAdmin);
@@ -448,8 +445,8 @@ public class Bootstrapper {
      * @param dateWritten When written.
      * @return The new medication order.
      */
-    private MedicationOrder buildMedicationOrder(int idnum, Patient patient, String medCode,
-                                                 MedicationOrderDosageInstructionComponent dose, Date dateWritten) {
+    public MedicationOrder buildMedicationOrder(int idnum, Patient patient, String medCode,
+                                                MedicationOrderDosageInstructionComponent dose, Date dateWritten) {
         MedicationOrder medOrder = new MedicationOrder();
         medOrder.setPatient(new Reference(patient));
         medOrder.addIdentifier(DemoUtils.createIdentifier("medorder", idnum, patient));
@@ -538,8 +535,8 @@ public class Bootstrapper {
      * @param dateRecorded
      * @return
      */
-    private Condition buildCondition(int idnum, Patient patient, String conditionCode, String status, String notes,
-                                     Date dateRecorded) {
+    public Condition buildCondition(int idnum, Patient patient, String conditionCode, String status, String notes,
+                                    Date dateRecorded) {
         Condition condition = new Condition();
         condition.setPatient(new Reference(patient));
         condition.addIdentifier(DemoUtils.createIdentifier("condition", idnum, patient));
@@ -589,8 +586,8 @@ public class Bootstrapper {
         return deleteByType(DocumentReference.class);
     }
     
-    private DocumentReference buildDocument(int idnum, Patient patient, Practitioner author, int createOffset, String type,
-                                            String description, String body) {
+    public DocumentReference buildDocument(int idnum, Patient patient, Practitioner author, int createOffset, String type,
+                                           String description, String body) {
         DocumentReference doc = new DocumentReference();
         doc.setType(FhirUtil.createCodeableConcept(SYS_COGMED, type, description));
         doc.setSubject(new Reference(patient));
@@ -623,6 +620,8 @@ public class Bootstrapper {
         list.add(getOrCreate(buildPractitioner("Fry,Emory", ++idnum)));
         list.add(getOrCreate(buildPractitioner("Martin,Doug", ++idnum)));
         list.add(getOrCreate(buildPractitioner("Huff,Stan", ++idnum)));
+        list.add(getOrCreate(buildPractitioner("Nurse,Charge", ++idnum)));
+        list.add(getOrCreate(buildPractitioner("Nurse,Bedside", ++idnum)));
         return list;
     }
     
@@ -635,7 +634,7 @@ public class Bootstrapper {
         return deleteByType(Practitioner.class);
     }
     
-    private Practitioner buildPractitioner(String name, int idnum) {
+    public Practitioner buildPractitioner(String name, int idnum) {
         Practitioner p = new Practitioner();
         p.addName(FhirUtil.parseName(name));
         p.addIdentifier(DemoUtils.createIdentifier("practitioner", idnum));
@@ -663,7 +662,7 @@ public class Bootstrapper {
         return deleteByType(Location.class);
     }
     
-    private Location buildLocation(String name, String code) {
+    public Location buildLocation(String name, String code) {
         Location loc = new Location();
         loc.setName(name);
         Identifier identifier = FhirUtil.createIdentifier("http://snomed.info/sct", code);

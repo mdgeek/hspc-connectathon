@@ -26,6 +26,11 @@
 							value="${labels.cwfdemoconfig.generaltab.welcome.msg}" />
 						<button id="btnDeleteAll"
 							label="Delete all demo data" />
+						<hlayout>
+							<textbox id="txtResource" />
+							<button id="btnDeleteResource"
+								label="Delete a resource" />
+						</hlayout>
 						<label id="lblAll" />
 					</vbox>
 				</tabpanel>

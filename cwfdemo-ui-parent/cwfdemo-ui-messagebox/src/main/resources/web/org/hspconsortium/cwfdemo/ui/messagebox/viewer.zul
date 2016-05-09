@@ -4,14 +4,14 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 
 	<window mode="overlapped" width="500px" mold="bootstrap"
-		sclass="panel-primary panel-sm"
+		sclass="panel-primary panel-sm" sizable="true"
 		apply="${cwfMessageboxViewerController}" visible="false"
 		position="center">
 		<caption id="caption" label="${labels.cwfmessagebox.viewer.title}" />
 		<vlayout hflex="1">
 			<label id="lblHeader" style="font-weight:bold" />
 			<textbox id="txtMessage" readonly="true" multiline="true" 
-				vflex="min" hflex="1" style="max-height:250px"/>
+				vflex="min" hflex="1" style="min-height:80px;max-height:250px"/>
 			<toolbar align="center" style="border-top: 1px solid lightgray">
 				<label value="${labels.cwfmessagebox.viewer.action.select}" 
 					style="display:block"/>

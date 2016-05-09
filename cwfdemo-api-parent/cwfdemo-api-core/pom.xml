@@ -35,6 +35,11 @@
 		    	</exclusion>
 		    </exclusions>
 		</dependency>
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-api-eps</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<!-- Tests -->
 		<dependency>
 			<groupId>org.carewebframework</groupId>

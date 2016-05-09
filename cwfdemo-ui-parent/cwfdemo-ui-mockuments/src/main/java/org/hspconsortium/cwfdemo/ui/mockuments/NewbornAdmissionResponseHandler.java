@@ -26,9 +26,14 @@ import org.zkoss.zk.ui.Component;
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterClass;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
+import org.hl7.fhir.dstu3.model.Encounter.EncounterParticipantComponent;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterState;
+import org.hl7.fhir.dstu3.model.Identifier;
+import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
+import org.hl7.fhir.dstu3.model.RelatedPerson;
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
@@ -50,6 +55,16 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         encounter.setPeriod(new Period());
         encounter.setStatus(EncounterState.INPROGRESS);
         encounter.setClass_(EncounterClass.INPATIENT);
+        Identifier ident = DemoUtils.createIdentifier("patient", "mother");
+        Patient mother = FhirUtil.getFirst(service.searchResourcesByIdentifier(ident, Patient.class));
+        
+        if (mother != null) {
+            EncounterParticipantComponent participant = encounter.addParticipant();
+            RelatedPerson rp = new RelatedPerson(new Reference(mother));
+            participant.setIndividual(new Reference(rp));
+            participant.addType(FhirUtil.createCodeableConcept("participant_type", "mother", "mother"));
+        }
+        
         DemoUtils.addDemoTag(encounter);
         
         processResponses(responses, new IResponseProcessor() {

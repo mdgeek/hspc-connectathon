@@ -7,4 +7,5 @@
 
 	<!-- Security-related beans -->
 	<import resource="applicationContext-security.xml" />
-</beans>
+	
+ </beans>

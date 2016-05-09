@@ -37,5 +37,14 @@
 			</constructor-arg>
 		</bean>	
 			
+		<bean id="cwfConnectathonController" scope="prototype"
+			class="org.hspconsortium.cwfdemo.ui.democonfig.ConnectathonController">
+			<constructor-arg>
+				<bean class="org.hspconsortium.cwfdemo.api.democonfig.Bootstrapper">
+					<constructor-arg ref="fhirService" />
+				</bean>
+			</constructor-arg>
+		</bean>	
+			
 	</beans>
 </beans>

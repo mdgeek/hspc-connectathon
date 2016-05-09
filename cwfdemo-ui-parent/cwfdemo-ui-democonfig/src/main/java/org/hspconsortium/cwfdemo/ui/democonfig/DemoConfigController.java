@@ -35,6 +35,7 @@ import org.carewebframework.ui.zk.PopupDialog;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
+import org.zkoss.zul.Textbox;
 
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
@@ -64,6 +65,8 @@ public class DemoConfigController extends PluginController {
     private final Bootstrapper bootstrapper;
     
     private Tabbox tabbox;
+    
+    private Textbox txtResource;
     
     /**
      * Demonstration Configuration Helper Class.
@@ -136,6 +139,14 @@ public class DemoConfigController extends PluginController {
     }
     
     // --------------- All Resources ---------------
+    
+    public void onClick$btnDeleteResource() {
+        String id = txtResource.getText().trim();
+        
+        if (!id.isEmpty()) {
+            bootstrapper.deleteResource(id);
+        }
+    }
     
     /**
      * Adds all patient-based demo resources to the FHIR server.

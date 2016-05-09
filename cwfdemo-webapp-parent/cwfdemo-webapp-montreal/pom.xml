@@ -144,6 +144,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-api-cds</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-messagebox</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
