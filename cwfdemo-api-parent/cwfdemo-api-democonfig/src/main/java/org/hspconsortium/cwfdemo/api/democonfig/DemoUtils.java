@@ -22,14 +22,11 @@ package org.hspconsortium.cwfdemo.api.democonfig;
 import java.util.Date;
 import java.util.List;
 
-import org.carewebframework.api.spring.SpringUtil;
-
 import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
-import org.hspconsortium.cwfdemo.api.eps.EPSService;
 
 import ca.uhn.fhir.model.api.Tag;
 
@@ -130,8 +127,4 @@ public class DemoUtils {
         FhirUtil.addTag(DEMO_GROUP_TAG, resource);
     }
     
-    public static void sendEvent(IBaseResource resource) {
-        EPSService eps = SpringUtil.getBean("cwfEPSService", EPSService.class);
-        eps.publishResourceToTopic("/Patient", resource);
-    }
 }

@@ -1,0 +1,17 @@
+{
+    "resourceType":"Condition",
+    "text":{
+        "status":"generated",
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Diabetes</div>"
+    },
+    "patient":{
+        "reference":"${patient}"
+    },
+    "asserter":{
+        "reference":"${practitioner}"
+    },
+    "code":{
+        "text":"Diabetes"
+    },
+    "verificationStatus":"provisional"
+}

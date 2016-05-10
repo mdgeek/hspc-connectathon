@@ -1,0 +1,19 @@
+# Breast feeding scenario
+
+patient1:
+    source: resource/patient_intermountain_jane
+    dob:   date/T-25y
+    photo: image/female_adult.jpeg
+  
+patient2:
+    source: resource/patient_intermountain_jose
+    dob:   date/T-1d
+    photo: image/male_newborn.jpeg
+  
+practitioner1:
+    source: resource/practitioner_emory_fry
+    
+condition1:
+    source: resource/condition_diabetes
+    patient: patient1
+    practitioner: practitioner1

@@ -1,0 +1,46 @@
+{
+    "resourceType":"Patient",
+    "identifier":[
+        {
+            "type":{
+                "coding":[
+                    {
+                        "system":"http://hl7.org/fhir/v2/0203",
+                        "code":"MR",
+                        "display":"MRN"
+                    }
+                ]
+            },
+            "system":"urn:cogmedsys:hsp:model:patient",
+            "value":"333333"
+        }
+    ],
+    "name":[
+        {
+            "family":[
+                "Intermountain"
+            ],
+            "given":[
+                "Jose"
+            ]
+        }
+    ],
+    "gender":"male",
+    "birthDate":"${dob}",
+    "address":[
+        {
+            "line":[
+                "1201 Regenstrief Blvd"
+            ],
+            "city":"Sanibel",
+            "state":"FL",
+            "postalCode":"33957"
+        }
+    ],
+    "photo":[
+        {
+            "contentType":"image/jpeg",
+            "data":"${photo}"
+        }
+    ]
+}

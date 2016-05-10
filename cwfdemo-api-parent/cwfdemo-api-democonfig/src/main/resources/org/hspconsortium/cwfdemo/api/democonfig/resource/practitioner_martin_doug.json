@@ -1,0 +1,19 @@
+{
+    "resourceType":"Practitioner",
+    "identifier":[
+        {
+            "system":"urn:cogmedsys:hsp:model:practitioner",
+            "value":"martin_doug"
+        }
+    ],
+    "name":[
+        {
+            "family":[
+                "Martin"
+            ],
+            "given":[
+                "Doug"
+            ]
+        }
+    ]
+}

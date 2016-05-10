@@ -8,14 +8,10 @@
 	</parent>
 
 	<name>API Core Support</name>
-	<artifactId>cwfdemo-api-core</artifactId>
+	<artifactId>cwfdemo-api-democonfig</artifactId>
 	<packaging>jar</packaging>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.carewebframework</groupId>
-			<artifactId>org.carewebframework.api.core</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwf-fhir-core</artifactId>
@@ -25,26 +21,11 @@
 			<artifactId>cwf-fhir-client</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>org.hspconsortium.client</groupId>
-		    <artifactId>hspc-java-client-fork</artifactId>
-		    <version>1.5-SNAPSHOT</version>
-		    <exclusions>
-		    	<exclusion>
-		    		<groupId>ch.qos.logback</groupId>
-		    		<artifactId>logback-classic</artifactId>
-		    	</exclusion>
-		    </exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-api-eps</artifactId>
-			<version>${project.parent.version}</version>
+			<groupId>org.yaml</groupId>
+			<artifactId>snakeyaml</artifactId>
+			<version>1.17</version>
 		</dependency>
 		<!-- Tests -->
-		<dependency>
-			<groupId>org.carewebframework</groupId>
-			<artifactId>org.carewebframework.api.test</artifactId>
-		</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>

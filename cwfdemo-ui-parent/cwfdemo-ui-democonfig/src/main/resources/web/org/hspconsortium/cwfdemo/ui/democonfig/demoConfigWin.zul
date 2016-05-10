@@ -4,9 +4,8 @@
 	xmlns:w="http://www.zkoss.org/2005/zk/client"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul
 		http://www.zkoss.org/2005/zul/zul.xsd">
-	<window title="Demonstration Configuration" width="90%"
-		minwidth="800" minheight="400" mode="modal" mold="bootstrap"
-		sclass="panel-primary cwf-demoConfig">
+	<window title="Demonstration Configuration" closable="true" width="300px"
+		mold="bootstrap" sclass="panel-primary">
 		<include src="~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfig.zul" />
 	</window>
 

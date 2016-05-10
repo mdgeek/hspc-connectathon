@@ -1,0 +1,55 @@
+{
+    "resourceType":"Patient",
+    "meta":{
+        "tag":[
+            {
+                "system":"urn:cogmedsys:hsp:model:demo",
+                "code":"gen",
+                "display":"Demo Data"
+            }
+        ]
+    },
+    "identifier":[
+        {
+            "type":{
+                "coding":[
+                    {
+                        "system":"http://hl7.org/fhir/v2/0203",
+                        "code":"MR",
+                        "display":"MRN"
+                    }
+                ]
+            },
+            "system":"urn:cogmedsys:hsp:model:patient",
+            "value":"111111"
+        }
+    ],
+    "name":[
+        {
+            "family":[
+                "LeMalade"
+            ],
+            "given":[
+                "Jacques"
+            ]
+        }
+    ],
+    "gender":"male",
+    "birthDate":"1960-05-22",
+    "address":[
+        {
+            "line":[
+                "123 Yellowbrick Road"
+            ],
+            "city":"Sanibel",
+            "state":"FL",
+            "postalCode":"33957"
+        }
+    ],
+    "photo":[
+        {
+            "contentType":"image/jpeg",
+            "data":"${photo}"
+        }
+    ]
+}

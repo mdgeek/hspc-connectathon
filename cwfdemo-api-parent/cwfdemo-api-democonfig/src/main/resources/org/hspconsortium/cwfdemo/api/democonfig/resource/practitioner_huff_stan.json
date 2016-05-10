@@ -1,0 +1,19 @@
+{
+    "resourceType":"Practitioner",
+    "identifier":[
+        {
+            "system":"urn:cogmedsys:hsp:model:practitioner",
+            "value":"huff_stan"
+        }
+    ],
+    "name":[
+        {
+            "family":[
+                "Huff"
+            ],
+            "given":[
+                "Stan"
+            ]
+        }
+    ]
+}

@@ -28,7 +28,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-api-core</artifactId>
+			<artifactId>cwfdemo-api-democonfig</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 	</dependencies>

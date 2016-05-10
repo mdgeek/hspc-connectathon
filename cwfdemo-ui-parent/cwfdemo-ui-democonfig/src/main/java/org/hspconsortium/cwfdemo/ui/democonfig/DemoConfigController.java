@@ -28,19 +28,19 @@
  */
 package org.hspconsortium.cwfdemo.ui.democonfig;
 
-import org.carewebframework.common.StrUtil;
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PopupDialog;
+import org.carewebframework.ui.zk.ZKUtil;
 
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Label;
-import org.zkoss.zul.Tab;
-import org.zkoss.zul.Tabbox;
-import org.zkoss.zul.Textbox;
+import org.zkoss.zul.ListModelList;
 
-import org.hl7.fhir.dstu3.model.Patient;
-import org.hspconsortium.cwf.api.patient.PatientContext;
-import org.hspconsortium.cwf.ui.patientselection.PatientSelection;
 import org.hspconsortium.cwfdemo.api.democonfig.Bootstrapper;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 
 /**
  * This controller is only intended to be used for demo purposes in order to stage and unstage data.
@@ -52,21 +52,15 @@ public class DemoConfigController extends PluginController {
     
     private static final long serialVersionUID = 1L;
     
-    private static final String ADDED = "%s resources: %d";
+    private Combobox cboScenarios;
     
-    private static final String DELETED = "%s deleted: %d";
+    private Button btnDelete;
     
-    private static final String NOPATIENT = "A patient must be selected to perform that operation.";
+    private Button btnLoad;
     
-    private static final String ADDALL = "Demo resources: %2$d";
-    
-    private static final String DELETEALL = "Resources deleted: %2$d";
+    private Label lblMessage;
     
     private final Bootstrapper bootstrapper;
-    
-    private Tabbox tabbox;
-    
-    private Textbox txtResource;
     
     /**
      * Demonstration Configuration Helper Class.
@@ -80,221 +74,54 @@ public class DemoConfigController extends PluginController {
         this.bootstrapper = bootstrapper;
     }
     
-    private void showAdded(int count) {
-        showMessage(ADDED, count);
+    @Override
+    public void doAfterCompose(Component comp) throws Exception {
+        super.doAfterCompose(comp);
+        cboScenarios.setModel(new ListModelList<String>(bootstrapper.getScenarios()));
     }
     
-    private void showDeleted(int count) {
-        showMessage(DELETED, count);
+    public void onSelect$cboScenarios() {
+        boolean disabled = getSelectedScenario() == null;
+        btnDelete.setDisabled(disabled);
+        btnLoad.setDisabled(disabled);
+        setMessage(null);
     }
     
-    private void showNoPatient() {
-        showMessage(NOPATIENT, null);
-    }
-    
-    private void showMessage(String msg, Object arg) {
-        Tab tab = tabbox.getSelectedTab();
-        Label lbl = (Label) tab.getFellow("lbl" + tab.getId().substring(3));
-        msg = StrUtil.formatMessage(msg, tab == null ? "" : tab.getLabel(), arg);
-        lbl.setValue(msg);
-    }
-    
-    private Patient getPatient() {
-        Patient patient = PatientContext.getActivePatient();
+    public void onClick$btnLoad() {
+        Scenario scenario = loadSelectedScenario();
         
-        if (patient == null) {
-            showNoPatient();
-        }
-        
-        return patient;
-    }
-    
-    private void clearPatient() {
-        PatientContext.changePatient(null);
-    }
-    
-    /*************************************************************************
-     * Event Listeners
-     *************************************************************************/
-    
-    public void onSelect$tabbox() {
-        showMessage("", null);
-    }
-    
-    /**
-     * Deletes all demo resources from the FHIR server.
-     */
-    public void onClick$btnDeleteAll() {
-        clearPatient();
-        showMessage(DELETEALL, bootstrapper.deleteAll());
-    }
-    
-    // --------------- Patient Resources ---------------
-    
-    /**
-     * Select a patient.
-     */
-    public void onClick$btnSelectPatient() {
-        PatientSelection.show();
-    }
-    
-    // --------------- All Resources ---------------
-    
-    public void onClick$btnDeleteResource() {
-        String id = txtResource.getText().trim();
-        
-        if (!id.isEmpty()) {
-            bootstrapper.deleteResource(id);
+        if (scenario != null) {
+            setMessage("Loaded " + scenario.getResources().size() + " resources");
         }
     }
     
-    /**
-     * Adds all patient-based demo resources to the FHIR server.
-     */
-    public void onClick$btnAddAllForPatient() {
-        Patient patient = getPatient();
+    public void onClick$btnDelete() {
+        Scenario scenario = loadSelectedScenario();
         
-        if (patient != null) {
-            showMessage(ADDALL, bootstrapper.addAll(patient));
+        if (scenario != null) {
+            bootstrapper.deleteScenario(scenario);
+            setMessage("Deleted " + scenario.getResources().size() + " resources");
         }
     }
     
-    /**
-     * Deletes all patient-based demo resources from the FHIR server.
-     */
-    public void onClick$btnDelAllForPatient() {
-        Patient patient = getPatient();
+    private Scenario loadSelectedScenario() {
+        Scenario scenario = null;
         
-        if (patient != null) {
-            showMessage(DELETEALL, bootstrapper.deleteAll(patient));
+        try {
+            scenario = bootstrapper.loadScenario(getSelectedScenario());
+        } catch (Exception e) {
+            setMessage(ZKUtil.formatExceptionForDisplay(e));
         }
-    }
-    
-    /**
-     * Adds demo patients to the FHIR server.
-     */
-    public void onClick$btnAddPatients() {
-        showAdded(bootstrapper.addPatients().size());
-    }
-    
-    /**
-     * Deletes demo patients from the FHIR server.
-     */
-    public void onClick$btnDelPatients() {
-        clearPatient();
-        showDeleted(bootstrapper.deletePatients());
-    }
-    
-    // --------------- Practitioner Resources ---------------
-    
-    /**
-     * Adds demo practitioners to the FHIR server.
-     */
-    public void onClick$btnAddPractitioners() {
-        showAdded(bootstrapper.addPractitioners().size());
-    }
-    
-    /**
-     * Deletes demo practitioners from the FHIR server.
-     */
-    public void onClick$btnDelPractitioners() {
-        showDeleted(bootstrapper.deletePractitioners());
-    }
-    
-    // --------------- Location Resources ---------------
-    
-    /**
-     * Adds demo locations to the FHIR server.
-     */
-    public void onClick$btnAddLocations() {
-        showAdded(bootstrapper.addLocations().size());
-    }
-    
-    /**
-     * Deletes demo locations from the FHIR server.
-     */
-    public void onClick$btnDelLocations() {
-        showDeleted(bootstrapper.deleteLocations());
-    }
-    
-    // --------------- Medication Administration Resources ---------------
-    
-    /**
-     * Adds demo medication administrations to the FHIR server.
-     */
-    public void onClick$btnAddMedAdmins() {
-        Patient patient = getPatient();
         
-        if (patient != null) {
-            showAdded(bootstrapper.addMedicationAdministrations(patient).size());
-        }
+        return scenario;
     }
     
-    /**
-     * Deletes demo medication administrations from the FHIR server.
-     */
-    public void onClick$btnDelMedAdmins() {
-        showDeleted(bootstrapper.deleteMedicationAdministrations());
+    private String getSelectedScenario() {
+        Comboitem item = cboScenarios.getSelectedItem();
+        return item == null ? null : item.getLabel();
     }
     
-    // --------------- Medication Order Resources ---------------
-    
-    /**
-     * Adds demo medication orders to the FHIR server.
-     */
-    public void onClick$btnAddMedOrders() {
-        Patient patient = getPatient();
-        
-        if (patient != null) {
-            showAdded(bootstrapper.addMedicationOrders(patient).size());
-        }
+    private void setMessage(String msg) {
+        lblMessage.setValue(msg);
     }
-    
-    /**
-     * Deletes demo medication orders from the FHIR server.
-     */
-    public void onClick$btnDelMedOrders() {
-        showDeleted(bootstrapper.deleteMedicationOrders());
-    }
-    
-    // --------------- Condition Resources ---------------
-    
-    /**
-     * Adds demo conditions to the FHIR server.
-     */
-    public void onClick$btnAddConditions() {
-        Patient patient = getPatient();
-        
-        if (patient != null) {
-            showAdded(bootstrapper.addConditions(patient).size());
-        }
-    }
-    
-    /**
-     * Deletes demo conditions from the FHIR server.
-     */
-    public void onClick$btnDelConditions() {
-        showDeleted(bootstrapper.deleteConditions());
-    }
-    
-    // --------------- Document Resources ---------------
-    
-    /**
-     * Adds demo documents to the FHIR server.
-     */
-    public void onClick$btnAddDocuments() {
-        Patient patient = getPatient();
-        
-        if (patient != null) {
-            showAdded(bootstrapper.addDocuments(patient).size());
-        }
-    }
-    
-    /**
-     * Deletes demo documents from the FHIR server.
-     */
-    public void onClick$btnDelDocuments() {
-        showDeleted(bootstrapper.deleteDocuments());
-    }
-    
 }
