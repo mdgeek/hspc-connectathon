@@ -21,13 +21,11 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
 
-import org.zkoss.zk.ui.Component;
-
+import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Encounter;
-import org.hl7.fhir.dstu3.model.Encounter.EncounterClass;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterParticipantComponent;
-import org.hl7.fhir.dstu3.model.Encounter.EncounterState;
+import org.hl7.fhir.dstu3.model.Encounter.EncounterStatus;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Period;
@@ -37,9 +35,9 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.zkoss.zk.ui.Component;
 
 public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
-    
     
     private final DocumentService service;
     
@@ -53,8 +51,9 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         final Encounter encounter = new Encounter();
         encounter.setPatient(document.getReference().getSubject());
         encounter.setPeriod(new Period());
-        encounter.setStatus(EncounterState.INPROGRESS);
-        encounter.setClass_(EncounterClass.INPATIENT);
+        encounter.setStatus(EncounterStatus.INPROGRESS);
+        Coding class_ = new Coding("http://hl7.org/fhir/ValueSet/v3-ActEncounterCode", "inpatient", "inpatient");
+        encounter.setClass_(class_);
         Identifier ident = DemoUtils.createIdentifier("patient", "mother");
         Patient mother = FhirUtil.getFirst(service.searchResourcesByIdentifier(ident, Patient.class));
         
@@ -68,7 +67,6 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         DemoUtils.addDemoTag(encounter);
         
         processResponses(responses, new IResponseProcessor() {
-            
             
             @Override
             public void processResponse(String value, String targetId) {

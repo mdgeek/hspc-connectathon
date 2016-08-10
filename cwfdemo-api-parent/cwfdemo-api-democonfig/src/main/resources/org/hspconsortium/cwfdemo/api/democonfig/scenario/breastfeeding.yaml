@@ -14,6 +14,7 @@ practitioner1:
     source: resource/practitioner_emory_fry
     
 condition1:
-    source: resource/condition_diabetes
+    source: resource/condition_generic
     patient: patient1
     practitioner: practitioner1
+    code: snippet/sct_fever

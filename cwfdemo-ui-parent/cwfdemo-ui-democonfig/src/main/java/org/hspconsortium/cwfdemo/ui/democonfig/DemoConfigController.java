@@ -56,7 +56,7 @@ public class DemoConfigController extends PluginController {
     
     private Button btnDelete;
     
-    private Button btnLoad;
+    private Button btnInit;
     
     private Label lblMessage;
     
@@ -83,42 +83,54 @@ public class DemoConfigController extends PluginController {
     public void onSelect$cboScenarios() {
         boolean disabled = getSelectedScenario() == null;
         btnDelete.setDisabled(disabled);
-        btnLoad.setDisabled(disabled);
-        setMessage(null);
+        btnInit.setDisabled(disabled);
+        
+        if (disabled) {
+            setMessage(null);
+        } else {
+            loadScenario();
+        }
     }
     
-    public void onClick$btnLoad() {
-        Scenario scenario = loadSelectedScenario();
+    private void loadScenario() {
+        Scenario scenario = getSelectedScenario();
         
         if (scenario != null) {
-            setMessage("Loaded " + scenario.getResources().size() + " resources");
+            try {
+                scenario.load();
+                setMessage(
+                    "Scenario " + scenario.getName() + " contains " + scenario.getResources().size() + " resource(s)");
+            } catch (Exception e) {
+                setMessage(ZKUtil.formatExceptionForDisplay(e));
+            }
+        }
+    }
+    
+    public void onClick$btnInit() {
+        Scenario scenario = getSelectedScenario();
+        
+        if (scenario != null) {
+            try {
+                scenario.init();
+                setMessage("Created " + scenario.getResources().size() + " resources");
+            } catch (Exception e) {
+                setMessage(ZKUtil.formatExceptionForDisplay(e));
+            }
         }
     }
     
     public void onClick$btnDelete() {
-        Scenario scenario = loadSelectedScenario();
+        Scenario scenario = getSelectedScenario();
         
         if (scenario != null) {
-            bootstrapper.deleteScenario(scenario);
-            setMessage("Deleted " + scenario.getResources().size() + " resources");
+            int count = scenario.destroy();
+            setMessage("Deleted " + count + " resources");
         }
     }
     
-    private Scenario loadSelectedScenario() {
-        Scenario scenario = null;
-        
-        try {
-            scenario = bootstrapper.loadScenario(getSelectedScenario());
-        } catch (Exception e) {
-            setMessage(ZKUtil.formatExceptionForDisplay(e));
-        }
-        
-        return scenario;
-    }
-    
-    private String getSelectedScenario() {
+    private Scenario getSelectedScenario() {
         Comboitem item = cboScenarios.getSelectedItem();
-        return item == null ? null : item.getLabel();
+        return item == null ? null : bootstrapper.getScenario(item.getLabel());
     }
     
     private void setMessage(String msg) {

@@ -25,6 +25,7 @@ import java.util.List;
 import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
+import org.hl7.fhir.instance.model.api.IBaseCoding;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 
@@ -33,10 +34,12 @@ import ca.uhn.fhir.model.api.Tag;
 public class DemoUtils {
     
     
+    public static final String DEMO_URN = "urn:cogmedsys:hsp:model:demo";
+    
     /**
      * Identifier used to locate demo resources for bulk deletes.
      */
-    public static final Tag DEMO_GROUP_TAG = new Tag("urn:cogmedsys:hsp:model:demo", "gen", "Demo Data");
+    public static final Tag DEMO_GROUP_TAG = new Tag(DEMO_URN, "gen", "Demo Data");
     
     /**
      * Convenience method for creating identifiers in local system.
@@ -125,6 +128,33 @@ public class DemoUtils {
      */
     public static void addDemoTag(IBaseResource resource) {
         FhirUtil.addTag(DEMO_GROUP_TAG, resource);
+    }
+    
+    /**
+     * Adds the demo tag to a resource for scenario-based deletes.
+     * 
+     * @param resource The resource.
+     * @param scenario The scenario to which this resource belongs.
+     * @param label The tag label.
+     */
+    public static void addDemoTag(IBaseResource resource, String scenario, String label) {
+        FhirUtil.addTag(createScenarioTag(scenario, label), resource);
+    }
+    
+    /**
+     * Creates a tag to be used for scenario-based deletes.
+     * 
+     * @param scenario The scenario name.
+     * @param label The tag's label.
+     * @return The newly created tag.
+     */
+    public static Tag createScenarioTag(String scenario, String label) {
+        return new Tag(DEMO_URN, scenario, label);
+    }
+    
+    public static Tag getScenarioTag(IBaseResource resource, String scenario) {
+        IBaseCoding coding = resource.getMeta().getTag(DEMO_URN, scenario);
+        return coding == null ? null : new Tag(coding.getSystem(), coding.getCode(), coding.getDisplay());
     }
     
 }

@@ -19,14 +19,6 @@
 
 	<beans profile="desktop">
 
-		<!-- globalEventDispatcher: Mediates communications between the local and 
-			the global event manager, in this case an EPS server. -->
-		<bean id="globalEventDispatcher" init-method="init"
-			destroy-method="destroy" cwf:override="always"
-			class="org.hspconsortium.cwfdemo.api.eps.GlobalEventDispatcher">
-			<constructor-arg ref="cwfEPSService" />
-			<property name="localEventDispatcher" ref="eventManager" />
-		</bean>
 
 	</beans>
 </beans>

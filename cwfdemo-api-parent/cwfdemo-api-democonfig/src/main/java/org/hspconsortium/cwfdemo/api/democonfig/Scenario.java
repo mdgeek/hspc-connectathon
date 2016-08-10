@@ -39,6 +39,7 @@ import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.yaml.snakeyaml.Yaml;
 
+import ca.uhn.fhir.model.api.Tag;
 import ca.uhn.fhir.parser.IParser;
 
 public class Scenario {
@@ -50,29 +51,17 @@ public class Scenario {
     
     private final Map<String, Map<String, String>> config;
     
-    private final IParser jsonParser;
-    
     private final String name;
+    
+    private final BaseService fhirService;
+    
+    private boolean initialized;
     
     @SuppressWarnings("unchecked")
     public Scenario(String name, BaseService fhirService) {
         this.name = name;
-        this.jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
-        
+        this.fhirService = fhirService;
         config = (Map<String, Map<String, String>>) new Yaml().load(getResourceAsStream("scenario/" + name + ".yaml"));
-        
-        for (String key : config.keySet()) {
-            Map<String, String> map = config.get(key);
-            String source = map.get("source");
-            
-            if (source == null) {
-                throw new RuntimeException("No source specified in scenario.");
-            }
-            
-            IBaseResource resource = parseResource(source, map);
-            resource = fhirService.createOrUpdateResource(resource);
-            resources.put(key, resource);
-        }
     }
     
     public String getName() {
@@ -83,12 +72,63 @@ public class Scenario {
         return new ArrayList<>(resources.values());
     }
     
+    public Scenario init() {
+        if (initialized) {
+            destroy();
+        }
+        
+        IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
+        
+        for (String name : config.keySet()) {
+            Map<String, String> map = config.get(name);
+            String source = map.get("source");
+            
+            if (source == null) {
+                throw new RuntimeException("No source specified in scenario.");
+            }
+            
+            IBaseResource resource = parseResource(source, map, jsonParser);
+            resource = fhirService.createOrUpdateResource(resource);
+            resources.put(name, resource);
+        }
+        
+        initialized = true;
+        return this;
+    }
+    
+    public Scenario load() {
+        if (initialized) {
+            return this;
+        }
+        
+        List<IBaseResource> existing = fhirService.searchResourcesByTag(DemoUtils.createScenarioTag(name, null));
+        
+        for (IBaseResource resource : existing) {
+            Tag tag = DemoUtils.getScenarioTag(resource, name);
+            
+            if (tag != null && tag.getLabel() != null) {
+                resources.put(tag.getLabel(), resource);
+            }
+        }
+        
+        initialized = true;
+        return this;
+    }
+    
+    public int destroy() {
+        Tag tag = DemoUtils.createScenarioTag(name, null);
+        int count = fhirService.deleteResourcesByTag(tag);
+        resources.clear();
+        initialized = false;
+        return count;
+    }
+    
     private InputStream getResourceAsStream(String path) {
         return Scenario.class.getClassLoader().getResourceAsStream(CONFIG_PATH + path);
     }
     
-    private IBaseResource parseResource(String source, Map<String, String> map) {
-        source = source.contains(".") ? source : source + ".json";
+    private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser) {
+        source = addExtension(source, "json");
         StringBuilder sb = new StringBuilder();
         
         try (InputStream is = getResourceAsStream(source);) {
@@ -118,24 +158,51 @@ public class Scenario {
         
         IBaseResource resource = jsonParser.parseResource(sb.toString());
         DemoUtils.addDemoTag(resource);
+        DemoUtils.addDemoTag(resource, name, source);
         return resource;
     }
     
+    /**
+     * Add default extension if one is not present.
+     * 
+     * @param source File resource path.
+     * @param dflt The default extension.
+     * @return File resource path with extension.
+     */
+    private String addExtension(String source, String dflt) {
+        return source.contains(".") ? source : source + "." + dflt;
+    }
+    
+    /**
+     * Evaluate an expression.
+     * 
+     * @param exp The expression. The general format is
+     *            <p>
+     *            <code>type/value</code>
+     *            </p>
+     *            If <code>type</code> is omitted, it is assumed to be a placeholder for a resource
+     *            previously defined. Possible values for <code>type</code> are:
+     *            <ul>
+     *            <li>value - A literal value; inserted as is</li>
+     *            <li>date - A date value; can be a relative date (T+n, for example)</li>
+     *            <li>image - A file containing an image</li>
+     *            <li>snippet - A file containing a snippet to be inserted</li>
+     *            </ul>
+     * @return The result of the evaluation.
+     */
     private String eval(String exp) {
         int i = exp.indexOf('/');
         
         if (i == -1) {
-            IBaseResource resource = resources.get(exp);
-            
-            if (resource == null) {
-                throw new RuntimeException("Resource not defined: " + exp);
-            }
-            
-            return resource.getIdElement().getValue();
+            return doReference(exp);
         }
         
         String type = exp.substring(0, i);
         String value = exp.substring(i + 1);
+        
+        if ("value".equals(type)) {
+            return value;
+        }
         
         if ("date".equals(type)) {
             return doDate(value);
@@ -145,7 +212,21 @@ public class Scenario {
             return doBinary(exp);
         }
         
+        if ("snippet".equals(type)) {
+            return doSnippet(exp);
+        }
+        
         throw new RuntimeException("Unknown type: " + type);
+    }
+    
+    private String doReference(String value) {
+        IBaseResource resource = resources.get(value);
+        
+        if (resource == null) {
+            throw new RuntimeException("Resource not defined: " + value);
+        }
+        
+        return resource.getIdElement().getValue();
     }
     
     private String doBinary(String value) {
@@ -156,17 +237,25 @@ public class Scenario {
         }
     }
     
-    private String doDate(String value) {
-        String s = value.toLowerCase().trim();
-        char first = s.charAt(0);
+    private String doSnippet(String value) {
+        value = addExtension(value, "json");
         
-        if (first == 't' || first == 'n') {
-            Date date = DateUtil.parseDate(s);
-            
-            if (date != null) {
-                BaseDateTimeType dtt = first == 't' ? new DateTimeType(date) : new DateType(date);
-                value = dtt.getValueAsString();
-            }
+        try (InputStream is = getResourceAsStream(value)) {
+            return IOUtils.toString(is);
+        } catch (Exception e) {
+            throw MiscUtil.toUnchecked(e);
+        }
+    }
+    
+    private String doDate(String value) {
+        boolean dateOnly = value.toLowerCase().trim().charAt(0) == 't';
+        Date date = DateUtil.parseDate(value);
+        
+        if (date != null) {
+            BaseDateTimeType dtt = dateOnly ? new DateType(date) : new DateTimeType(date);
+            value = dtt.getValueAsString();
+        } else {
+            throw new RuntimeException("Bad date specification: " + value);
         }
         
         return value;

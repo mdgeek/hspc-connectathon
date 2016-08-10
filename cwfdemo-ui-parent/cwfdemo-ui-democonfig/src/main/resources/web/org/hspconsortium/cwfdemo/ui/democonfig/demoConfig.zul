@@ -8,10 +8,10 @@
 		<combobox id="cboScenarios" readonly="true" width="100%"
 			placeholder="Select a scenario"/>
 		<space height="10px" />
-		<toolbar align="center">
+		<toolbar align="center" mold="panel">
 			<button id="btnDelete" label="Delete Scenario" disabled="true"
 				zclass="btn" sclass="btn-danger btn-xs"/>
-			<button id="btnLoad" label="Load Scenario" disabled="true"
+			<button id="btnInit" label="Initialize Scenario" disabled="true"
 				zclass="btn" sclass="btn-success btn-xs"/>
 		</toolbar>
 		<space height="10px" />

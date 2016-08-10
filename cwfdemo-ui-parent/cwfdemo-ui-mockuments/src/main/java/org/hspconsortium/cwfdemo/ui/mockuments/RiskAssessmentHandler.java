@@ -21,16 +21,15 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
 
-import org.zkoss.zk.ui.Component;
-
+import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.RiskAssessment;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.zkoss.zk.ui.Component;
 
 public class RiskAssessmentHandler extends BaseQuestionnaireHandler {
-    
     
     private final DocumentService service;
     
@@ -45,9 +44,8 @@ public class RiskAssessmentHandler extends BaseQuestionnaireHandler {
         DemoUtils.addDemoTag(ra);
         ra.setSubject(document.getReference().getSubject());
         ra.setPerformer(FhirUtil.getFirst(document.getReference().getAuthor()));
-        ra.setDate(new Date());
+        ra.setOccurrence(new DateTimeType(new Date()));
         processResponses(responses, new BaseQuestionnaireHandler.IResponseProcessor() {
-            
             
             @Override
             public void processResponse(String value, String targetId) {

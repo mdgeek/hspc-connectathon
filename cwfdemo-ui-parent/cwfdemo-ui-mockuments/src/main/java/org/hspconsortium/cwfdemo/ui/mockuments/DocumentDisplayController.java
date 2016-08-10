@@ -22,7 +22,9 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 import org.carewebframework.ui.FrameworkController;
 import org.carewebframework.ui.zk.PromptDialog;
 import org.carewebframework.ui.zk.ZKUtil;
-
+import org.hspconsortium.cwf.fhir.document.Document;
+import org.hspconsortium.cwf.fhir.document.DocumentContent;
+import org.hspconsortium.cwf.ui.reporting.Util;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;
@@ -32,18 +34,12 @@ import org.zkoss.zul.Iframe;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 
-import org.hspconsortium.cwf.fhir.document.Document;
-import org.hspconsortium.cwf.fhir.document.DocumentContent;
-import org.hspconsortium.cwf.ui.reporting.Util;
-
 /**
  * Controller for displaying the contents of selected documents.
  */
 public class DocumentDisplayController extends FrameworkController {
     
-    
     public interface IDocumentOperation {
-        
         
         boolean hasChanged();
         

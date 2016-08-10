@@ -20,20 +20,14 @@
 package org.hspconsortium.cwfdemo.api.democonfig;
 
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import org.carewebframework.api.spring.SpringUtil;
 import org.carewebframework.common.MiscUtil;
 
 import org.springframework.core.io.Resource;
 
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 
 /**
@@ -42,8 +36,6 @@ import org.hspconsortium.cwf.fhir.common.BaseService;
  */
 public class Bootstrapper {
     
-    
-    private static final Log log = LogFactory.getLog(Bootstrapper.class);
     
     protected static final String CONFIG_PATH = "org/hspconsortium/cwfdemo/api/democonfig/";
     
@@ -78,28 +70,17 @@ public class Bootstrapper {
         return scenarios.keySet();
     }
     
-    public Scenario loadScenario(String key) {
-        Scenario scenario = scenarios.get(key);
+    public Scenario getScenario(String name) {
+        Scenario scenario = scenarios.get(name);
         
         if (scenario == null) {
-            scenarios.put(key, scenario = new Scenario(key, fhirService));
+            scenarios.put(name, scenario = new Scenario(name, fhirService));
         }
         
         return scenario;
     }
     
-    public void deleteScenario(String name) {
-        deleteScenario(loadScenario(name));
-    }
-    
-    public void deleteScenario(Scenario scenario) {
-        List<IBaseResource> resources = scenario.getResources();
-        Collections.reverse(resources);
-        
-        for (IBaseResource resource : resources) {
-            fhirService.deleteResource(resource);
-        }
-        
-        scenarios.put(scenario.getName(), null);
+    public int deleteScenario(Scenario scenario) {
+        return scenario.destroy();
     }
 }

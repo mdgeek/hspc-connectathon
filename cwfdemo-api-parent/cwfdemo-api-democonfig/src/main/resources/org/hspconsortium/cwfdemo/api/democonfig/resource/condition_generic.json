@@ -10,8 +10,10 @@
     "asserter":{
         "reference":"${practitioner}"
     },
-    "code":{
-        "text":"Diabetes"
-    },
+	"code": {
+	    "coding": [
+	    	${code}
+	    ]
+  	},
     "verificationStatus":"provisional"
 }
