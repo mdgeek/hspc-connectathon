@@ -23,6 +23,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hl7.fhir.dstu3.exceptions.FHIRException;
+import org.hl7.fhir.dstu3.model.MedicationAdministration;
+import org.hl7.fhir.dstu3.model.MedicationOrder;
+import org.hl7.fhir.dstu3.model.MedicationOrder.MedicationOrderDosageInstructionComponent;
+import org.hl7.fhir.dstu3.model.Quantity;
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
+import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
+import org.hspconsortium.cwfdemo.ui.mar.controller.MainController;
+import org.hspconsortium.cwfdemo.ui.mar.model.MarModel;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zul.Cell;
@@ -34,16 +43,6 @@ import org.zkoss.zul.Row;
 import org.zkoss.zul.RowRenderer;
 import org.zkoss.zul.Vbox;
 
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
-import org.hl7.fhir.dstu3.model.MedicationAdministration;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
-import org.hl7.fhir.dstu3.model.MedicationOrder.MedicationOrderDosageInstructionComponent;
-import org.hl7.fhir.dstu3.model.Quantity;
-import org.hspconsortium.cwf.fhir.common.FhirUtil;
-import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
-import org.hspconsortium.cwfdemo.ui.mar.controller.MainController;
-import org.hspconsortium.cwfdemo.ui.mar.model.MarModel;
-
 /**
  * Medication Administration Record Grid Renderer. Renderer identifies grid cells with the
  * placeholder text, generally an "x" and replace the placeholder with an icon specified by the
@@ -52,7 +51,6 @@ import org.hspconsortium.cwfdemo.ui.mar.model.MarModel;
  * @author cnanjo
  */
 public class MarRenderer implements RowRenderer<List<Object>> {
-    
     
     /**
      * Formats dates to the form 12:05 PM
@@ -72,7 +70,6 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     private MainController marController;
     
     public class SignMedAdminListener implements EventListener<MouseEvent> {
-        
         
         private MedicationOrder prescription;
         
@@ -104,6 +101,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     /**
      * Constructor
      * 
+     * @param marController
      * @param imagePlaceholder The placeholder for the image
      * @param imagePath The path of the image
      */
@@ -198,6 +196,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
      * 
      * @param grid
      * @param marModel
+     * @param marRenderer
      */
     public static void populateGrid(Grid grid, MarModel marModel, MarRenderer marRenderer) {
         if (marRenderer != null) {
@@ -271,7 +270,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
         } else {
             item += "|";
         }
-        Quantity adminQty = medAdmin.getDosage().getQuantity();
+        Quantity adminQty = medAdmin.getDosage().getDose();
         Quantity orderQty = (Quantity) order.getDosageInstruction().get(0).getDose();
         if (!FhirUtil.equalQuantities(adminQty, orderQty)) {
             item += "Dose adj. " + adminQty.getValue() + " " + getUnitLabel(adminQty.getUnit()) + " at ";

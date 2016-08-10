@@ -34,19 +34,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PromptDialog;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.Decimalbox;
-import org.zkoss.zul.Textbox;
-
 import org.hl7.fhir.dstu3.exceptions.FHIRException;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DateTimeType;
@@ -64,12 +54,18 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.medication.MedicationService;
 import org.hspconsortium.cwfdemo.api.eps.EPSService;
 import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.Decimalbox;
+import org.zkoss.zul.Textbox;
 
 /**
  * 
  */
 public class SimpleMedicationAdministrationController extends PluginController {
-    
     
     private static final long serialVersionUID = 1908890098540845685L;
     
@@ -82,8 +78,6 @@ public class SimpleMedicationAdministrationController extends PluginController {
     private final MedicationService medicationService;
     
     private final EPSService epsService;
-    
-    private MainController marController;
     
     /**
      * Textbox for the doseQuantity
@@ -162,6 +156,9 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * No-arg constructor
+     * 
+     * @param epsService
+     * @param medicationService
      */
     public SimpleMedicationAdministrationController(EPSService epsService, MedicationService medicationService) {
         this.epsService = epsService;
@@ -172,6 +169,9 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * Accessor Methods
      *********************************************************************************************/
     
+    /**
+     * @return
+     */
     public Decimalbox getDoseQuantity() {
         return doseQuantity;
     }
@@ -254,6 +254,8 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * Method populates the administrable medications for the patient
+     * 
+     * @param order
      */
     public void populateMedSelector(MedicationOrder order) {//TODO For demo only. In future, reference a repository
         Map<String, Comboitem> meds = new HashMap<String, Comboitem>();
@@ -517,6 +519,8 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * Creates a new medication administration entry if a selection has been made in the medication
      * combo box. If there is not medication selected or no active patient then the method will do
      * nothing.
+     * 
+     * @param event
      */
     public void onClick$btnMarAdminister(Event event) {
         
@@ -551,6 +555,8 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * Creates a new medication administration entry if a selection has been made in the medication
      * combo box. If there is not medication selected or no active patient then the method will do
      * nothing.
+     * 
+     * @param event
      */
     public void onClick$btnOrderMedication(Event event) {
         
@@ -591,7 +597,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
         administration.setEffectiveTime(administrationTime);
         MedicationAdministrationDosageComponent dose = new MedicationAdministrationDosageComponent();
         administration.setDosage(dose);
-        dose.setQuantity(formHelper.getDoseQuantity());
+        dose.setDose(formHelper.getDoseQuantity());
         administration.addIdentifier(generatedMedAdminsIdentifier);
         dose.setRoute(formHelper.getSelectedRoute());
         administration.setPatientTarget(patient);
@@ -635,6 +641,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * topic.
      * 
      * @param medAdmin
+     * @param epsTopic
      */
     public void publishJsonPayloadToEpsTopic(MedicationAdministration medAdmin, String epsTopic) {
         epsService.publishResourceToTopic(epsTopic, medAdmin, "New Medication Administration",
