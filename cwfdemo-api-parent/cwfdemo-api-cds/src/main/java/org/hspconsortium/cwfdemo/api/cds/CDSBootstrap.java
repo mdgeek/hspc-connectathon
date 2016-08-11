@@ -33,7 +33,6 @@ import com.cognitivemedicine.hl7.cds.pubsub.eps.EPSClient;
  */
 public class CDSBootstrap {
     
-    
     private final CDSConfigurator config;
     
     private CDSSystem cds;
@@ -50,6 +49,7 @@ public class CDSBootstrap {
         String ucsClientURL = config.getUcsClientUrl();
         int ucsClientPort = config.getUcsClientPort();
         int ucsAlertingPort = config.getUcsAlertingPort();
+        int ucsPingPort = config.getUcsPingPort();
         
         String epsEndpoint = config.getEpsEndpoint();
         String epsUser = config.getEpsUser();
@@ -62,8 +62,8 @@ public class CDSBootstrap {
         EPSClient pubSubClient = EPSClient.getInstance();
         pubSubClient.init(epsEndpoint, epsUser, epsPassword, epsPollTime);
         EvaluateOperationExecutor evaluateOperationExecutor = new HapiEvaluateOperationExecutor(fhirEvaluateURL);
-        CommunicationServiceClient communicationServiceClient = new UCSClient(ucsServerURL, ucsClientPort, ucsAlertingPort,
-                ucsClientURL);
+        CommunicationServiceClient communicationServiceClient = new UCSClient(ucsServerURL, ucsPingPort, ucsClientPort,
+                ucsAlertingPort, ucsClientURL);
         
         cds = new CDSSystem(dataSource, pubSubClient, evaluateOperationExecutor, communicationServiceClient);
         cds.start(cdsTopic);

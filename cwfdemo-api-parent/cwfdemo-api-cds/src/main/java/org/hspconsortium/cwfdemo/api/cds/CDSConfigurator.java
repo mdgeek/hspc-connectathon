@@ -23,7 +23,6 @@ import org.springframework.beans.factory.annotation.Value;
 
 public class CDSConfigurator {
     
-    
     /**
      * The host where ucs-nifi is running.
      */
@@ -44,6 +43,9 @@ public class CDSConfigurator {
     
     @Value("${org.socraticgrid.hl7.ucs.nifiAlertingCommandPort}")
     private int ucsAlertingPort;
+    
+    @Value("${org.socraticgrid.hl7.ucs.nifiPingPort}")
+    private int ucsPingPort;
     
     @Value("${org.socraticgrid.hl7.eps.endpoint}")
     private String epsEndpoint;
@@ -82,6 +84,10 @@ public class CDSConfigurator {
     
     public int getUcsAlertingPort() {
         return ucsAlertingPort;
+    }
+    
+    public int getUcsPingPort() {
+        return ucsPingPort;
     }
     
     public String getEpsEndpoint() {
