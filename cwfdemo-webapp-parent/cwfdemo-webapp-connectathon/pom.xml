@@ -8,7 +8,7 @@
 	</parent>
 	
 	<name>Web App Demo</name>
-	<artifactId>cwfdemo-webapp-montreal</artifactId>
+	<artifactId>cwfdemo-webapp-connectathon</artifactId>
 	<packaging>war</packaging>
 	
 	<description>
