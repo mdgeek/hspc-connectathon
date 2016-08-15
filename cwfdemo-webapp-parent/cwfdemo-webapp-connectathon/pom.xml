@@ -167,11 +167,6 @@
 		<!-- CareWeb Framework components -->
 		<dependency>
 			<groupId>org.carewebframework</groupId>
-			<artifactId>org.carewebframework.messaging.kafka</artifactId>
-			<version>5.0.0-SNAPSHOT</version>
-		</dependency>
-		<dependency>
-			<groupId>org.carewebframework</groupId>
 			<artifactId>org.carewebframework.ui.popupsupport</artifactId>
 			<version>5.0.0-SNAPSHOT</version>
 		</dependency>
