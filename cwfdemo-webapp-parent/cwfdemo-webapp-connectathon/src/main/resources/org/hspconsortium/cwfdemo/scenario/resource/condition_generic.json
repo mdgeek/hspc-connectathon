@@ -2,7 +2,7 @@
     "resourceType":"Condition",
     "text":{
         "status":"generated",
-        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Diabetes</div>"
+        "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Fever</div>"
     },
     "subject":{
         "reference":"${patient}"
