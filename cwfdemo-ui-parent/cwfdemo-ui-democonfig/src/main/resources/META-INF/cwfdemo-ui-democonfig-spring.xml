@@ -30,11 +30,7 @@
 	
 		<bean id="cwfDemoConfigController" scope="prototype"
 			class="org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController">
-			<constructor-arg>
-				<bean class="org.hspconsortium.cwfdemo.api.democonfig.Bootstrapper">
-					<constructor-arg ref="fhirService" />
-				</bean>
-			</constructor-arg>
+			<constructor-arg ref="cwfDemoConfigBootstrapper" />
 		</bean>	
 			
 	</beans>

@@ -31,16 +31,14 @@ package org.hspconsortium.cwfdemo.ui.democonfig;
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PopupDialog;
 import org.carewebframework.ui.zk.ZKUtil;
-
+import org.hspconsortium.cwfdemo.api.democonfig.Bootstrapper;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
-
-import org.hspconsortium.cwfdemo.api.democonfig.Bootstrapper;
-import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 
 /**
  * This controller is only intended to be used for demo purposes in order to stage and unstage data.
@@ -49,8 +47,9 @@ import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
  */
 public class DemoConfigController extends PluginController {
     
-    
     private static final long serialVersionUID = 1L;
+    
+    private static final String ATTR_SCENARIO = "scenario";
     
     private Combobox cboScenarios;
     
@@ -77,6 +76,10 @@ public class DemoConfigController extends PluginController {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
+        refreshScenarios();
+    }
+    
+    private void refreshScenarios() {
         cboScenarios.setModel(new ListModelList<String>(bootstrapper.getScenarios()));
     }
     
@@ -130,7 +133,18 @@ public class DemoConfigController extends PluginController {
     
     private Scenario getSelectedScenario() {
         Comboitem item = cboScenarios.getSelectedItem();
-        return item == null ? null : bootstrapper.getScenario(item.getLabel());
+        Scenario scenario = null;
+        
+        if (item != null) {
+            scenario = (Scenario) item.getAttribute(ATTR_SCENARIO);
+            
+            if (scenario == null) {
+                scenario = bootstrapper.loadScenario(item.getLabel());
+                item.setAttribute(ATTR_SCENARIO, scenario);
+            }
+        }
+        
+        return scenario;
     }
     
     private void setMessage(String msg) {

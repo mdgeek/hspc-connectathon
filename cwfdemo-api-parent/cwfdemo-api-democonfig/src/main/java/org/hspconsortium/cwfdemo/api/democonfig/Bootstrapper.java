@@ -25,10 +25,8 @@ import java.util.TreeMap;
 
 import org.carewebframework.api.spring.SpringUtil;
 import org.carewebframework.common.MiscUtil;
-
-import org.springframework.core.io.Resource;
-
 import org.hspconsortium.cwf.fhir.common.BaseService;
+import org.springframework.core.io.Resource;
 
 /**
  * Currently hard coded but in later iterations, bootstrapper should be configured based on a
@@ -36,30 +34,28 @@ import org.hspconsortium.cwf.fhir.common.BaseService;
  */
 public class Bootstrapper {
     
-    
-    protected static final String CONFIG_PATH = "org/hspconsortium/cwfdemo/api/democonfig/";
-    
     /**
      * FHIR service for managing resources.
      */
     private final BaseService fhirService;
     
-    private final Map<String, Scenario> scenarios = new TreeMap<>();
+    private final Map<String, Resource> configs = new TreeMap<>();
     
     /**
      * Initialize with FHIR service and populate demo codes.
      * 
      * @param fhirService The FHIR service.
+     * @param scenarioBase Base path for scenario files.
      */
-    public Bootstrapper(BaseService fhirService) {
+    public Bootstrapper(BaseService fhirService, String scenarioBase) {
         this.fhirService = fhirService;
         
         try {
-            Resource[] resources = SpringUtil.getAppContext().getResources("classpath:" + CONFIG_PATH + "scenario/*.yaml");
+            Resource[] resources = SpringUtil.getAppContext().getResources(scenarioBase + "/*.yaml");
             
-            for (Resource scenario : resources) {
-                String fn = scenario.getFilename();
-                scenarios.put(fn.substring(0, fn.length() - 5), null);
+            for (Resource resource : resources) {
+                String fn = resource.getFilename();
+                configs.put(fn.substring(0, fn.length() - 5), resource);
             }
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);
@@ -67,17 +63,21 @@ public class Bootstrapper {
     }
     
     public Collection<String> getScenarios() {
-        return scenarios.keySet();
+        return configs.keySet();
     }
     
-    public Scenario getScenario(String name) {
-        Scenario scenario = scenarios.get(name);
+    public Scenario loadScenario(String name) {
+        Resource config = configs.get(name);
         
-        if (scenario == null) {
-            scenarios.put(name, scenario = new Scenario(name, fhirService));
+        if (config == null) {
+            throw new RuntimeException("Scenario not found:" + name);
         }
         
-        return scenario;
+        try {
+            return new Scenario(name, config, fhirService);
+        } catch (Exception e) {
+            throw MiscUtil.toUnchecked(e);
+        }
     }
     
     public int deleteScenario(Scenario scenario) {

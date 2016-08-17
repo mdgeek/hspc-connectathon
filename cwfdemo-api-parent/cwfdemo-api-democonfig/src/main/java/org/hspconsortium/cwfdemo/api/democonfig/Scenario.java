@@ -19,24 +19,27 @@
  */
 package org.hspconsortium.cwfdemo.api.democonfig;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
-import java.util.LinkedHashMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.io.IOUtils;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.carewebframework.common.DateUtil;
 import org.carewebframework.common.MiscUtil;
-
 import org.hl7.fhir.dstu3.model.BaseDateTimeType;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.DateType;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
+import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
 import ca.uhn.fhir.model.api.Tag;
@@ -44,32 +47,39 @@ import ca.uhn.fhir.parser.IParser;
 
 public class Scenario {
     
+    private static final Log log = LogFactory.getLog(Scenario.class);
     
-    private static final String CONFIG_PATH = Bootstrapper.CONFIG_PATH;
+    private final Map<String, IBaseResource> resourceMap = new HashMap<>();
     
-    private final Map<String, IBaseResource> resources = new LinkedHashMap<>();
+    private final List<IBaseResource> resourceList = new ArrayList<>();
     
     private final Map<String, Map<String, String>> config;
     
-    private final String name;
+    private final String scenarioName;
+    
+    private final Resource scenarioBase;
     
     private final BaseService fhirService;
     
     private boolean initialized;
     
     @SuppressWarnings("unchecked")
-    public Scenario(String name, BaseService fhirService) {
-        this.name = name;
+    public Scenario(String scenarioName, Resource scenarioBase, BaseService fhirService) throws IOException {
+        this.scenarioName = scenarioName;
+        this.scenarioBase = scenarioBase;
         this.fhirService = fhirService;
-        config = (Map<String, Map<String, String>>) new Yaml().load(getResourceAsStream("scenario/" + name + ".yaml"));
+        
+        try (InputStream in = scenarioBase.getInputStream()) {
+            config = (Map<String, Map<String, String>>) new Yaml().load(in);
+        }
     }
     
     public String getName() {
-        return name;
+        return scenarioName;
     }
     
     public List<IBaseResource> getResources() {
-        return new ArrayList<>(resources.values());
+        return Collections.unmodifiableList(resourceList);
     }
     
     public Scenario init() {
@@ -88,8 +98,11 @@ public class Scenario {
             }
             
             IBaseResource resource = parseResource(source, map, jsonParser);
+            DemoUtils.addDemoTag(resource);
+            DemoUtils.addScenarioTag(resource, scenarioName, name);
             resource = fhirService.createOrUpdateResource(resource);
-            resources.put(name, resource);
+            addResource(name, resource);
+            log.info("Created resource: " + name);
         }
         
         initialized = true;
@@ -101,13 +114,19 @@ public class Scenario {
             return this;
         }
         
-        List<IBaseResource> existing = fhirService.searchResourcesByTag(DemoUtils.createScenarioTag(name, null));
+        Tag scenarioTag = DemoUtils.createScenarioTag(scenarioName, null);
         
-        for (IBaseResource resource : existing) {
-            Tag tag = DemoUtils.getScenarioTag(resource, name);
+        for (Class<? extends IBaseResource> clazz : DemoUtils.getResourceClasses()) {
+            @SuppressWarnings("unchecked")
+            List<IBaseResource> existing = fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz);
             
-            if (tag != null && tag.getLabel() != null) {
-                resources.put(tag.getLabel(), resource);
+            for (IBaseResource resource : existing) {
+                String name = DemoUtils.getScenarioLabel(resource, scenarioName);
+                
+                if (name != null) {
+                    addResource(name, resource);
+                    log.info("Loaded resource: " + name);
+                }
             }
         }
         
@@ -115,16 +134,49 @@ public class Scenario {
         return this;
     }
     
+    private void addResource(String name, IBaseResource resource) {
+        if (resourceMap.containsKey(name)) {
+            log.warn("Duplicate resource key: " + name);
+        } else {
+            resourceMap.put(name, resource);
+        }
+        
+        resourceList.add(resource);
+    }
+    
     public int destroy() {
-        Tag tag = DemoUtils.createScenarioTag(name, null);
-        int count = fhirService.deleteResourcesByTag(tag);
-        resources.clear();
+        int count = resourceList.size();
+        
+        for (int pass = 2; pass >= 0; pass--) {
+            if (resourceList.isEmpty()) {
+                break;
+            }
+            
+            for (int i = resourceList.size() - 1; i >= 0; i--) {
+                IBaseResource resource = resourceList.get(i);
+                String name = DemoUtils.getScenarioLabel(resource, scenarioName);
+                
+                try {
+                    fhirService.deleteResource(resource);
+                    resourceList.remove(i);
+                    resourceMap.remove(name);
+                    log.info("Deleted resource: " + name);
+                } catch (Exception e) {
+                    if (pass == 0) {
+                        log.error("Failed to delete resource: " + name);
+                    }
+                }
+            }
+        }
+        
+        resourceList.clear();
+        resourceMap.clear();
         initialized = false;
         return count;
     }
     
-    private InputStream getResourceAsStream(String path) {
-        return Scenario.class.getClassLoader().getResourceAsStream(CONFIG_PATH + path);
+    private InputStream getResourceAsStream(String path) throws IOException {
+        return scenarioBase.createRelative(path).getInputStream();
     }
     
     private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser) {
@@ -156,10 +208,7 @@ public class Scenario {
             MiscUtil.toUnchecked(e);
         }
         
-        IBaseResource resource = jsonParser.parseResource(sb.toString());
-        DemoUtils.addDemoTag(resource);
-        DemoUtils.addDemoTag(resource, name, source);
-        return resource;
+        return jsonParser.parseResource(sb.toString());
     }
     
     /**
@@ -220,13 +269,13 @@ public class Scenario {
     }
     
     private String doReference(String value) {
-        IBaseResource resource = resources.get(value);
+        IBaseResource resource = resourceMap.get(value);
         
         if (resource == null) {
             throw new RuntimeException("Resource not defined: " + value);
         }
         
-        return resource.getIdElement().getValue();
+        return resource.getIdElement().getResourceType() + "/" + resource.getIdElement().getIdPart();
     }
     
     private String doBinary(String value) {

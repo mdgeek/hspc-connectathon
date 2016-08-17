@@ -19,27 +19,35 @@
  */
 package org.hspconsortium.cwfdemo.api.democonfig;
 
+import java.lang.reflect.Modifier;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.hl7.fhir.dstu3.model.DomainResource;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.instance.model.api.IBaseCoding;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hl7.fhir.instance.model.api.IDomainResource;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 
 import ca.uhn.fhir.model.api.Tag;
+import io.github.lukehutch.fastclasspathscanner.FastClasspathScanner;
+import io.github.lukehutch.fastclasspathscanner.matchprocessor.ImplementingClassMatchProcessor;
 
 public class DemoUtils {
-    
     
     public static final String DEMO_URN = "urn:cogmedsys:hsp:model:demo";
     
     /**
      * Identifier used to locate demo resources for bulk deletes.
      */
-    public static final Tag DEMO_GROUP_TAG = new Tag(DEMO_URN, "gen", "Demo Data");
+    public static final Tag DEMO_GROUP_TAG = new Tag(DEMO_URN, "*", "Demo Data");
+    
+    private static final Set<Class<? extends IBaseResource>> resourceClasses = new HashSet<>();
     
     /**
      * Convenience method for creating identifiers in local system.
@@ -122,7 +130,7 @@ public class DemoUtils {
     }
     
     /**
-     * Adds the demo tag to a resource for bulk deletes.
+     * Adds a tag to a resource for bulk deletes of demo data.
      * 
      * @param resource The resource.
      */
@@ -131,13 +139,13 @@ public class DemoUtils {
     }
     
     /**
-     * Adds the demo tag to a resource for scenario-based deletes.
+     * Adds a tag to a resource for scenario-based deletes.
      * 
      * @param resource The resource.
      * @param scenario The scenario to which this resource belongs.
      * @param label The tag label.
      */
-    public static void addDemoTag(IBaseResource resource, String scenario, String label) {
+    public static void addScenarioTag(IBaseResource resource, String scenario, String label) {
         FhirUtil.addTag(createScenarioTag(scenario, label), resource);
     }
     
@@ -157,4 +165,35 @@ public class DemoUtils {
         return coding == null ? null : new Tag(coding.getSystem(), coding.getCode(), coding.getDisplay());
     }
     
+    public static String getScenarioLabel(IBaseResource resource, String scenario) {
+        Tag tag = getScenarioTag(resource, scenario);
+        return tag == null ? null : tag.getLabel();
+    }
+    
+    /**
+     * This is a bit of a hack to enumerate all valid DSTU3 resource classes. It's used right now
+     * because many FHIR servers don't implement cross-resource searches.
+     * 
+     * @return Set of all valid DSTU3 resource classes.
+     */
+    public static Set<Class<? extends IBaseResource>> getResourceClasses() {
+        synchronized (resourceClasses) {
+            if (resourceClasses.isEmpty()) {
+                FastClasspathScanner fcs = new FastClasspathScanner("org.hl7.fhir.dstu3.model");
+                fcs.matchClassesImplementing(IDomainResource.class, new ImplementingClassMatchProcessor<IDomainResource>() {
+                    
+                    @Override
+                    public void processMatch(Class<? extends IDomainResource> implementingClass) {
+                        if (!Modifier.isAbstract(implementingClass.getModifiers())) {
+                            resourceClasses.add(implementingClass);
+                        }
+                    }
+                    
+                });
+                fcs.scan();
+            }
+            
+            return Collections.unmodifiableSet(resourceClasses);
+        }
+    }
 }

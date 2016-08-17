@@ -4,7 +4,7 @@
         "status":"generated",
         "div":"<div xmlns=\"http://www.w3.org/1999/xhtml\">Diabetes</div>"
     },
-    "patient":{
+    "subject":{
         "reference":"${patient}"
     },
     "asserter":{
