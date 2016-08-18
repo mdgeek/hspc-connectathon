@@ -37,10 +37,11 @@ import org.carewebframework.common.MiscUtil;
 import org.hl7.fhir.dstu3.model.BaseDateTimeType;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.DateType;
+import org.hl7.fhir.instance.model.api.IBaseCoding;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
 
-import ca.uhn.fhir.model.api.Tag;
 import ca.uhn.fhir.parser.IParser;
 
 public class Scenario {
@@ -53,10 +54,13 @@ public class Scenario {
     
     private final ScenarioDefinition scenarioDefinition;
     
+    private final IBaseCoding scenarioTag;
+    
     private boolean initialized;
     
     public Scenario(ScenarioDefinition scenarioDefinition) {
         this.scenarioDefinition = scenarioDefinition;
+        this.scenarioTag = ScenarioUtil.createScenarioTag(getName());
     }
     
     public String getName() {
@@ -86,7 +90,8 @@ public class Scenario {
             
             IBaseResource resource = parseResource(source, map, jsonParser);
             ScenarioUtil.addDemoTag(resource);
-            ScenarioUtil.addScenarioTag(resource, getName(), name);
+            FhirUtil.addTag(scenarioTag, resource);
+            ScenarioUtil.addResourceTag(resource, getName(), name);
             resource = fhirService.createOrUpdateResource(resource);
             addResource(name, resource);
             log.info("Created resource: " + name);
@@ -101,7 +106,6 @@ public class Scenario {
             return this;
         }
         
-        Tag scenarioTag = ScenarioUtil.createScenarioTag(getName(), null);
         BaseService fhirService = scenarioDefinition.getFhirService();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
@@ -109,7 +113,7 @@ public class Scenario {
             List<IBaseResource> existing = fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz);
             
             for (IBaseResource resource : existing) {
-                String name = ScenarioUtil.getScenarioLabel(resource, getName());
+                String name = ScenarioUtil.getResourceCode(resource, getName());
                 
                 if (name != null) {
                     addResource(name, resource);
@@ -143,7 +147,7 @@ public class Scenario {
             
             for (int i = resourceList.size() - 1; i >= 0; i--) {
                 IBaseResource resource = resourceList.get(i);
-                String name = ScenarioUtil.getScenarioLabel(resource, getName());
+                String name = ScenarioUtil.getResourceCode(resource, getName());
                 
                 try {
                     fhirService.deleteResource(resource);

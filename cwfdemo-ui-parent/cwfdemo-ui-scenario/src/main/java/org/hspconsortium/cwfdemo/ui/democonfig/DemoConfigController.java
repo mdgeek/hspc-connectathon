@@ -30,6 +30,7 @@ package org.hspconsortium.cwfdemo.ui.democonfig;
 
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PopupDialog;
+import org.carewebframework.ui.zk.PromptDialog;
 import org.carewebframework.ui.zk.ZKUtil;
 import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.hspconsortium.cwfdemo.api.democonfig.ScenarioDefinition;
@@ -44,8 +45,6 @@ import org.zkoss.zul.ListModelList;
 
 /**
  * This controller is only intended to be used for demo purposes in order to stage and unstage data.
- * At this time, it is fairly simple in its function. At a later time, it can be enhanced as needed
- * for demo or connectathon use cases.
  */
 public class DemoConfigController extends PluginController {
     
@@ -121,8 +120,7 @@ public class DemoConfigController extends PluginController {
         if (scenario != null) {
             try {
                 scenario.load();
-                setMessage(
-                    "Scenario " + scenario.getName() + " contains " + scenario.getResources().size() + " resource(s)");
+                setMessage(scenario.getResources().size() + " resource(s) retrieved for scenario " + scenario.getName());
             } catch (Exception e) {
                 setMessage(ZKUtil.formatExceptionForDisplay(e));
             }
@@ -135,7 +133,7 @@ public class DemoConfigController extends PluginController {
         if (scenario != null) {
             try {
                 scenario.init();
-                setMessage("Created " + scenario.getResources().size() + " resources");
+                setMessage("Created " + scenario.getResources().size() + " resource(s)");
             } catch (Exception e) {
                 setMessage(ZKUtil.formatExceptionForDisplay(e));
             }
@@ -147,7 +145,19 @@ public class DemoConfigController extends PluginController {
         
         if (scenario != null) {
             int count = scenario.destroy();
-            setMessage("Deleted " + count + " resources");
+            setMessage("Deleted " + count + " resource(s)");
+        }
+    }
+    
+    public void onClick$btnDeleteAll() {
+        if (PromptDialog.confirm("Delete all demo scenario resources?", "Delete All")) {
+            int count = 0;
+            
+            for (Scenario scenario : model) {
+                count += scenario.destroy();
+            }
+            
+            setMessage("Deleted " + count + " resource(s) across " + model.size() + " scenario(s)");
         }
     }
     

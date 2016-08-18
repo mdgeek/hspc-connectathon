@@ -22,6 +22,7 @@ package org.hspconsortium.cwfdemo.api.democonfig;
 import java.io.InputStream;
 import java.util.Map;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.carewebframework.common.MiscUtil;
@@ -42,12 +43,12 @@ public class ScenarioDefinition {
     private final BaseService fhirService;
     
     @SuppressWarnings("unchecked")
-    public ScenarioDefinition(String scenarioName, Resource scenarioBase, BaseService fhirService) {
-        this.scenarioName = scenarioName;
-        this.scenarioBase = scenarioBase;
+    public ScenarioDefinition(Resource scenarioYaml, BaseService fhirService) {
+        this.scenarioName = FilenameUtils.getBaseName(scenarioYaml.getFilename());
+        this.scenarioBase = scenarioYaml;
         this.fhirService = fhirService;
         
-        try (InputStream in = scenarioBase.createRelative(scenarioName + ".yaml").getInputStream()) {
+        try (InputStream in = scenarioYaml.getInputStream()) {
             scenarioConfig = (Map<String, Map<String, String>>) new Yaml().load(in);
         } catch (Exception e) {
             log.error("Failed to load scenario: " + scenarioName, e);

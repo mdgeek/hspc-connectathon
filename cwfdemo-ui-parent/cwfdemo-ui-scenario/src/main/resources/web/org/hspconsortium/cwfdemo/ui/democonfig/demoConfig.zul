@@ -7,15 +7,26 @@
 	<vlayout apply="${cwfDemoConfigController}" style="padding: 5px">
 		<combobox id="cboScenarios" readonly="true" width="100%"
 			placeholder="Select a scenario"/>
-		<space height="10px" />
-		<toolbar align="center" mold="panel">
-			<button id="btnDelete" label="Delete Scenario" disabled="true"
-				zclass="btn" sclass="btn-danger btn-xs"/>
-			<button id="btnInit" label="Initialize Scenario" disabled="true"
-				zclass="btn" sclass="btn-success btn-xs"/>
+		<div style="padding:10px" height="40px">
+			<label id="lblMessage" multiline="true" />
+		</div>
+		<toolbar sclass="cwfDemoConfigToolbar" mold="panel">
+			<span style="float:left">
+				<button id="btnDeleteAll" label="Delete All"
+					zclass="btn" sclass="btn-danger btn-xs"/>
+			</span>
+			<span style="float:right">
+				<button id="btnDelete" label="Delete Scenario" disabled="true"
+					zclass="btn" sclass="btn-warning btn-xs"/>
+				<button id="btnInit" label="Initialize Scenario" disabled="true"
+					zclass="btn" sclass="btn-success btn-xs"/>
+			</span>
 		</toolbar>
-		<space height="10px" />
-		<label id="lblMessage" multiline="true" />
 	</vlayout>
 
+	<style>
+		.cwfDemoConfigToolbar table {
+			width: 100%;
+		}
+	</style>
 </zk>
