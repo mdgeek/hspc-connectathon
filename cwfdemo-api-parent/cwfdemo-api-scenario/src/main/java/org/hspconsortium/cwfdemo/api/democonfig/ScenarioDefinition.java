@@ -26,7 +26,10 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.carewebframework.common.MiscUtil;
+import org.hl7.fhir.instance.model.api.IBaseCoding;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
@@ -40,6 +43,8 @@ public class ScenarioDefinition {
     
     private final Resource scenarioBase;
     
+    private final IBaseCoding scenarioTag;
+    
     private final BaseService fhirService;
     
     @SuppressWarnings("unchecked")
@@ -47,6 +52,7 @@ public class ScenarioDefinition {
         this.scenarioName = FilenameUtils.getBaseName(scenarioYaml.getFilename());
         this.scenarioBase = scenarioYaml;
         this.fhirService = fhirService;
+        this.scenarioTag = ScenarioUtil.createScenarioTag(scenarioName);
         
         try (InputStream in = scenarioYaml.getInputStream()) {
             scenarioConfig = (Map<String, Map<String, String>>) new Yaml().load(in);
@@ -62,8 +68,21 @@ public class ScenarioDefinition {
         return scenarioName;
     }
     
-    public Resource getBase() {
-        return scenarioBase;
+    public IBaseCoding getTag() {
+        return scenarioTag;
+    }
+    
+    public InputStream getResourceAsStream(String name) {
+        try {
+            return scenarioBase.createRelative(name).getInputStream();
+        } catch (Exception e) {
+            throw MiscUtil.toUnchecked(e);
+        }
+    }
+    
+    public void addTags(IBaseResource resource) {
+        ScenarioUtil.addDemoTag(resource);
+        FhirUtil.addTag(scenarioTag, resource);
     }
     
     public Map<String, Map<String, String>> getConfig() {

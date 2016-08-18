@@ -19,7 +19,6 @@
  */
 package org.hspconsortium.cwfdemo.api.democonfig;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,13 +51,10 @@ public class Scenario {
     
     private final ScenarioDefinition scenarioDefinition;
     
-    private final IBaseCoding scenarioTag;
-    
     private boolean initialized;
     
     public Scenario(ScenarioDefinition scenarioDefinition) {
         this.scenarioDefinition = scenarioDefinition;
-        this.scenarioTag = ScenarioUtil.createScenarioTag(getName());
     }
     
     public String getName() {
@@ -88,10 +84,10 @@ public class Scenario {
             }
             
             IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
-            ScenarioUtil.addDemoTag(resource);
-            FhirUtil.addTag(scenarioTag, resource);
+            scenarioDefinition.addTags(resource);
             resource = fhirService.createOrUpdateResource(resource);
-            addResource(resource, "Created");
+            resourceList.add(resource);
+            logAction(resource, "Created");
             resourceMap.put(name, resource);
         }
         
@@ -99,32 +95,41 @@ public class Scenario {
         return this;
     }
     
-    @SuppressWarnings("unchecked")
-    public Scenario load() {
-        if (initialized) {
-            return this;
+    public void load() {
+        if (!initialized) {
+            loadResources(false);
         }
-        
+    }
+    
+    /**
+     * Load all resources for this scenario.
+     */
+    @SuppressWarnings("unchecked")
+    private void loadResources(boolean silent) {
+        initialized = true;
         BaseService fhirService = scenarioDefinition.getFhirService();
+        IBaseCoding scenarioTag = scenarioDefinition.getTag();
+        resourceList.clear();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
             for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
-                addResource(resource, "Retrieved");
+                resourceList.add(resource);
+                
+                if (!silent) {
+                    logAction(resource, "Retrieved");
+                }
             }
         }
-        
-        initialized = true;
-        return this;
     }
     
     public int destroy() {
-        int count = resourceList.size();
+        loadResources(true);
+        int count = 0;
+        boolean deleted = true;
         BaseService fhirService = scenarioDefinition.getFhirService();
         
-        for (int pass = 2; pass >= 0; pass--) {
-            if (resourceList.isEmpty()) {
-                break;
-            }
+        while (deleted) {
+            deleted = false;
             
             for (int i = resourceList.size() - 1; i >= 0; i--) {
                 IBaseResource resource = resourceList.get(i);
@@ -132,13 +137,15 @@ public class Scenario {
                 try {
                     fhirService.deleteResource(resource);
                     resourceList.remove(i);
-                    log.info("Deleted resource: " + resource.getIdElement().getValue());
-                } catch (Exception e) {
-                    if (pass == 0) {
-                        log.error("Failed to delete resource: " + resource.getIdElement().getValue());
-                    }
-                }
+                    deleted = true;
+                    count++;
+                    logAction(resource, "Deleted");
+                } catch (Exception e) {}
             }
+        }
+        
+        for (IBaseResource resource : resourceList) {
+            logAction(resource, "Failed to delete");
         }
         
         resourceList.clear();
@@ -146,14 +153,9 @@ public class Scenario {
         return count;
     }
     
-    private void addResource(IBaseResource resource, String operation) {
+    private void logAction(IBaseResource resource, String operation) {
         FhirUtil.stripVersion(resource);
-        resourceList.add(resource);
         log.info(operation + " resource: " + resource.getIdElement().getValue());
-    }
-    
-    private InputStream getResourceAsStream(String path) throws IOException {
-        return scenarioDefinition.getBase().createRelative(path).getInputStream();
     }
     
     private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser,
@@ -161,7 +163,7 @@ public class Scenario {
         source = addExtension(source, "json");
         StringBuilder sb = new StringBuilder();
         
-        try (InputStream is = getResourceAsStream(source);) {
+        try (InputStream is = scenarioDefinition.getResourceAsStream(source);) {
             List<String> json = IOUtils.readLines(is, "UTF-8");
             
             for (String s : json) {
@@ -254,7 +256,7 @@ public class Scenario {
     }
     
     private String doBinary(String value) {
-        try (InputStream is = getResourceAsStream(value)) {
+        try (InputStream is = scenarioDefinition.getResourceAsStream(value)) {
             return Base64.encodeBase64String(IOUtils.toByteArray(is));
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);
@@ -264,7 +266,7 @@ public class Scenario {
     private String doSnippet(String value) {
         value = addExtension(value, "json");
         
-        try (InputStream is = getResourceAsStream(value)) {
+        try (InputStream is = scenarioDefinition.getResourceAsStream(value)) {
             return IOUtils.toString(is);
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);
