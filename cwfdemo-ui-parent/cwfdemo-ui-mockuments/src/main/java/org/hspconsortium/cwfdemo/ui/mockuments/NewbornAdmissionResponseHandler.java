@@ -34,7 +34,7 @@ import org.hl7.fhir.dstu3.model.RelatedPerson;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
@@ -54,7 +54,7 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         encounter.setStatus(EncounterStatus.INPROGRESS);
         Coding class_ = new Coding("http://hl7.org/fhir/ValueSet/v3-ActEncounterCode", "inpatient", "inpatient");
         encounter.setClass_(class_);
-        Identifier ident = DemoUtils.createIdentifier("patient", "mother");
+        Identifier ident = ScenarioUtil.createIdentifier("patient", "mother");
         Patient mother = FhirUtil.getFirst(service.searchResourcesByIdentifier(ident, Patient.class));
         
         if (mother != null) {
@@ -64,7 +64,7 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
             participant.addType(FhirUtil.createCodeableConcept("participant_type", "mother", "mother"));
         }
         
-        DemoUtils.addDemoTag(encounter);
+        ScenarioUtil.addDemoTag(encounter);
         
         processResponses(responses, new IResponseProcessor() {
             

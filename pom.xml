@@ -25,6 +25,7 @@
 	<modules>
 		<module>cwfdemo-api-parent</module>
 		<module>cwfdemo-ui-parent</module>
+		<module>cwfdemo-scenarios</module>
 		<module>cwfdemo-webapp-parent</module>
 	</modules>
 	

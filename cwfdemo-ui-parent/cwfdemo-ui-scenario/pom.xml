@@ -1,15 +1,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	
 	<parent>
 		<groupId>org.hspconsortium.carewebframework</groupId>
 		<artifactId>cwfdemo-ui-parent</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	
-	<name>Clinical Mock Documents Plugin</name>
-	<artifactId>cwfdemo-ui-mockuments</artifactId>
+	<name>Demo Configuration Plugin</name>
+	<artifactId>cwfdemo-ui-scenario</artifactId>
 	<packaging>jar</packaging>
+	
+	<description>Configures resources for demo.</description>
 	
 	<dependencies>
 		<dependency>
@@ -18,18 +19,22 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwf-fhir-core</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwf-ui-reporting</artifactId>
+			<artifactId>cwf-api-core</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-api-scenario</artifactId>
 			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwf-ui-patientselection-core</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
 		</dependency>
 	</dependencies>
 </project>

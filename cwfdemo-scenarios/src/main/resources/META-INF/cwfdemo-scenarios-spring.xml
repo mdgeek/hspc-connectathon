@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+<!-- This profile is processed during web server startup -->
+
+	<beans profile="root">
+	
+		<bean class="org.hspconsortium.cwfdemo.api.democonfig.ScenarioDefinition">
+			<constructor-arg value="breastfeeding" />
+			<constructor-arg value="classpath:org/hspconsortium/cwfdemo/scenarios/" />
+			<constructor-arg ref="fhirService" />
+		</bean>
+		
+	</beans>
+	
+</beans>

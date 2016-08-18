@@ -26,7 +26,7 @@ import org.hl7.fhir.dstu3.model.RiskAssessment;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class RiskAssessmentHandler extends BaseQuestionnaireHandler {
@@ -41,7 +41,7 @@ public class RiskAssessmentHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final RiskAssessment ra = new RiskAssessment();
-        DemoUtils.addDemoTag(ra);
+        ScenarioUtil.addDemoTag(ra);
         ra.setSubject(document.getReference().getSubject());
         ra.setPerformer(FhirUtil.getFirst(document.getReference().getAuthor()));
         ra.setOccurrence(new DateTimeType(new Date()));

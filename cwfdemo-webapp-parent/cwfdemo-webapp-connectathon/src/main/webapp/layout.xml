@@ -73,7 +73,7 @@
 			</tabview>
 		</splitterpane>
 		<splitterpane relative="false" size="26.0">
-			<statusPanel/>
+			<cwfStatusPanel/>
 		</splitterpane>
 		<splitterpane relative="false" size="71.0">
 			<frame url="/footer.html"/>

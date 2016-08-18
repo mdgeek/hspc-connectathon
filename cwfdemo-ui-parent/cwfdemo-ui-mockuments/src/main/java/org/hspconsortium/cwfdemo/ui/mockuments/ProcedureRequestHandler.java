@@ -21,8 +21,6 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
 
-import org.zkoss.zk.ui.Component;
-
 import org.hl7.fhir.dstu3.model.Annotation;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.ProcedureRequest;
@@ -31,10 +29,10 @@ import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestStatus;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
+import org.zkoss.zk.ui.Component;
 
 public class ProcedureRequestHandler extends BaseQuestionnaireHandler {
-    
     
     private final DocumentService service;
     
@@ -46,12 +44,11 @@ public class ProcedureRequestHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final ProcedureRequest pr = new ProcedureRequest();
-        DemoUtils.addDemoTag(pr);
+        ScenarioUtil.addDemoTag(pr);
         pr.setSubject(document.getReference().getSubject());
         pr.setStatus(ProcedureRequestStatus.REQUESTED);
         pr.setOrderedOn(new Date());
         processResponses(responses, new IResponseProcessor() {
-            
             
             @Override
             public void processResponse(String value, String targetId) {

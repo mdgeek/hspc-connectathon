@@ -21,8 +21,6 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
 
-import org.zkoss.zk.ui.Component;
-
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent;
@@ -31,10 +29,10 @@ import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatu
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwfdemo.api.democonfig.DemoUtils;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
+import org.zkoss.zk.ui.Component;
 
 public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
-    
     
     private final DocumentService service;
     
@@ -46,7 +44,7 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final QuestionnaireResponse qr = new QuestionnaireResponse();
-        DemoUtils.addDemoTag(qr);
+        ScenarioUtil.addDemoTag(qr);
         //String ref = (String) root.getAttribute("questionnaire_reference");
         //qr.setQuestionnaire(ref == null ? null : new Reference(ref));
         qr.setSubject(document.getReference().getSubject());
@@ -55,7 +53,6 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
         qr.setAuthored(new Date());
         
         processResponses(responses, new BaseQuestionnaireHandler.IResponseProcessor() {
-            
             
             @Override
             public void processResponse(String value, String targetId) {
