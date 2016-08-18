@@ -139,18 +139,6 @@ public class ScenarioUtil {
     }
     
     /**
-     * Adds a tag to a resource for populating the resource map.
-     * 
-     * @param resource The resource.
-     * @param scenario The scenario to which this resource belongs.
-     * @param code The resource code.
-     */
-    public static void addResourceTag(IBaseResource resource, String scenario, String code) {
-        IBaseCoding tag = new Tag(DEMO_URN + ":" + scenario, code, "Resource: " + code);
-        FhirUtil.addTag(tag, resource);
-    }
-    
-    /**
      * Creates a tag to be used for scenario-based deletes.
      * 
      * @param scenario The scenario name.
@@ -158,15 +146,6 @@ public class ScenarioUtil {
      */
     public static IBaseCoding createScenarioTag(String scenario) {
         return new Tag(DEMO_URN, scenario, "Scenario: " + scenario);
-    }
-    
-    public static IBaseCoding getResourceTag(IBaseResource resource, String scenario) {
-        return getTagBySystem(resource, DEMO_URN + ":" + scenario);
-    }
-    
-    public static String getResourceCode(IBaseResource resource, String scenario) {
-        IBaseCoding tag = getResourceTag(resource, scenario);
-        return tag == null ? null : tag.getCode();
     }
     
     public static IBaseCoding getTagBySystem(IBaseResource resource, String system) {

@@ -48,8 +48,6 @@ public class Scenario {
     
     private static final Log log = LogFactory.getLog(Scenario.class);
     
-    private final Map<String, IBaseResource> resourceMap = new HashMap<>();
-    
     private final List<IBaseResource> resourceList = new ArrayList<>();
     
     private final ScenarioDefinition scenarioDefinition;
@@ -79,6 +77,7 @@ public class Scenario {
         BaseService fhirService = scenarioDefinition.getFhirService();
         IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
         Map<String, Map<String, String>> config = scenarioDefinition.getConfig();
+        Map<String, IBaseResource> resourceMap = new HashMap<>();
         
         for (String name : config.keySet()) {
             Map<String, String> map = config.get(name);
@@ -88,19 +87,19 @@ public class Scenario {
                 throw new RuntimeException("No source specified in scenario.");
             }
             
-            IBaseResource resource = parseResource(source, map, jsonParser);
+            IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
             ScenarioUtil.addDemoTag(resource);
             FhirUtil.addTag(scenarioTag, resource);
-            ScenarioUtil.addResourceTag(resource, getName(), name);
             resource = fhirService.createOrUpdateResource(resource);
-            addResource(name, resource);
-            log.info("Created resource: " + name);
+            addResource(resource, "Created");
+            resourceMap.put(name, resource);
         }
         
         initialized = true;
         return this;
     }
     
+    @SuppressWarnings("unchecked")
     public Scenario load() {
         if (initialized) {
             return this;
@@ -109,31 +108,13 @@ public class Scenario {
         BaseService fhirService = scenarioDefinition.getFhirService();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
-            @SuppressWarnings("unchecked")
-            List<IBaseResource> existing = fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz);
-            
-            for (IBaseResource resource : existing) {
-                String name = ScenarioUtil.getResourceCode(resource, getName());
-                
-                if (name != null) {
-                    addResource(name, resource);
-                    log.info("Loaded resource: " + name);
-                }
+            for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
+                addResource(resource, "Retrieved");
             }
         }
         
         initialized = true;
         return this;
-    }
-    
-    private void addResource(String name, IBaseResource resource) {
-        if (resourceMap.containsKey(name)) {
-            log.warn("Duplicate resource key: " + name);
-        } else {
-            resourceMap.put(name, resource);
-        }
-        
-        resourceList.add(resource);
     }
     
     public int destroy() {
@@ -147,32 +128,36 @@ public class Scenario {
             
             for (int i = resourceList.size() - 1; i >= 0; i--) {
                 IBaseResource resource = resourceList.get(i);
-                String name = ScenarioUtil.getResourceCode(resource, getName());
                 
                 try {
                     fhirService.deleteResource(resource);
                     resourceList.remove(i);
-                    resourceMap.remove(name);
-                    log.info("Deleted resource: " + name);
+                    log.info("Deleted resource: " + resource.getIdElement().getValue());
                 } catch (Exception e) {
                     if (pass == 0) {
-                        log.error("Failed to delete resource: " + name);
+                        log.error("Failed to delete resource: " + resource.getIdElement().getValue());
                     }
                 }
             }
         }
         
         resourceList.clear();
-        resourceMap.clear();
         initialized = false;
         return count;
+    }
+    
+    private void addResource(IBaseResource resource, String operation) {
+        FhirUtil.stripVersion(resource);
+        resourceList.add(resource);
+        log.info(operation + " resource: " + resource.getIdElement().getValue());
     }
     
     private InputStream getResourceAsStream(String path) throws IOException {
         return scenarioDefinition.getBase().createRelative(path).getInputStream();
     }
     
-    private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser) {
+    private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser,
+                                        Map<String, IBaseResource> resourceMap) {
         source = addExtension(source, "json");
         StringBuilder sb = new StringBuilder();
         
@@ -191,7 +176,7 @@ public class Scenario {
                         throw new RuntimeException("Reference not found: " + key);
                     }
                     
-                    String r = eval(value);
+                    String r = eval(value, resourceMap);
                     s = s.substring(0, p1) + r + s.substring(p2 + 1);
                 }
                 
@@ -230,13 +215,20 @@ public class Scenario {
      *            <li>image - A file containing an image</li>
      *            <li>snippet - A file containing a snippet to be inserted</li>
      *            </ul>
+     * @param resourceMap Map of resolved resources.
      * @return The result of the evaluation.
      */
-    private String eval(String exp) {
+    private String eval(String exp, Map<String, IBaseResource> resourceMap) {
         int i = exp.indexOf('/');
         
         if (i == -1) {
-            return doReference(exp);
+            IBaseResource resource = resourceMap.get(exp);
+            
+            if (resource == null) {
+                throw new RuntimeException("Resource not defined: " + exp);
+            }
+            
+            return resource.getIdElement().getResourceType() + "/" + resource.getIdElement().getIdPart();
         }
         
         String type = exp.substring(0, i);
@@ -259,16 +251,6 @@ public class Scenario {
         }
         
         throw new RuntimeException("Unknown type: " + type);
-    }
-    
-    private String doReference(String value) {
-        IBaseResource resource = resourceMap.get(value);
-        
-        if (resource == null) {
-            throw new RuntimeException("Resource not defined: " + value);
-        }
-        
-        return resource.getIdElement().getResourceType() + "/" + resource.getIdElement().getIdPart();
     }
     
     private String doBinary(String value) {
