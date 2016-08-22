@@ -13,13 +13,19 @@
 		<toolbar sclass="cwfDemoConfigToolbar" mold="panel">
 			<span style="float:left">
 				<button id="btnDeleteAll" label="Delete All"
+					tooltiptext="Delete resources across all scenarios."
 					zclass="btn" sclass="btn-danger btn-xs"/>
 			</span>
 			<span style="float:right">
-				<button id="btnDelete" label="Delete Scenario" disabled="true"
+				<button id="btnDelete" label="Delete" disabled="true"
+					tooltiptext="Delete resources associated with this scenario."
 					zclass="btn" sclass="btn-warning btn-xs"/>
-				<button id="btnInit" label="Initialize Scenario" disabled="true"
+				<button id="btnReset" label="Reset" disabled="true"
+					tooltiptext="Reset this scenario to its baseline state."
 					zclass="btn" sclass="btn-success btn-xs"/>
+				<button id="btnReload" label="Reload" disabled="true"
+					tooltiptext="Reload all resources associated with this scenario."
+					zclass="btn" sclass="btn-primary btn-xs"/>
 			</span>
 		</toolbar>
 	</vlayout>

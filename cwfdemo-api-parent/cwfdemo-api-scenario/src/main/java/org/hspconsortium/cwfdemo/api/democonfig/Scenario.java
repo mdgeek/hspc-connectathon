@@ -21,13 +21,13 @@ package org.hspconsortium.cwfdemo.api.democonfig;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,6 +40,8 @@ import org.hl7.fhir.instance.model.api.IBaseCoding;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
+import org.springframework.core.io.Resource;
+import org.yaml.snakeyaml.Yaml;
 
 import ca.uhn.fhir.parser.IParser;
 
@@ -47,36 +49,76 @@ public class Scenario {
     
     private static final Log log = LogFactory.getLog(Scenario.class);
     
-    private final List<IBaseResource> resourceList = new ArrayList<>();
+    private final Map<String, Map<String, String>> scenarioConfig;
     
-    private final ScenarioDefinition scenarioDefinition;
+    private final String scenarioName;
     
-    private boolean initialized;
+    private final Resource scenarioBase;
     
-    public Scenario(ScenarioDefinition scenarioDefinition) {
-        this.scenarioDefinition = scenarioDefinition;
-    }
+    private final IBaseCoding scenarioTag;
     
-    public String getName() {
-        return scenarioDefinition.getName();
-    }
+    private final BaseService fhirService;
     
-    public List<IBaseResource> getResources() {
-        return Collections.unmodifiableList(resourceList);
-    }
-    
-    public Scenario init() {
-        if (initialized) {
-            destroy();
+    @SuppressWarnings("unchecked")
+    public Scenario(Resource scenarioYaml, BaseService fhirService) {
+        this.scenarioName = FilenameUtils.getBaseName(scenarioYaml.getFilename());
+        this.scenarioBase = scenarioYaml;
+        this.fhirService = fhirService;
+        this.scenarioTag = ScenarioUtil.createScenarioTag(scenarioName);
+        
+        try (InputStream in = scenarioYaml.getInputStream()) {
+            scenarioConfig = (Map<String, Map<String, String>>) new Yaml().load(in);
+        } catch (Exception e) {
+            log.error("Failed to load scenario: " + scenarioName, e);
+            throw MiscUtil.toUnchecked(e);
         }
         
-        BaseService fhirService = scenarioDefinition.getFhirService();
+        log.info("Loaded demo scenario: " + scenarioName);
+    }
+    
+    /**
+     * Return the name of this scenario.
+     * 
+     * @return The scenario name.
+     */
+    public String getName() {
+        return scenarioName;
+    }
+    
+    /**
+     * Return the tag used to mark a resource as belonging to this scenario.
+     * 
+     * @return The scenario tag.
+     */
+    public IBaseCoding getTag() {
+        return scenarioTag;
+    }
+    
+    /**
+     * Adds the general demo tag and a scenario tag to the resource.
+     * 
+     * @param resource Resource to be tagged.
+     */
+    public void addTags(IBaseResource resource) {
+        ScenarioUtil.addDemoTag(resource);
+        FhirUtil.addTag(scenarioTag, resource);
+    }
+    
+    /**
+     * Initialize the scenario. Any existing resources belonging to the scenario will first be
+     * deleted. Then creates all resources as defined in the scenario configuration.
+     * 
+     * @param silent If true, suppress logging.
+     * @return List of initial resources.
+     */
+    public List<IBaseResource> initialize(boolean silent) {
+        destroy(true);
+        List<IBaseResource> resourceList = new ArrayList<>();
         IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
-        Map<String, Map<String, String>> config = scenarioDefinition.getConfig();
         Map<String, IBaseResource> resourceMap = new HashMap<>();
         
-        for (String name : config.keySet()) {
-            Map<String, String> map = config.get(name);
+        for (String name : scenarioConfig.keySet()) {
+            Map<String, String> map = scenarioConfig.get(name);
             String source = map.get("source");
             
             if (source == null) {
@@ -84,32 +126,39 @@ public class Scenario {
             }
             
             IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
-            scenarioDefinition.addTags(resource);
-            resource = fhirService.createOrUpdateResource(resource);
+            resource = createOrUpdateResource(resource);
             resourceList.add(resource);
-            logAction(resource, "Created");
             resourceMap.put(name, resource);
+            
+            if (!silent) {
+                logAction(resource, "Created");
+            }
         }
         
-        initialized = true;
-        return this;
+        return resourceList;
     }
     
-    public void load() {
-        if (!initialized) {
-            loadResources(false);
-        }
+    /**
+     * Creates or updates the specified resource, first tagging it as belonging to this scenario.
+     * 
+     * @param resource The resource to create or update.
+     * @return The resource, possibly modified.
+     */
+    public IBaseResource createOrUpdateResource(IBaseResource resource) {
+        addTags(resource);
+        return fhirService.createOrUpdateResource(resource);
     }
     
     /**
      * Load all resources for this scenario.
+     * 
+     * @param silent If true, suppress logging.
+     * @return List of all resources belonging to this scenario.
      */
     @SuppressWarnings("unchecked")
-    private void loadResources(boolean silent) {
-        initialized = true;
-        BaseService fhirService = scenarioDefinition.getFhirService();
-        IBaseCoding scenarioTag = scenarioDefinition.getTag();
-        resourceList.clear();
+    public List<IBaseResource> loadResources(boolean silent) {
+        IBaseCoding scenarioTag = getTag();
+        List<IBaseResource> resourceList = new ArrayList<>();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
             for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
@@ -120,13 +169,20 @@ public class Scenario {
                 }
             }
         }
+        
+        return resourceList;
     }
     
-    public int destroy() {
-        loadResources(true);
+    /**
+     * Destroy all resources belonging to this scenario.
+     * 
+     * @param silent If true, suppress logging.
+     * @return The number of resources successfully deleted.
+     */
+    public int destroy(boolean silent) {
+        List<IBaseResource> resourceList = loadResources(true);
         int count = 0;
         boolean deleted = true;
-        BaseService fhirService = scenarioDefinition.getFhirService();
         
         while (deleted) {
             deleted = false;
@@ -139,18 +195,29 @@ public class Scenario {
                     resourceList.remove(i);
                     deleted = true;
                     count++;
-                    logAction(resource, "Deleted");
+                    
+                    if (!silent) {
+                        logAction(resource, "Deleted");
+                    }
                 } catch (Exception e) {}
             }
         }
         
-        for (IBaseResource resource : resourceList) {
-            logAction(resource, "Failed to delete");
+        if (!silent) {
+            for (IBaseResource resource : resourceList) {
+                logAction(resource, "Failed to delete");
+            }
         }
         
-        resourceList.clear();
-        initialized = false;
         return count;
+    }
+    
+    private InputStream getResourceAsStream(String name) {
+        try {
+            return scenarioBase.createRelative(name).getInputStream();
+        } catch (Exception e) {
+            throw MiscUtil.toUnchecked(e);
+        }
     }
     
     private void logAction(IBaseResource resource, String operation) {
@@ -163,7 +230,7 @@ public class Scenario {
         source = addExtension(source, "json");
         StringBuilder sb = new StringBuilder();
         
-        try (InputStream is = scenarioDefinition.getResourceAsStream(source);) {
+        try (InputStream is = getResourceAsStream(source);) {
             List<String> json = IOUtils.readLines(is, "UTF-8");
             
             for (String s : json) {
@@ -256,7 +323,7 @@ public class Scenario {
     }
     
     private String doBinary(String value) {
-        try (InputStream is = scenarioDefinition.getResourceAsStream(value)) {
+        try (InputStream is = getResourceAsStream(value)) {
             return Base64.encodeBase64String(IOUtils.toByteArray(is));
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);
@@ -266,7 +333,7 @@ public class Scenario {
     private String doSnippet(String value) {
         value = addExtension(value, "json");
         
-        try (InputStream is = scenarioDefinition.getResourceAsStream(value)) {
+        try (InputStream is = getResourceAsStream(value)) {
             return IOUtils.toString(is);
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);
@@ -286,4 +353,5 @@ public class Scenario {
         
         return value;
     }
+    
 }

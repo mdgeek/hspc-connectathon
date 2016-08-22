@@ -4,7 +4,7 @@
 	xmlns:w="http://www.zkoss.org/2005/zk/client"
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul
 		http://www.zkoss.org/2005/zul/zul.xsd">
-	<window title="Demonstration Configuration" closable="true" width="400px"
+	<window title="Scenario Configuration" closable="true" width="400px"
 		mold="bootstrap" sclass="panel-primary">
 		<include src="~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfig.zul" />
 	</window>
