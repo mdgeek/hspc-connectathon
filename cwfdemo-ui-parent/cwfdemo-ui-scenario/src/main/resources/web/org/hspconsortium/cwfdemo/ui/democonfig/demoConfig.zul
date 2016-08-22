@@ -33,7 +33,7 @@
 				<button id="btnView" disabled="true"
 					label="${labels.cwfdemo.scenario.btn.view.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.view.tooltip}"
-					zclass="btn" sclass="btn-default btn-xs"/>
+					zclass="btn" sclass="btn-info btn-xs"/>
 			</span>
 		</toolbar>
 	</vlayout>
