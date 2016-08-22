@@ -6,25 +6,29 @@
 
 	<vlayout apply="${cwfDemoConfigController}" style="padding: 5px">
 		<combobox id="cboScenarios" readonly="true" width="100%"
-			placeholder="Select a scenario"/>
+			placeholder="${labels.cwfdemo.scenario.cbox.placeholder}"/>
 		<div style="padding:10px" height="40px">
 			<label id="lblMessage" multiline="true" />
 		</div>
 		<toolbar sclass="cwfDemoConfigToolbar" mold="panel">
 			<span style="float:left">
-				<button id="btnDeleteAll" label="Delete All"
-					tooltiptext="Delete resources across all scenarios."
+				<button id="btnDeleteAll" 
+					label="${labels.cwfdemo.scenario.btn.deleteall.label}"
+					tooltiptext="${labels.cwfdemo.scenario.btn.deleteall.tooltip}"
 					zclass="btn" sclass="btn-danger btn-xs"/>
 			</span>
 			<span style="float:right">
-				<button id="btnDelete" label="Delete" disabled="true"
-					tooltiptext="Delete resources associated with this scenario."
+				<button id="btnDelete" disabled="true"
+					label="${labels.cwfdemo.scenario.btn.delete.label}" 
+					tooltiptext="${labels.cwfdemo.scenario.btn.delete.tooltip}"
 					zclass="btn" sclass="btn-warning btn-xs"/>
-				<button id="btnReset" label="Reset" disabled="true"
-					tooltiptext="Reset this scenario to its baseline state."
+				<button id="btnReset" disabled="true"
+					label="${labels.cwfdemo.scenario.btn.reset.label}" 
+					tooltiptext="${labels.cwfdemo.scenario.btn.reset.tooltip}"
 					zclass="btn" sclass="btn-success btn-xs"/>
-				<button id="btnReload" label="Reload" disabled="true"
-					tooltiptext="Reload all resources associated with this scenario."
+				<button id="btnReload" disabled="true"
+					label="${labels.cwfdemo.scenario.btn.reload.label}" 
+					tooltiptext="${labels.cwfdemo.scenario.btn.reload.tooltip}"
 					zclass="btn" sclass="btn-primary btn-xs"/>
 			</span>
 		</toolbar>

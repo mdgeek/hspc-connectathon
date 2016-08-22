@@ -17,7 +17,7 @@
 			url="~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfig.zul">
 			<cwp:resource>
 				<cwp:action-resource id="cwfDemoConfigShow"
-					label="${labels.cwfdemoconfig.action.label}"
+					label="${labels.cwfdemo.scenario.action.label}"
 					script="zscript:org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController.show();" /> 
 			</cwp:resource>
 		</cwp:plugin>
