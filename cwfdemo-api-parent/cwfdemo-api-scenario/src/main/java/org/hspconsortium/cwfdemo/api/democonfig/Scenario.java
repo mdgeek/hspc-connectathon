@@ -20,9 +20,11 @@
 package org.hspconsortium.cwfdemo.api.democonfig;
 
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -57,7 +59,11 @@ public class Scenario {
     
     private final IBaseCoding scenarioTag;
     
+    private final Map<String, IBaseResource> scenarioResources = new HashMap<>();
+    
     private final BaseService fhirService;
+    
+    private boolean isLoaded;
     
     @SuppressWarnings("unchecked")
     public Scenario(Resource scenarioYaml, BaseService fhirService) {
@@ -105,15 +111,35 @@ public class Scenario {
     }
     
     /**
+     * Returns a read-only list of loaded resources.
+     * 
+     * @return List of loaded resources.
+     */
+    public Collection<IBaseResource> getResources() {
+        return Collections.unmodifiableCollection(scenarioResources.values());
+    }
+    
+    /**
+     * Returns a count of loaded resources.
+     * 
+     * @return Count of loaded resources.
+     */
+    public int getResourceCount() {
+        return scenarioResources.size();
+    }
+    
+    public boolean isLoaded() {
+        return isLoaded;
+    }
+    
+    /**
      * Initialize the scenario. Any existing resources belonging to the scenario will first be
      * deleted. Then creates all resources as defined in the scenario configuration.
      * 
-     * @param silent If true, suppress logging.
-     * @return List of initial resources.
+     * @return Count of resources in scenario.
      */
-    public List<IBaseResource> initialize(boolean silent) {
-        destroy(true);
-        List<IBaseResource> resourceList = new ArrayList<>();
+    public synchronized int initialize() {
+        destroy();
         IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
         Map<String, IBaseResource> resourceMap = new HashMap<>();
         
@@ -127,15 +153,65 @@ public class Scenario {
             
             IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
             resource = createOrUpdateResource(resource);
-            resourceList.add(resource);
             resourceMap.put(name, resource);
-            
-            if (!silent) {
-                logAction(resource, "Created");
+            logAction(resource, "Created");
+        }
+        
+        return scenarioResources.size();
+    }
+    
+    /**
+     * Load all resources for this scenario.
+     * 
+     * @return Count of resources loaded for this scenario.
+     */
+    @SuppressWarnings("unchecked")
+    public synchronized int load() {
+        isLoaded = true;
+        scenarioResources.clear();
+        
+        for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
+            for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
+                addResource(resource);
+                logAction(resource, "Retrieved");
             }
         }
         
-        return resourceList;
+        return scenarioResources.size();
+    }
+    
+    /**
+     * Destroy all resources belonging to this scenario.
+     * 
+     * @return The number of resources successfully deleted.
+     */
+    public synchronized int destroy() {
+        load();
+        int count = 0;
+        boolean deleted = true;
+        
+        while (deleted) {
+            deleted = false;
+            Iterator<IBaseResource> iterator = scenarioResources.values().iterator();
+            
+            while (iterator.hasNext()) {
+                IBaseResource resource = iterator.next();
+                
+                try {
+                    fhirService.deleteResource(resource);
+                    iterator.remove();
+                    deleted = true;
+                    count++;
+                    logAction(resource, "Deleted");
+                } catch (Exception e) {}
+            }
+        }
+        
+        for (IBaseResource resource : scenarioResources.values()) {
+            logAction(resource, "Failed to delete");
+        }
+        
+        return count;
     }
     
     /**
@@ -146,70 +222,18 @@ public class Scenario {
      */
     public IBaseResource createOrUpdateResource(IBaseResource resource) {
         addTags(resource);
-        return fhirService.createOrUpdateResource(resource);
+        resource = fhirService.createOrUpdateResource(resource);
+        addResource(resource);
+        return resource;
     }
     
     /**
-     * Load all resources for this scenario.
+     * Adds a resource to the list of resources for this scenario.
      * 
-     * @param silent If true, suppress logging.
-     * @return List of all resources belonging to this scenario.
+     * @param resource Scenario to add.
      */
-    @SuppressWarnings("unchecked")
-    public List<IBaseResource> loadResources(boolean silent) {
-        IBaseCoding scenarioTag = getTag();
-        List<IBaseResource> resourceList = new ArrayList<>();
-        
-        for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
-            for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
-                resourceList.add(resource);
-                
-                if (!silent) {
-                    logAction(resource, "Retrieved");
-                }
-            }
-        }
-        
-        return resourceList;
-    }
-    
-    /**
-     * Destroy all resources belonging to this scenario.
-     * 
-     * @param silent If true, suppress logging.
-     * @return The number of resources successfully deleted.
-     */
-    public int destroy(boolean silent) {
-        List<IBaseResource> resourceList = loadResources(true);
-        int count = 0;
-        boolean deleted = true;
-        
-        while (deleted) {
-            deleted = false;
-            
-            for (int i = resourceList.size() - 1; i >= 0; i--) {
-                IBaseResource resource = resourceList.get(i);
-                
-                try {
-                    fhirService.deleteResource(resource);
-                    resourceList.remove(i);
-                    deleted = true;
-                    count++;
-                    
-                    if (!silent) {
-                        logAction(resource, "Deleted");
-                    }
-                } catch (Exception e) {}
-            }
-        }
-        
-        if (!silent) {
-            for (IBaseResource resource : resourceList) {
-                logAction(resource, "Failed to delete");
-            }
-        }
-        
-        return count;
+    public synchronized void addResource(IBaseResource resource) {
+        scenarioResources.put(resource.getIdElement().getValue(), resource);
     }
     
     private InputStream getResourceAsStream(String name) {

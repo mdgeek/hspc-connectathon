@@ -30,6 +30,10 @@
 					label="${labels.cwfdemo.scenario.btn.reload.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.reload.tooltip}"
 					zclass="btn" sclass="btn-primary btn-xs"/>
+				<button id="btnView" disabled="true"
+					label="${labels.cwfdemo.scenario.btn.view.label}" 
+					tooltiptext="${labels.cwfdemo.scenario.btn.view.tooltip}"
+					zclass="btn" sclass="btn-default btn-xs"/>
 			</span>
 		</toolbar>
 	</vlayout>

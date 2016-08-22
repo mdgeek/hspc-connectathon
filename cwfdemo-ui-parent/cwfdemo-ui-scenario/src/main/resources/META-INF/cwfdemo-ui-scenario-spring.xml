@@ -33,5 +33,10 @@
 			<constructor-arg ref="cwfDemoConfigScenarioRegistry" />
 		</bean>	
 			
+		<bean id="cwfDemoViewResourcesController" scope="prototype"
+			class="org.hspconsortium.cwfdemo.ui.democonfig.ViewResourcesController">
+			<constructor-arg ref="fhirService" />
+		</bean>	
+			
 	</beans>
 </beans>

@@ -30,13 +30,11 @@ package org.hspconsortium.cwfdemo.ui.democonfig;
 
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PopupDialog;
 import org.carewebframework.ui.zk.PromptDialog;
 import org.carewebframework.ui.zk.ZKUtil;
-import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.hspconsortium.cwfdemo.api.democonfig.ScenarioRegistry;
 import org.zkoss.zk.ui.Component;
@@ -57,59 +55,24 @@ public class DemoConfigController extends PluginController {
     
     private static final long serialVersionUID = 1L;
     
-    private static final ComboitemRenderer<AScenario> scenarioRenderer = new ComboitemRenderer<AScenario>() {
+    private static final ComboitemRenderer<Scenario> scenarioRenderer = new ComboitemRenderer<Scenario>() {
         
         @Override
-        public void render(Comboitem item, AScenario scenario, int index) throws Exception {
+        public void render(Comboitem item, Scenario scenario, int index) throws Exception {
             item.setLabel(scenario.getName());
             item.setValue(scenario);
         }
         
     };
     
-    private static final Comparator<AScenario> scenarioComparator = new Comparator<AScenario>() {
+    private static final Comparator<Scenario> scenarioComparator = new Comparator<Scenario>() {
         
         @Override
-        public int compare(AScenario s1, AScenario s2) {
+        public int compare(Scenario s1, Scenario s2) {
             return s1.getName().compareToIgnoreCase(s2.getName());
         }
         
     };
-    
-    /**
-     * A scenario and its associated resources.
-     */
-    private static class AScenario {
-        
-        private final Scenario scenario;
-        
-        private List<IBaseResource> resources;
-        
-        private AScenario(Scenario scenario) {
-            this.scenario = scenario;
-        }
-        
-        private String getName() {
-            return scenario.getName();
-        }
-        
-        private List<IBaseResource> init() {
-            return resources = scenario.initialize(false);
-        }
-        
-        private List<IBaseResource> load(boolean forced) {
-            if (forced || resources == null) {
-                resources = scenario.loadResources(false);
-            }
-            
-            return resources;
-        }
-        
-        private int destroy() {
-            resources = null;
-            return scenario.destroy(false);
-        }
-    }
     
     private enum Action {
         LOAD("Loading scenario"), RELOAD("Reloading scenario"), RESET("Resetting scenario"), DELETE(
@@ -135,11 +98,13 @@ public class DemoConfigController extends PluginController {
     
     private Button btnReload;
     
+    private Button btnView;
+    
     private Label lblMessage;
     
     private final ScenarioRegistry scenarioRegistry;
     
-    private final ListModelList<AScenario> model = new ListModelList<>();
+    private final ListModelList<Scenario> model = new ListModelList<>();
     
     /**
      * Demonstration Configuration Helper Class.
@@ -164,11 +129,7 @@ public class DemoConfigController extends PluginController {
         cboScenarios.setModel(null);
         cboScenarios.setSelectedItem(null);
         model.clear();
-        
-        for (Scenario scenario : scenarioRegistry.getAll()) {
-            model.add(new AScenario(scenario));
-        }
-        
+        model.addAll(scenarioRegistry.getAll());
         Collections.sort(model, scenarioComparator);
         cboScenarios.setModel(model);
     }
@@ -178,6 +139,7 @@ public class DemoConfigController extends PluginController {
         btnDelete.setDisabled(disabled);
         btnReset.setDisabled(disabled);
         btnReload.setDisabled(disabled);
+        btnView.setDisabled(disabled);
         
         if (disabled) {
             setMessage(null);
@@ -204,6 +166,10 @@ public class DemoConfigController extends PluginController {
         }
     }
     
+    public void onClick$btnView() {
+        ViewResourcesController.show(getSelectedScenario());
+    }
+    
     /**
      * Queues an action to be performed on the next execution.
      * 
@@ -223,7 +189,7 @@ public class DemoConfigController extends PluginController {
      */
     public void onAction(Event event) {
         Clients.clearBusy(root);
-        AScenario scenario = getSelectedScenario();
+        Scenario scenario = getSelectedScenario();
         Action action = (Action) event.getData();
         String result = null;
         
@@ -232,13 +198,20 @@ public class DemoConfigController extends PluginController {
                 
                 switch (action) {
                     case LOAD:
+                        if (scenario.isLoaded()) {
+                            result = scenario.getResourceCount() + " resource(s) associated with scenario "
+                                    + scenario.getName();
+                            break;
+                        }
+                        
+                        // Fall through intended here.
+                        
                     case RELOAD:
-                        result = scenario.load(action == Action.RELOAD).size() + " resource(s) are associated with scenario "
-                                + scenario.getName();
+                        result = scenario.load() + " resource(s) loaded for scenario " + scenario.getName();
                         break;
                     
                     case RESET:
-                        result = "Created " + scenario.init().size() + " resource(s)";
+                        result = "Created " + scenario.initialize() + " resource(s)";
                         break;
                     
                     case DELETE:
@@ -248,7 +221,7 @@ public class DemoConfigController extends PluginController {
                     case DELETEALL:
                         int count = 0;
                         
-                        for (AScenario ascenario : model) {
+                        for (Scenario ascenario : model) {
                             count += ascenario.destroy();
                         }
                         
@@ -267,16 +240,9 @@ public class DemoConfigController extends PluginController {
      * 
      * @return The currently selected scenario.
      */
-    private AScenario getSelectedScenario() {
+    private Scenario getSelectedScenario() {
         Comboitem item = cboScenarios.getSelectedItem();
-        AScenario scenario = null;
-        
-        if (item != null) {
-            scenario = item.getValue();
-            scenario.load(false);
-        }
-        
-        return scenario;
+        return item == null ? null : (Scenario) item.getValue();
     }
     
     /**
