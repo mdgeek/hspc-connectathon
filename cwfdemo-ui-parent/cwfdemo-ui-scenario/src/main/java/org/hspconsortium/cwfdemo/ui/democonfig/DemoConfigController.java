@@ -36,6 +36,8 @@ import org.carewebframework.ui.zk.PopupDialog;
 import org.carewebframework.ui.zk.PromptDialog;
 import org.carewebframework.ui.zk.ZKUtil;
 import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioContext;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioContext.IScenarioContextEvent;
 import org.hspconsortium.cwfdemo.api.democonfig.ScenarioRegistry;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -51,25 +53,30 @@ import org.zkoss.zul.ListModelList;
 /**
  * This controller is only intended to be used for demo purposes in order to stage and unstage data.
  */
-public class DemoConfigController extends PluginController {
+public class DemoConfigController extends PluginController implements IScenarioContextEvent {
     
     private static final long serialVersionUID = 1L;
-    
-    private static final ComboitemRenderer<Scenario> scenarioRenderer = new ComboitemRenderer<Scenario>() {
-        
-        @Override
-        public void render(Comboitem item, Scenario scenario, int index) throws Exception {
-            item.setLabel(scenario.getName());
-            item.setValue(scenario);
-        }
-        
-    };
     
     private static final Comparator<Scenario> scenarioComparator = new Comparator<Scenario>() {
         
         @Override
         public int compare(Scenario s1, Scenario s2) {
             return s1.getName().compareToIgnoreCase(s2.getName());
+        }
+        
+    };
+    
+    private final ComboitemRenderer<Scenario> scenarioRenderer = new ComboitemRenderer<Scenario>() {
+        
+        @Override
+        public void render(Comboitem item, Scenario scenario, int index) throws Exception {
+            boolean active = activeScenario == scenario;
+            item.setLabel(scenario.getName() + (active ? " (active)" : ""));
+            item.setValue(scenario);
+            
+            if (active) {
+                item.setStyle("font-weight: bold; color: blue!important");
+            }
         }
         
     };
@@ -100,7 +107,11 @@ public class DemoConfigController extends PluginController {
     
     private Button btnView;
     
+    private Button btnContext;
+    
     private Label lblMessage;
+    
+    private Scenario activeScenario;
     
     private final ScenarioRegistry scenarioRegistry;
     
@@ -121,6 +132,7 @@ public class DemoConfigController extends PluginController {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
+        activeScenario = ScenarioContext.getActiveScenario();
         cboScenarios.setItemRenderer(scenarioRenderer);
         refreshScenarios();
     }
@@ -134,12 +146,19 @@ public class DemoConfigController extends PluginController {
         cboScenarios.setModel(model);
     }
     
+    private void rerenderScenarios() {
+        activeScenario = ScenarioContext.getActiveScenario();
+        cboScenarios.setModel(null);
+        cboScenarios.setModel(model);
+    }
+    
     public void onSelect$cboScenarios() {
         boolean disabled = getSelectedScenario() == null;
         btnDelete.setDisabled(disabled);
         btnReset.setDisabled(disabled);
         btnReload.setDisabled(disabled);
         btnView.setDisabled(disabled);
+        btnContext.setDisabled(disabled);
         
         if (disabled) {
             setMessage(null);
@@ -168,6 +187,10 @@ public class DemoConfigController extends PluginController {
     
     public void onClick$btnView() {
         ViewResourcesController.show(getSelectedScenario());
+    }
+    
+    public void onClick$btnContext() {
+        ScenarioContext.changeScenario(getSelectedScenario());
     }
     
     /**
@@ -252,5 +275,21 @@ public class DemoConfigController extends PluginController {
      */
     private void setMessage(String msg) {
         lblMessage.setValue(msg);
+    }
+    
+    // Scenario context change events
+    
+    @Override
+    public String pending(boolean silent) {
+        return null;
+    }
+    
+    @Override
+    public void committed() {
+        rerenderScenarios();
+    }
+    
+    @Override
+    public void canceled() {
     }
 }

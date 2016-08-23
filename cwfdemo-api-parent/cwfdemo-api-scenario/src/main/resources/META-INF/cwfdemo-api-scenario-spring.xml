@@ -14,4 +14,13 @@
 		
 	</beans>
 	
+	<beans profile="desktop">
+	
+		<bean id="scenarioContext" parent="managedContext"
+			class="org.hspconsortium.cwfdemo.api.democonfig.ScenarioContext">
+			<constructor-arg ref="cwfDemoConfigScenarioRegistry" />
+		</bean>
+	
+	</beans>
+	
 </beans>

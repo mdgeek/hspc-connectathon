@@ -34,6 +34,10 @@
 					label="${labels.cwfdemo.scenario.btn.view.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.view.tooltip}"
 					zclass="btn" sclass="btn-info btn-xs"/>
+				<button id="btnContext" disabled="true"
+					label="${labels.cwfdemo.scenario.btn.context.label}" 
+					tooltiptext="${labels.cwfdemo.scenario.btn.context.tooltip}"
+					zclass="btn" sclass="btn-default btn-xs"/>
 			</span>
 		</toolbar>
 	</vlayout>
