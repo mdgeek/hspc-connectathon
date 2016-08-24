@@ -8,7 +8,7 @@
 		apply="${cwfDemoViewResourcesController}">
 		<caption />
 		<borderlayout width="100%" height="100%">
-			<west splittable="true" width="30%">
+			<west splittable="true" collapsible="true" width="30%">
 				<listbox id="lboxResources" height="100%" width="100%">
 					<listhead>
 						<listheader label="Resource" />

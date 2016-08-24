@@ -17,27 +17,27 @@
 					tooltiptext="${labels.cwfdemo.scenario.btn.deleteall.tooltip}"
 					zclass="btn" sclass="btn-danger btn-xs"/>
 			</span>
-			<span style="float:right">
-				<button id="btnDelete" disabled="true"
+			<span id="scenarioButtons" style="float:right">
+				<button id="btnDelete"
 					label="${labels.cwfdemo.scenario.btn.delete.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.delete.tooltip}"
-					zclass="btn" sclass="btn-warning btn-xs"/>
-				<button id="btnReset" disabled="true"
+					zclass="btn" sclass="btn-danger btn-xs"/>
+				<button id="btnReset"
 					label="${labels.cwfdemo.scenario.btn.reset.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.reset.tooltip}"
-					zclass="btn" sclass="btn-success btn-xs"/>
-				<button id="btnReload" disabled="true"
+					zclass="btn" sclass="btn-warning btn-xs"/>
+				<button id="btnReload"
 					label="${labels.cwfdemo.scenario.btn.reload.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.reload.tooltip}"
 					zclass="btn" sclass="btn-primary btn-xs"/>
-				<button id="btnView" disabled="true"
+				<button id="btnView"
 					label="${labels.cwfdemo.scenario.btn.view.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.view.tooltip}"
 					zclass="btn" sclass="btn-info btn-xs"/>
-				<button id="btnContext" disabled="true"
+				<button id="btnContext"
 					label="${labels.cwfdemo.scenario.btn.context.label}" 
 					tooltiptext="${labels.cwfdemo.scenario.btn.context.tooltip}"
-					zclass="btn" sclass="btn-default btn-xs"/>
+					zclass="btn" sclass="btn-success btn-xs"/>
 			</span>
 		</toolbar>
 	</vlayout>

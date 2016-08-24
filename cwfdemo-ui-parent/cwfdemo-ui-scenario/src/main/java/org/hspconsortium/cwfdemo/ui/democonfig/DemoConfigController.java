@@ -43,7 +43,6 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.ComboitemRenderer;
@@ -99,17 +98,9 @@ public class DemoConfigController extends PluginController implements IScenarioC
     
     private Combobox cboScenarios;
     
-    private Button btnDelete;
-    
-    private Button btnReset;
-    
-    private Button btnReload;
-    
-    private Button btnView;
-    
-    private Button btnContext;
-    
     private Label lblMessage;
+    
+    private Component scenarioButtons;
     
     private Scenario activeScenario;
     
@@ -144,6 +135,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
         model.addAll(scenarioRegistry.getAll());
         Collections.sort(model, scenarioComparator);
         cboScenarios.setModel(model);
+        ZKUtil.disableChildren(scenarioButtons, true);
     }
     
     private void rerenderScenarios() {
@@ -154,11 +146,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
     
     public void onSelect$cboScenarios() {
         boolean disabled = getSelectedScenario() == null;
-        btnDelete.setDisabled(disabled);
-        btnReset.setDisabled(disabled);
-        btnReload.setDisabled(disabled);
-        btnView.setDisabled(disabled);
-        btnContext.setDisabled(disabled);
+        ZKUtil.disableChildren(scenarioButtons, disabled);
         
         if (disabled) {
             setMessage(null);
@@ -222,7 +210,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
                 switch (action) {
                     case LOAD:
                         if (scenario.isLoaded()) {
-                            result = scenario.getResourceCount() + " resource(s) associated with scenario "
+                            result = scenario.getResourceCount() + " resource(s) associated with scenario: "
                                     + scenario.getName();
                             break;
                         }
@@ -230,7 +218,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
                         // Fall through intended here.
                         
                     case RELOAD:
-                        result = scenario.load() + " resource(s) loaded for scenario " + scenario.getName();
+                        result = scenario.load() + " resource(s) loaded for scenario: " + scenario.getName();
                         break;
                     
                     case RESET:
@@ -287,6 +275,12 @@ public class DemoConfigController extends PluginController implements IScenarioC
     @Override
     public void committed() {
         rerenderScenarios();
+        
+        if (activeScenario == null) {
+            setMessage("No scenario is currently active.");
+        } else {
+            setMessage("Active scenario set to: " + activeScenario.getName());
+        }
     }
     
     @Override
