@@ -160,13 +160,13 @@ public class DemoConfigController extends PluginController implements IScenarioC
     }
     
     public void onClick$btnDelete() {
-        if (PromptDialog.confirm("Delete all resources for this scenario?", activeScenario.getName())) {
+        if (PromptDialog.confirm("Delete all resources for this scenario?", getSelectedScenario().getName())) {
             doAction(Action.DELETE);
         }
     }
     
     public void onClick$btnReset() {
-        if (PromptDialog.confirm("Reset this scenario to its baseline state?", activeScenario.getName())) {
+        if (PromptDialog.confirm("Reset this scenario to its baseline state?", getSelectedScenario().getName())) {
             doAction(Action.RESET);
         }
     }
