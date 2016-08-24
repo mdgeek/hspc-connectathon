@@ -263,7 +263,19 @@ public class Scenario {
                 while ((p1 = s.indexOf("${")) > -1) {
                     int p2 = s.indexOf("}", p1);
                     String key = s.substring(p1 + 2, p2);
+                    int p3 = key.indexOf(":");
+                    String dflt = "";
+                    
+                    if (p3 > 0) {
+                        dflt = key.substring(p3 + 1);
+                        key = key.substring(0, p3);
+                    }
+                    
                     String value = map.get(key);
+                    
+                    if (value == null && !dflt.isEmpty()) {
+                        value = dflt;
+                    }
                     
                     if (value == null) {
                         throw new RuntimeException("Reference not found: " + key);
@@ -276,7 +288,7 @@ public class Scenario {
                 sb.append(s).append('\n');
             }
         } catch (Exception e) {
-            MiscUtil.toUnchecked(e);
+            throw MiscUtil.toUnchecked(e);
         }
         
         return jsonParser.parseResource(sb.toString());

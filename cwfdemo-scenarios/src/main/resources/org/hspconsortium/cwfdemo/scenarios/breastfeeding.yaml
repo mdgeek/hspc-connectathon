@@ -8,6 +8,7 @@ patient_newborn:
 relatedperson_newborn:
     source: resource/relatedperson
     patient: patient_newborn
+    relationship: value/CHILD
     
 patient_mother:
     source: resource/patient_intermountain_jane

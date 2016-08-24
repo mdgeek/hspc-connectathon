@@ -2,5 +2,13 @@
     "resourceType":"RelatedPerson",
     "patient":{
         "reference":"${patient}"
+    },
+    "relationship":{
+        "coding":[
+          {
+            "system":"http://hl7.org/fhir/v3/RoleCode",
+            "code":"${relationship}"
+          }
+        ]
     }
 }
