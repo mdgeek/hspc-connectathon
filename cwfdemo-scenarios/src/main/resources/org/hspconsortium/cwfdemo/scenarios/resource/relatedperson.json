@@ -1,0 +1,6 @@
+{
+    "resourceType":"RelatedPerson",
+    "patient":{
+        "reference":"${patient}"
+    }
+}

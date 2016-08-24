@@ -37,6 +37,14 @@
             "postalCode":"10010"
         }
     ],
+    "link":[
+    	{
+    		"other":{
+    			reference:"${relatedperson}"
+    		},
+    		"type":"seealso"
+    	}
+    ],
     "photo":[
         {
             "contentType":"image/jpeg",

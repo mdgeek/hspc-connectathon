@@ -1,20 +1,25 @@
 # Breast feeding scenario
 
-patient1:
-    source: resource/patient_intermountain_jane
-    dob:   date/T-25y
-    photo: image/female_adult.jpeg
-  
-patient2:
+patient_newborn:
     source: resource/patient_intermountain_jose
     dob:   date/T-1d
     photo: image/male_newborn.jpeg
   
-practitioner1:
+relatedperson_newborn:
+    source: resource/relatedperson
+    patient: patient_newborn
+    
+patient_mother:
+    source: resource/patient_intermountain_jane
+    dob:   date/T-25y
+    photo: image/female_adult.jpeg
+    relatedperson: relatedperson_newborn
+  
+practitioner_fry:
     source: resource/practitioner_emory_fry
     
-condition1:
+condition_fever:
     source: resource/condition_generic
-    patient: patient1
-    practitioner: practitioner1
+    patient: patient_mother
+    practitioner: practitioner_fry
     code: snippet/sct_fever
