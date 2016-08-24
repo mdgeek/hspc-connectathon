@@ -155,20 +155,24 @@ public class DemoConfigController extends PluginController implements IScenarioC
         }
     }
     
-    public void onClick$btnReset() {
-        doAction(Action.RESET);
-    }
-    
     public void onClick$btnReload() {
         doAction(Action.RELOAD);
     }
     
     public void onClick$btnDelete() {
-        doAction(Action.DELETE);
+        if (PromptDialog.confirm("Delete all resources for this scenario?", activeScenario.getName())) {
+            doAction(Action.DELETE);
+        }
+    }
+    
+    public void onClick$btnReset() {
+        if (PromptDialog.confirm("Reset this scenario to its baseline state?", activeScenario.getName())) {
+            doAction(Action.RESET);
+        }
     }
     
     public void onClick$btnDeleteAll() {
-        if (PromptDialog.confirm("Delete all demo scenario resources?", "Delete All")) {
+        if (PromptDialog.confirm("Delete resources across all scenarios?", "All Scenarios")) {
             doAction(Action.DELETEALL);
         }
     }
@@ -210,15 +214,14 @@ public class DemoConfigController extends PluginController implements IScenarioC
                 switch (action) {
                     case LOAD:
                         if (scenario.isLoaded()) {
-                            result = scenario.getResourceCount() + " resource(s) associated with scenario: "
-                                    + scenario.getName();
+                            result = "Scenario contains " + scenario.getResourceCount() + " resource(s)";
                             break;
                         }
                         
                         // Fall through intended here.
                         
                     case RELOAD:
-                        result = scenario.load() + " resource(s) loaded for scenario: " + scenario.getName();
+                        result = "Loaded " + scenario.load() + " resource(s)";
                         break;
                     
                     case RESET:
