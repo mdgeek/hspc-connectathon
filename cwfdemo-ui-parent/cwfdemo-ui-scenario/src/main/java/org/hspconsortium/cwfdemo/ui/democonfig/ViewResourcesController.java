@@ -1,3 +1,22 @@
+/*
+ * #%L
+ * Demo Configuration Plugin
+ * %%
+ * Copyright (C) 2014 - 2016 Healthcare Services Platform Consortium
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
 package org.hspconsortium.cwfdemo.ui.democonfig;
 
 import java.util.HashMap;
@@ -8,7 +27,7 @@ import org.carewebframework.ui.zk.PopupDialog;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
-import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario2;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -41,16 +60,16 @@ public class ViewResourcesController extends FrameworkController {
     
     private Radiogroup rgrpFormat;
     
-    private Scenario scenario;
+    private Scenario2 scenario;
     
     private final BaseService fhirService;
     
     /**
      * Display view resources dialog.
      * 
-     * @param scenario Scenario whose resources are to be viewed.
+     * @param scenario Scenario2 whose resources are to be viewed.
      */
-    public static void show(Scenario scenario) {
+    public static void show(Scenario2 scenario) {
         Map<Object, Object> args = new HashMap<>();
         args.put("scenario", scenario);
         PopupDialog.popup("~./org/hspconsortium/cwfdemo/ui/democonfig/viewResources.zul", args, true, true, true);
@@ -64,7 +83,7 @@ public class ViewResourcesController extends FrameworkController {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        scenario = (Scenario) arg.get("scenario");
+        scenario = (Scenario2) arg.get("scenario");
         ((Window) comp).getCaption().setLabel(scenario.getName());
         ListModelList<IBaseResource> model = new ListModelList<>();
         model.addAll(scenario.getResources());

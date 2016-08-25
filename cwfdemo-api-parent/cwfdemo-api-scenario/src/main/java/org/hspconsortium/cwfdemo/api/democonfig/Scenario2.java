@@ -47,9 +47,9 @@ import org.yaml.snakeyaml.Yaml;
 
 import ca.uhn.fhir.parser.IParser;
 
-public class Scenario {
+public class Scenario2 {
     
-    private static final Log log = LogFactory.getLog(Scenario.class);
+    private static final Log log = LogFactory.getLog(Scenario2.class);
     
     private final Map<String, Map<String, String>> scenarioConfig;
     
@@ -66,7 +66,7 @@ public class Scenario {
     private boolean isLoaded;
     
     @SuppressWarnings("unchecked")
-    public Scenario(Resource scenarioYaml, BaseService fhirService) {
+    public Scenario2(Resource scenarioYaml, BaseService fhirService) {
         this.scenarioName = FilenameUtils.getBaseName(scenarioYaml.getFilename());
         this.scenarioBase = scenarioYaml;
         this.fhirService = fhirService;
@@ -230,7 +230,7 @@ public class Scenario {
     /**
      * Adds a resource to the list of resources for this scenario.
      * 
-     * @param resource Scenario to add.
+     * @param resource Scenario2 to add.
      */
     public synchronized void addResource(IBaseResource resource) {
         scenarioResources.put(resource.getIdElement().getValue(), resource);

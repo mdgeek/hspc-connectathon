@@ -106,7 +106,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
     
     private final ScenarioRegistry scenarioRegistry;
     
-    private final ListModelList<Scenario> model = new ListModelList<>();
+    private final ListModelList<Scenario2> model = new ListModelList<>();
     
     /**
      * Demonstration Configuration Helper Class.
@@ -204,7 +204,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
      */
     public void onAction(Event event) {
         Clients.clearBusy(root);
-        Scenario scenario = getSelectedScenario();
+        Scenario2 scenario = getSelectedScenario();
         Action action = (Action) event.getData();
         String result = null;
         
@@ -235,7 +235,7 @@ public class DemoConfigController extends PluginController implements IScenarioC
                     case DELETEALL:
                         int count = 0;
                         
-                        for (Scenario ascenario : model) {
+                        for (Scenario2 ascenario : model) {
                             count += ascenario.destroy();
                         }
                         
@@ -254,9 +254,9 @@ public class DemoConfigController extends PluginController implements IScenarioC
      * 
      * @return The currently selected scenario.
      */
-    private Scenario getSelectedScenario() {
+    private Scenario2 getSelectedScenario() {
         Comboitem item = cboScenarios.getSelectedItem();
-        return item == null ? null : (Scenario) item.getValue();
+        return item == null ? null : (Scenario2) item.getValue();
     }
     
     /**

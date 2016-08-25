@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:cwp="http://www.carewebframework.org/schema/plugin"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans
+		 http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.carewebframework.org/schema/plugin
+		 http://www.carewebframework.org/schema/plugin/plugin-extensions.xsd">
+
+	<beans profile="root">
+
+		<cwp:plugin
+			url="~./org/hspconsortium/cwfdemo/ui/devices/devices.zul"
+			id="cwfDevices" name="Devices Display">
+			<cwp:resource>
+				<cwp:help-resource module="cwfDevicesHelp" />
+			</cwp:resource>
+			<cwp:security requiresAll="false">
+			</cwp:security>
+		</cwp:plugin>
+
+	</beans>
+
+	<beans profile="desktop">
+
+		<!-- Controllers -->
+		<bean id="cwfDevicesMainController"
+			class="org.hspconsortium.cwfdemo.ui.devices.DevicesMainController"
+			scope="prototype">
+            <property name="fhirService" ref="cwfEPSService"/>
+            <property name="fhirContext" ref="cwfEPSService"/>
+            <property name="epsService" ref="cwfEPSService"/>
+		</bean>
+
+	</beans>
+</beans>
