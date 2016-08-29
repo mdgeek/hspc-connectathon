@@ -178,7 +178,9 @@ public class DemoConfigController extends PluginController implements IScenarioC
     }
     
     public void onClick$btnView() {
-        ViewResourcesController.show(getSelectedScenario());
+        if (ViewResourcesController.show(getSelectedScenario())) {
+            doAction(Action.RELOAD);
+        }
     }
     
     public void onClick$btnContext() {

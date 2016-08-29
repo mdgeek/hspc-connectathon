@@ -17,12 +17,16 @@
 			</west>
 			<center>
 				<vlayout height="100%" width="100%" spacing="0">
-					<toolbar align="end" height="33px" style="padding-top:8px">
+					<div width="100%" style="padding:5px">
 						<radiogroup id="rgrpFormat">
 							<radio label="JSON" checked="true" />
 							<radio label="XML" />
 						</radiogroup>
-					</toolbar>
+						<button id="btnDelete" disabled="true" style="float:right"
+							label="${labels.cwfdemo.scenario.btn.deleteresource.label}"
+							tooltiptext="${labelscwfdemo.scenario.btn.deleteresource.tooltip}"
+							zclass="btn" sclass="btn-xs btn-danger" />
+					</div>
 					<textbox id="txtResource" multiline="true" readonly="true" vflex="1" hflex="1" />
 				</vlayout>
 			</center>
