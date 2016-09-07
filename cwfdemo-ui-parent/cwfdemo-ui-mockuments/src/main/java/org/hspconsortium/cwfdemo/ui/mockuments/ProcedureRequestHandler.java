@@ -44,7 +44,7 @@ public class ProcedureRequestHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final ProcedureRequest pr = new ProcedureRequest();
-        ScenarioUtil.addDemoTag(pr);
+        ScenarioUtil.copyDemoTags(document.getReference(), pr);
         pr.setSubject(document.getReference().getSubject());
         pr.setStatus(ProcedureRequestStatus.REQUESTED);
         pr.setOrderedOn(new Date());

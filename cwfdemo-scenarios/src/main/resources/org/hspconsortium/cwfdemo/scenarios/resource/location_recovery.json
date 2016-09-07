@@ -1,0 +1,51 @@
+{
+  "resourceType": "Location",
+  "text": {
+    "status": "generated",
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Recovery Room</div>"
+  },
+  "identifier": [
+    {
+      "value": "RR"
+    }
+  ],
+  "status": "active",
+  "name": "Recovery Room",
+  "description": "Recovery room",
+  "mode": "instance",
+  "telecom": [
+    {
+      "system": "phone",
+      "value": "2328",
+      "use": "work"
+    },
+    {
+      "system": "fax",
+      "value": "2329",
+      "use": "work"
+    }
+  ],
+  "address": {
+    "use": "work",
+    "line": [
+      "Galapagosweg 91, Building A"
+    ],
+    "city": "Den Burg",
+    "postalCode": "9105 PZ",
+    "country": "NLD"
+  },
+  "physicalType": {
+    "coding": [
+      {
+        "system": "http://hl7.org/fhir/location-physical-type",
+        "code": "wi",
+        "display": "Wing"
+      }
+    ]
+  },
+  "position": {
+    "longitude": -83.6945691,
+    "latitude": 42.25475478,
+    "altitude": 0
+  }
+}

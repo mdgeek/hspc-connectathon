@@ -49,6 +49,7 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final Encounter encounter = new Encounter();
+        ScenarioUtil.copyDemoTags(document.getReference(), encounter);
         encounter.setPatient(document.getReference().getSubject());
         encounter.setPeriod(new Period());
         encounter.setStatus(EncounterStatus.INPROGRESS);
@@ -59,12 +60,11 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         
         if (mother != null) {
             EncounterParticipantComponent participant = encounter.addParticipant();
-            RelatedPerson rp = new RelatedPerson(new Reference(mother));
+            RelatedPerson rp = new RelatedPerson(new Reference(FhirUtil.getResourceIdPath(mother)));
+            ScenarioUtil.copyDemoTags(mother, rp);
             participant.setIndividual(new Reference(rp));
             participant.addType(FhirUtil.createCodeableConcept("participant_type", "mother", "mother"));
         }
-        
-        ScenarioUtil.addDemoTag(encounter);
         
         processResponses(responses, new IResponseProcessor() {
             

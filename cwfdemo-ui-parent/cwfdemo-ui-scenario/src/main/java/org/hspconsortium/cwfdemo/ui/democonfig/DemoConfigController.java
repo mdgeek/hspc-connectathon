@@ -75,6 +75,8 @@ public class DemoConfigController extends PluginController implements IScenarioC
             
             if (active) {
                 item.setStyle("font-weight: bold; color: blue!important");
+                cboScenarios.setSelectedItem(item);
+                Events.postEvent(Events.ON_SELECT, cboScenarios, item);
             }
         }
         

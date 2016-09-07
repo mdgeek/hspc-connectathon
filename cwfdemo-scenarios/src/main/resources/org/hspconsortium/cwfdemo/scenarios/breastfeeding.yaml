@@ -18,6 +18,9 @@ patient_mother:
   
 practitioner_fry:
     source: resource/practitioner_emory_fry
+
+location_recovery:
+    source: resource/location_recovery
     
 condition_fever:
     source: resource/condition_generic

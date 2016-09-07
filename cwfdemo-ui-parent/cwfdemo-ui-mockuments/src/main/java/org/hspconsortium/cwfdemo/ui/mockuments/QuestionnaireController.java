@@ -28,17 +28,6 @@ import org.carewebframework.common.XMLUtil;
 import org.carewebframework.ui.FrameworkController;
 import org.carewebframework.ui.zk.ListUtil;
 import org.carewebframework.ui.zk.ZKUtil;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.Datebox;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Textbox;
-
 import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.Location;
 import org.hl7.fhir.dstu3.model.Patient;
@@ -53,12 +42,20 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.Datebox;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Textbox;
 
 /**
  * Controller for questionnaires.
  */
 public class QuestionnaireController extends FrameworkController implements IDocumentOperation {
-    
     
     private static final long serialVersionUID = 1L;
     
@@ -94,7 +91,7 @@ public class QuestionnaireController extends FrameworkController implements IDoc
             
             for (Location location : FhirUtil.getEntries(locations, Location.class)) {
                 Comboitem item = new Comboitem(location.getName());
-                item.setValue(location.getIdElement().asStringValue());
+                item.setValue(FhirUtil.getResourceIdPath(location));
                 cboLocation.appendChild(item);
             }
             
