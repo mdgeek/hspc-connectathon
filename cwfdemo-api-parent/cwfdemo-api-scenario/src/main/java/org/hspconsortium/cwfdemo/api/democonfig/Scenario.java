@@ -141,6 +141,7 @@ public class Scenario {
     public synchronized int initialize() {
         destroy();
         IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
+        IParser xmlParser = fhirService.getClient().getFhirContext().newXmlParser();
         Map<String, IBaseResource> resourceMap = new HashMap<>();
         
         for (String name : scenarioConfig.keySet()) {
@@ -151,7 +152,9 @@ public class Scenario {
                 throw new RuntimeException("No source specified in scenario.");
             }
             
-            IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
+            source = addExtension(source, "json");
+            IBaseResource resource = parseResource(source, map, source.endsWith(".xml") ? xmlParser : jsonParser,
+                resourceMap);
             resource = createOrUpdateResource(resource);
             resourceMap.put(name, resource);
             logAction(resource, "Created");
@@ -249,9 +252,8 @@ public class Scenario {
         log.info(operation + " resource: " + resource.getIdElement().getValue());
     }
     
-    private IBaseResource parseResource(String source, Map<String, String> map, IParser jsonParser,
+    private IBaseResource parseResource(String source, Map<String, String> map, IParser parser,
                                         Map<String, IBaseResource> resourceMap) {
-        source = addExtension(source, "json");
         StringBuilder sb = new StringBuilder();
         
         try (InputStream is = getResourceAsStream(source);) {
@@ -291,7 +293,7 @@ public class Scenario {
             throw MiscUtil.toUnchecked(e);
         }
         
-        return jsonParser.parseResource(sb.toString());
+        return parser.parseResource(sb.toString());
     }
     
     /**
