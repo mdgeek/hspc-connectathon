@@ -9,9 +9,11 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.carewebframework.common.StrUtil;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.Resource;
 
-public class DemoSetup {
+public class DemoSetup implements BeanPostProcessor {
     
     private static final Log log = LogFactory.getLog(DemoSetup.class);
     
@@ -26,6 +28,16 @@ public class DemoSetup {
         } catch (Exception e) {
             log.error("Error during demo setup.  This can occur if setup has already been processed.\n\n" + e.getMessage());
         }
+    }
+    
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+    
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
     }
     
 }
