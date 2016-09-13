@@ -2,7 +2,7 @@
 
 patient_newborn:
     source: resource/patient_intermountain_jose
-    dob:   date/T-1d
+    dob:   date/N-36h
     photo: image/male_newborn.jpeg
   
 relatedperson_newborn:
@@ -27,3 +27,25 @@ condition_fever:
     patient: patient_mother
     practitioner: practitioner_fry
     code: snippet/sct_fever
+
+observation_bili0:
+    source: resource/observation_transbilirubin
+    patient: patient_newborn
+    time: date/N-30h
+    
+observation_bili1:
+    source: resource/observation_totalbilirubin1
+    patient: patient_newborn
+    time: date/N-1350n
+    
+observation_bili2:
+    source: resource/observation_totalbilirubin2
+    patient: patient_newborn
+    time: date/N-345n
+    
+observation_bili3:
+    source: resource/observation_totalbilirubin3
+    patient: patient_newborn
+    time: date/N
+    
+    

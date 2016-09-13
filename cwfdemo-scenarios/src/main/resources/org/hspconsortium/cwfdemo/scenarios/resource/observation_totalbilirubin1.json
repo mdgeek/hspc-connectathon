@@ -1,0 +1,22 @@
+{
+	"resourceType": "Observation",
+	"text": "Total bilirubin 13.5 hrs after birth, 7.5 mg/dL",					
+	"status": "final",
+	"code": {
+		"coding": [
+			{
+				"system": "http://loinc.org",
+				"code": "1975-2",
+				"display": "Total Bilirubin"
+			}
+		]
+	},
+	"subject": {  
+		"reference": "${patient}"
+	},
+	"effectiveDateTime": "${time}",
+	"valueQuantity": {
+		"value": 7.5,
+		"unit": "mg/dL"					
+	}
+}
