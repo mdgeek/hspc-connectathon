@@ -1,10 +1,19 @@
 # Breast feeding scenario
 
+organization:
+    source: resource/organization
+    
 patient_newborn:
     source: resource/patient_intermountain_jose
-    dob:   date/N-36h
+    dob:   datetime/N-36h
     photo: image/male_newborn.jpeg
   
+patient_infant:
+    source: resource/patient-infant.xml
+    dob: date/N-36h
+    tob: datetime/N-36h
+    photo: image/male_newborn.jpeg
+    
 relatedperson_newborn:
     source: resource/relatedperson
     patient: patient_newborn
@@ -16,6 +25,10 @@ patient_mother:
     photo: image/female_adult.jpeg
     relatedperson: relatedperson_newborn
   
+patient_mom:
+    source: resource/patient-mother.xml
+    photo: image/female_adult.jpeg
+        
 practitioner_fry:
     source: resource/practitioner_emory_fry
 
@@ -31,21 +44,21 @@ condition_fever:
 observation_bili0:
     source: resource/observation_transbilirubin
     patient: patient_newborn
-    time: date/N-30h
+    time: datetime/N-30h
     
 observation_bili1:
     source: resource/observation_totalbilirubin1
     patient: patient_newborn
-    time: date/N-1350n
+    time: datetime/N-1350n
     
 observation_bili2:
     source: resource/observation_totalbilirubin2
     patient: patient_newborn
-    time: date/N-345n
+    time: datetime/N-345n
     
 observation_bili3:
     source: resource/observation_totalbilirubin3
     patient: patient_newborn
-    time: date/N
+    time: datetime/N
     
     

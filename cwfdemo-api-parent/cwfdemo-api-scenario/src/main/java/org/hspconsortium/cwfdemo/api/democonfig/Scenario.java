@@ -346,7 +346,11 @@ public class Scenario {
         }
         
         if ("date".equals(type)) {
-            return doDate(value);
+            return doDate(value, true);
+        }
+        
+        if ("datetime".equals(type)) {
+            return doDate(value, false);
         }
         
         if ("image".equals(type)) {
@@ -378,8 +382,7 @@ public class Scenario {
         }
     }
     
-    private String doDate(String value) {
-        boolean dateOnly = value.toLowerCase().trim().charAt(0) == 't';
+    private String doDate(String value, boolean dateOnly) {
         Date date = DateUtil.parseDate(value);
         
         if (date != null) {
