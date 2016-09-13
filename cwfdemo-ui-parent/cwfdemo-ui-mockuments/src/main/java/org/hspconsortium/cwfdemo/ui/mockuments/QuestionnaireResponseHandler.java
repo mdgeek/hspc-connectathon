@@ -44,7 +44,7 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final QuestionnaireResponse qr = new QuestionnaireResponse();
-        ScenarioUtil.addDemoTag(qr);
+        ScenarioUtil.copyDemoTags(document.getReference(), qr);
         //String ref = (String) root.getAttribute("questionnaire_reference");
         //qr.setQuestionnaire(ref == null ? null : new Reference(ref));
         qr.setSubject(document.getReference().getSubject());

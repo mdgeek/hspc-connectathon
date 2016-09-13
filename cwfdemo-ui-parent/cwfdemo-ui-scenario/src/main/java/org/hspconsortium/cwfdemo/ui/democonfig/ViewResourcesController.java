@@ -1,4 +1,4 @@
-/*
+/*-
  * #%L
  * Demo Configuration Plugin
  * %%
@@ -24,11 +24,14 @@ import java.util.Map;
 
 import org.carewebframework.ui.FrameworkController;
 import org.carewebframework.ui.zk.PopupDialog;
+import org.carewebframework.ui.zk.PromptDialog;
+import org.carewebframework.ui.zk.ZKUtil;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwfdemo.api.democonfig.Scenario2;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
@@ -60,19 +63,26 @@ public class ViewResourcesController extends FrameworkController {
     
     private Radiogroup rgrpFormat;
     
-    private Scenario2 scenario;
+    private Button btnDelete;
+    
+    private Scenario scenario;
     
     private final BaseService fhirService;
+    
+    private final ListModelList<IBaseResource> model = new ListModelList<>();
     
     /**
      * Display view resources dialog.
      * 
-     * @param scenario Scenario2 whose resources are to be viewed.
+     * @param scenario Scenario whose resources are to be viewed.
+     * @return True if the scenario was modified.
      */
-    public static void show(Scenario2 scenario) {
+    public static boolean show(Scenario scenario) {
         Map<Object, Object> args = new HashMap<>();
         args.put("scenario", scenario);
-        PopupDialog.popup("~./org/hspconsortium/cwfdemo/ui/democonfig/viewResources.zul", args, true, true, true);
+        Window dlg = PopupDialog.popup("~./org/hspconsortium/cwfdemo/ui/democonfig/viewResources.zul", args, true, true,
+            true);
+        return dlg.hasAttribute("modified");
     }
     
     public ViewResourcesController(BaseService fhirService) {
@@ -85,7 +95,6 @@ public class ViewResourcesController extends FrameworkController {
         super.doAfterCompose(comp);
         scenario = (Scenario2) arg.get("scenario");
         ((Window) comp).getCaption().setLabel(scenario.getName());
-        ListModelList<IBaseResource> model = new ListModelList<>();
         model.addAll(scenario.getResources());
         lboxResources.setItemRenderer(resourceRenderer);
         lboxResources.setModel(model);
@@ -99,18 +108,38 @@ public class ViewResourcesController extends FrameworkController {
         displayResource();
     }
     
-    private void displayResource() {
+    public void onClick$btnDelete() {
+        if (PromptDialog.confirm("Delete selected resource?", "Delete")) {
+            try {
+                IBaseResource resource = getSelectedResource();
+                fhirService.deleteResource(resource);
+                model.remove(resource);
+                root.setAttribute("modified", true);
+                displayResource();
+            } catch (Exception e) {
+                PromptDialog.showError("Error deleting resource:\n\n" + ZKUtil.formatExceptionForDisplay(e));
+            }
+        }
+    }
+    
+    private IBaseResource getSelectedResource() {
         Listitem item = lboxResources.getSelectedItem();
+        return item == null ? null : (IBaseResource) item.getValue();
+    }
+    
+    private void displayResource() {
+        IBaseResource resource = getSelectedResource();
         
-        if (item == null) {
+        if (resource == null) {
             txtResource.setValue(null);
+            btnDelete.setDisabled(true);
         } else {
-            IBaseResource resource = item.getValue();
             FhirContext ctx = fhirService.getClient().getFhirContext();
             IParser parser = rgrpFormat.getSelectedIndex() == 0 ? ctx.newJsonParser() : ctx.newXmlParser();
             parser.setPrettyPrint(true);
             txtResource.setValue(parser.encodeResourceToString(resource));
             txtResource.setSelectionRange(0, 0);
+            btnDelete.setDisabled(false);
         }
     }
 }

@@ -41,7 +41,7 @@ public class RiskAssessmentHandler extends BaseQuestionnaireHandler {
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
         final RiskAssessment ra = new RiskAssessment();
-        ScenarioUtil.addDemoTag(ra);
+        ScenarioUtil.copyDemoTags(document.getReference(), ra);
         ra.setSubject(document.getReference().getSubject());
         ra.setPerformer(FhirUtil.getFirst(document.getReference().getAuthor()));
         ra.setOccurrence(new DateTimeType(new Date()));

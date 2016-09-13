@@ -139,6 +139,28 @@ public class ScenarioUtil {
     }
     
     /**
+     * Adds a tag to a resource for scenario-based deletes of demo data.
+     * 
+     * @param resource The resource.
+     * @param scenario The scenario name.
+     */
+    public static void addScenarioTag(IBaseResource resource, String scenario) {
+        FhirUtil.addTag(createScenarioTag(scenario), resource);
+    }
+    
+    /**
+     * Copies any demo tags from source to destination.
+     * 
+     * @param source The source resource.
+     * @param destination The destination resource.
+     */
+    public static void copyDemoTags(IBaseResource source, IBaseResource destination) {
+        for (IBaseCoding tag : FhirUtil.getTagsBySystem(source, DEMO_URN)) {
+            FhirUtil.addTag(tag, destination);
+        }
+    }
+    
+    /**
      * Creates a tag to be used for scenario-based deletes.
      * 
      * @param scenario The scenario name.
@@ -146,16 +168,6 @@ public class ScenarioUtil {
      */
     public static IBaseCoding createScenarioTag(String scenario) {
         return new Tag(DEMO_URN, scenario, "Scenario: " + scenario);
-    }
-    
-    public static IBaseCoding getTagBySystem(IBaseResource resource, String system) {
-        for (IBaseCoding coding : resource.getMeta().getTag()) {
-            if (system.equals(coding.getSystem())) {
-                return coding;
-            }
-        }
-        
-        return null;
     }
     
     /**

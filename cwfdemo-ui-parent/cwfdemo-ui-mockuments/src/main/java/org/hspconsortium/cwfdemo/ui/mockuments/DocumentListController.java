@@ -31,14 +31,6 @@ import org.carewebframework.api.query.DateQueryFilter.DateType;
 import org.carewebframework.api.query.IQueryContext;
 import org.carewebframework.ui.zk.ListUtil;
 import org.carewebframework.ui.zk.PromptDialog;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.Listitem;
-
 import org.hl7.fhir.dstu3.model.DocumentReference;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -50,19 +42,24 @@ import org.hspconsortium.cwf.fhir.document.DocumentContent;
 import org.hspconsortium.cwf.fhir.document.DocumentListDataService;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwf.ui.reporting.controller.AbstractListController;
+import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
 import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.DocumentAction;
+import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModel;
+import org.zkoss.zul.Listitem;
 
 /**
  * Controller for the list-based display of clinical documents.
  */
 public class DocumentListController extends AbstractListController<Document, Document> {
     
-    
     /**
      * Handles filtering by document type.
      */
     private class DocumentTypeFilter extends AbstractQueryFilter<Document> {
-        
         
         @Override
         public boolean include(Document document) {
@@ -221,7 +218,10 @@ public class DocumentListController extends AbstractListController<Document, Doc
         
         String displayName = itemNames.get(items.indexOf(item));
         DocumentReference ref = new DocumentReference();
-        ref.setSubject(new Reference(PatientContext.getActivePatient()));
+        Patient patient = PatientContext.getActivePatient();
+        ScenarioUtil.copyDemoTags(patient, ref);
+        String id = FhirUtil.getResourceIdPath(patient);
+        ref.setSubject(new Reference(id));
         ref.setCreated(new Date());
         ref.setType(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, item, displayName));
         ref.setDocStatus(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, "status-draft", "Draft"));
