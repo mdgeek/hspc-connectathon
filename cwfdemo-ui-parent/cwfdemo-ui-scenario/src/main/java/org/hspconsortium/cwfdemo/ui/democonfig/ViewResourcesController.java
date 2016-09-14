@@ -19,6 +19,7 @@
  */
 package org.hspconsortium.cwfdemo.ui.democonfig;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -57,6 +58,22 @@ public class ViewResourcesController extends FrameworkController {
         
     };
     
+    private static class ResourceComparator implements Comparator<IBaseResource> {
+        
+        private final boolean ascending;
+        
+        public ResourceComparator(boolean ascending) {
+            this.ascending = ascending;
+        }
+        
+        @Override
+        public int compare(IBaseResource r1, IBaseResource r2) {
+            int cmp = r1.getIdElement().getValue().compareToIgnoreCase(r2.getIdElement().getValue());
+            return ascending ? cmp : -cmp;
+        }
+        
+    }
+    
     private Listbox lboxResources;
     
     private Textbox txtResource;
@@ -70,6 +87,10 @@ public class ViewResourcesController extends FrameworkController {
     private final BaseService fhirService;
     
     private final ListModelList<IBaseResource> model = new ListModelList<>();
+    
+    private final ResourceComparator ascendingComparator = new ResourceComparator(true);
+    
+    private final ResourceComparator descendingComparator = new ResourceComparator(false);
     
     /**
      * Display view resources dialog.
@@ -141,5 +162,13 @@ public class ViewResourcesController extends FrameworkController {
             txtResource.setSelectionRange(0, 0);
             btnDelete.setDisabled(false);
         }
+    }
+    
+    public Comparator<IBaseResource> getAscendingComparator() {
+        return ascendingComparator;
+    }
+    
+    public Comparator<IBaseResource> getDescendingComparator() {
+        return descendingComparator;
     }
 }
