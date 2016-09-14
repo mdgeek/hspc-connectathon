@@ -19,6 +19,7 @@
  */
 package org.hspconsortium.cwfdemo.api.democonfig;
 
+import java.lang.reflect.Constructor;
 import org.carewebframework.common.MiscUtil;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.springframework.beans.BeansException;
@@ -48,7 +49,7 @@ public class ScenarioFinder implements ApplicationContextAware {
         try {
             for (Resource yaml : applicationContext.getResources(scenarioBase + "/*.yaml")) {
                 
-                scenarioRegistry.register(new Scenario2(yaml, fhirService));
+                scenarioRegistry.register(new Scenario(yaml, fhirService));
             }
         } catch (Exception e) {
             throw MiscUtil.toUnchecked(e);

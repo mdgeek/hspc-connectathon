@@ -26,20 +26,15 @@
 			<artifactId>cwf-ui-reporting</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-api-democonfig</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>
         <dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-api-eps</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-<!--        <dependency>
+        <dependency>
 			<groupId>org.carewebframework</groupId>
 			<artifactId>org.carewebframework.ui.highcharts</artifactId>
 			<version>${org.carewebframework.highcharts.version}</version>
-		</dependency>-->
+		</dependency>
 	</dependencies>
 </project>

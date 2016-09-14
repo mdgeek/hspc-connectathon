@@ -1,85 +1,89 @@
 <layout helpViewerMode="POPUP" icon="images/fhir_icon.png" name="FHIRWorks"
-	style="DEFAULT" title="FHIRWorks" version="3.0">
-	<_menubar>
-		<menuitem label="Actions">
-			<menuitem
-				action="zscript:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show();"
-				hint="Show patient selection dialog."
-				label="Select a Patient" />
-			<menuitem
-				action="zscript:org.carewebframework.api.event.EventManager.getInstance().fireLocalEvent(&quot;VIEW.REFRESH&quot;, null);"
-				hint="Refresh patient data."
-				label="Refresh" />
-			<menuitem
-				action="zscript:org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController.show();"
-				hint="Configure demo data."
-				label="Configure Demo" />
-		</menuitem>
-	</_menubar>
-	<_toolbar>
-		<link action="cwf.shell.lock" color="gray" hint="Lock the application" label="Lock" size="TINY"/>
-		<link action="cwf.shell.logout" color="gray" hint="Logout the application" label="Logout" size="TINY"/>
-	</_toolbar>
-	<splitterview orientation="vertical">
-		<splitterpane relative="false" size="30.0">
-			<splitterview orientation="horizontal">
-				<splitterpane relative="false" size="27.0">
-					<cwfPatientPhoto/>
-				</splitterpane>
-				<splitterpane relative="true" size="100">
-					<cwfPatientHeader color="lightyellow"/>
-				</splitterpane>
-			</splitterview>
-		</splitterpane>
-		<splitterpane relative="true" size="80">
-			<tabview orientation="top">
-				<tabpane label="Messages">
-					<cwfMessagebox/>
-				</tabpane>
-				<tabpane label="Chart">
-					<treeview open="true" selectionStyle="PRIMARY">
-						<treepane label="Observations">
-							<cwfObservations/>
-						</treepane>
-						<treepane label="Orders">
-							<cwfOrders/>
-						</treepane>
-						<treepane label="Procedures">
-							<cwfProcedures/>
-						</treepane>
-						<treepane label="Family History">
-							<cwfFamilyHistory/>
-						</treepane>
-						<treepane label="Adverse Reactions">
-							<cwfAdverseReactions/>
-						</treepane>
-						<treepane label="Conditions">
-							<cwfConditions/>
-						</treepane>
-						<treepane label="Medication Orders">
-							<cwfMedicationOrders/>
-						</treepane>
-						<treepane label="Documents">
-							<cwfMockuments/>
-						</treepane>
-						<treepane label="Growth Chart">
-							<growth_chart/>
-						</treepane>
-						<treepane label="Bilirubin Risk">
-							<bilirubin_chart/>
-						</treepane>
-					</treeview>
-				</tabpane>
-                <tabpane label="Devices">
-                    <cwfDevices/>
+        style="DEFAULT" title="FHIRWorks" version="3.0">
+    <_menubar>
+        <menuitem label="Actions">
+            <menuitem
+                action="zscript:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show();"
+                hint="Show patient selection dialog."
+                label="Select a Patient" />
+            <menuitem
+                action="zscript:org.carewebframework.api.event.EventManager.getInstance().fireLocalEvent(&quot;VIEW.REFRESH&quot;, null);"
+                hint="Refresh patient data."
+                label="Refresh" />
+            <menuitem
+                action="zscript:org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController.show();"
+                hint="Configure demo data."
+                label="Configure Demo" />
+        </menuitem>
+    </_menubar>
+    <_toolbar>
+        <link action="cwf.shell.lock" color="gray" hint="Lock the application" label="Lock" size="TINY"/>
+        <link action="cwf.shell.logout" color="gray" hint="Logout the application" label="Logout" size="TINY"/>
+    </_toolbar>
+    <splitterview orientation="vertical">
+        <splitterpane relative="false" size="30.0">
+            <splitterview orientation="horizontal">
+                <splitterpane relative="false" size="27.0">
+                    <cwfPatientPhoto/>
+                </splitterpane>
+                <splitterpane relative="true" size="100">
+                    <cwfPatientHeader color="lightyellow"/>
+                </splitterpane>
+            </splitterview>
+        </splitterpane>
+        <splitterpane relative="true" size="80">
+            <tabview orientation="top">
+                <tabpane label="Messages">
+                    <cwfMessagebox/>
                 </tabpane>
-			</tabview>
-		</splitterpane>
-		<splitterpane relative="false" size="26.0">
-			<cwfStatusPanel/>
-		</splitterpane>
-		<splitterpane relative="false" size="71.0">
-			<frame url="/footer.html"/>
-		</splitterpane>
-	</splitterview>
+                <tabpane label="Chart">
+                    <treeview open="true" selectionStyle="PRIMARY">
+                        <treepane label="Observations">
+                            <cwfObservations/>
+                        </treepane>
+                        <treepane label="Orders">
+                            <cwfOrders/>
+                        </treepane>
+                        <treepane label="Procedures">
+                            <cwfProcedures/>
+                        </treepane>
+                        <treepane label="Family History">
+                            <cwfFamilyHistory/>
+                        </treepane>
+                        <treepane label="Adverse Reactions">
+                            <cwfAdverseReactions/>
+                        </treepane>
+                        <treepane label="Conditions">
+                            <cwfConditions/>
+                        </treepane>
+                        <treepane label="Medication Orders">
+                            <cwfMedicationOrders/>
+                        </treepane>
+                        <treepane label="Documents">
+                            <cwfMockuments/>
+                        </treepane>
+                        <treepane label="Growth Chart">
+                            <growth_chart/>
+                        </treepane>
+                        <treepane label="Bilirubin Risk">
+                            <bilirubin_chart/>
+                        </treepane>
+                    </treeview>
+                </tabpane>
+                <tabpane label="Devices">
+                    <cwfDevices cfgEPSEndpoint="http://64.87.15.70:8087/EPSWebService"
+                                 cfgFHIREndpoint="http://64.87.15.70:8087/server-web/baseDstu3"
+                                 cfgFHIRPassword="somePa$$w0rd"
+                                 cfgFHIRUsername="connectathon"
+                                 cfgPlotThreshold="10"/>
+                </tabpane>
+            </tabview>
+        </splitterpane>
+        <splitterpane relative="false" size="26.0">
+            <cwfStatusPanel/>
+        </splitterpane>
+        <splitterpane relative="false" size="71.0">
+            <frame url="/footer.html"/>
+        </splitterpane>
+    </splitterview>
 </layout>

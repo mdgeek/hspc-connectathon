@@ -1,4 +1,4 @@
-/*-
+/*
  * #%L
  * Support for demo scenarios
  * %%

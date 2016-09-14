@@ -24,14 +24,14 @@ import org.carewebframework.api.spring.BeanRegistry;
 /**
  * Registry that detects and automatically registers scenario definitions.
  */
-public class ScenarioRegistry extends BeanRegistry<String, Scenario2> {
+public class ScenarioRegistry extends BeanRegistry<String, Scenario> {
     
     public ScenarioRegistry() {
-        super(Scenario2.class);
+        super(Scenario.class);
     }
     
     @Override
-    protected String getKey(Scenario2 scenario) {
+    protected String getKey(Scenario scenario) {
         return scenario.getName();
     }
 }

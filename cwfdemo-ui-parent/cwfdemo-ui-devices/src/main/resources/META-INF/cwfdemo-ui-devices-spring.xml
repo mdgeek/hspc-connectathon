@@ -18,6 +18,13 @@
 			</cwp:resource>
 			<cwp:security requiresAll="false">
 			</cwp:security>
+            <cwp:serialization>
+                <cwp:property id="cfgPlotThreshold" name="Plot Threshold" type="integer" default="10" description="Maximum number of points to be contained in a chart" />
+                <cwp:property id="cfgEPSEndpoint" name="EPS Endpoint" type="text" default="" description="Event Pub/Sub endpoint" />
+                <cwp:property id="cfgFHIREndpoint" name="FHIR-Server Endpoint" type="text" default="" description="FHIR-Service endpoint" />
+                <cwp:property id="cfgFHIRUsername" name="FHIR-Server User" type="text" default="" description="FHIR-Service username" />
+                <cwp:property id="cfgFHIRPassword" name="FHIR-Server Password" type="text" default="" description="FHIR-Service password" />
+            </cwp:serialization>
 		</cwp:plugin>
 
 	</beans>
@@ -28,8 +35,9 @@
 		<bean id="cwfDevicesMainController"
 			class="org.hspconsortium.cwfdemo.ui.devices.DevicesMainController"
 			scope="prototype">
-            <property name="fhirService" ref="cwfEPSService"/>
-            <property name="fhirContext" ref="cwfEPSService"/>
+            <property name="fhirConfig" ref="fhirConfigurator"/>
+            <property name="fhirService" ref="fhirService"/>
+            <property name="fhirContext" ref="fhirContext"/>
             <property name="epsService" ref="cwfEPSService"/>
 		</bean>
 

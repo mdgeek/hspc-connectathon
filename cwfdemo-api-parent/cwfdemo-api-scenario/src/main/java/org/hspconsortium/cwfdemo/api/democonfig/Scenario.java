@@ -46,10 +46,15 @@ import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
 import ca.uhn.fhir.parser.IParser;
+import java.net.MalformedURLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.hl7.fhir.dstu3.model.Bundle;
+import org.springframework.core.io.UrlResource;
 
-public class Scenario2 {
+public class Scenario {
     
-    private static final Log log = LogFactory.getLog(Scenario2.class);
+    private static final Log log = LogFactory.getLog(Scenario.class);
     
     private final Map<String, Map<String, String>> scenarioConfig;
     
@@ -66,7 +71,7 @@ public class Scenario2 {
     private boolean isLoaded;
     
     @SuppressWarnings("unchecked")
-    public Scenario2(Resource scenarioYaml, BaseService fhirService) {
+    public Scenario(Resource scenarioYaml, BaseService fhirService) {
         this.scenarioName = FilenameUtils.getBaseName(scenarioYaml.getFilename());
         this.scenarioBase = scenarioYaml;
         this.fhirService = fhirService;
@@ -152,8 +157,20 @@ public class Scenario2 {
             }
             
             IBaseResource resource = parseResource(source, map, jsonParser, resourceMap);
-            resource = createOrUpdateResource(resource);
-            resourceMap.put(name, resource);
+            
+            //if the Resource is a Bundle, then use the resources it contains
+            if (resource instanceof Bundle){
+                Bundle bundle = (Bundle) resource;
+                for (Bundle.BundleEntryComponent bec : bundle.getEntry()) {
+                    //if (bec.isResource()){ TODO: this ALWAYS returns false!
+                    IBaseResource r = createOrUpdateResource(bec.getResource());
+                    resourceMap.put(name, r);
+                    //}
+                }
+            } else {
+                resource = createOrUpdateResource(resource);
+                resourceMap.put(name, resource);
+            }
             logAction(resource, "Created");
         }
         
@@ -230,7 +247,7 @@ public class Scenario2 {
     /**
      * Adds a resource to the list of resources for this scenario.
      * 
-     * @param resource Scenario2 to add.
+     * @param resource Scenario to add.
      */
     public synchronized void addResource(IBaseResource resource) {
         scenarioResources.put(resource.getIdElement().getValue(), resource);

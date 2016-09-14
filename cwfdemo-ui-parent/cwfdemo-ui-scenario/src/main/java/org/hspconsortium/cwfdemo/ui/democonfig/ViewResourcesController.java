@@ -29,7 +29,7 @@ import org.carewebframework.ui.zk.ZKUtil;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 import org.hspconsortium.cwf.fhir.common.BaseService;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
-import org.hspconsortium.cwfdemo.api.democonfig.Scenario2;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
@@ -93,7 +93,7 @@ public class ViewResourcesController extends FrameworkController {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        scenario = (Scenario2) arg.get("scenario");
+        scenario = (Scenario) arg.get("scenario");
         ((Window) comp).getCaption().setLabel(scenario.getName());
         model.addAll(scenario.getResources());
         lboxResources.setItemRenderer(resourceRenderer);
