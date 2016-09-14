@@ -43,3 +43,4 @@ org.socraticgrid.hl7.cds.topic=Patient
 
 # Kafka settings
 org.carewebframework.messaging.kafka.bootstrap.servers=127.0.0.1:2181
+
