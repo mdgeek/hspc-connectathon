@@ -1,17 +1,13 @@
 {
+  "id": "location-south-wing",
   "resourceType": "Location",
   "text": {
     "status": "generated",
-    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Recovery Room</div>"
+    "div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">South Wing, second floor</div>"
   },
-  "identifier": [
-    {
-      "value": "RR"
-    }
-  ],
   "status": "active",
-  "name": "Recovery Room",
-  "description": "Recovery room",
+  "name": "South Wing, second floor",
+  "description": "South Wing, second floor",
   "mode": "instance",
   "telecom": [
     {

@@ -5,7 +5,7 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul
 		http://www.zkoss.org/2005/zul/zul.xsd">
 	<window title="${labels.cwfdemo.scenario.title}" closable="true" width="400px"
-		mold="bootstrap" sclass="panel-primary">
+		height="200px" mold="bootstrap" sclass="panel-primary">
 		<include src="~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfig.zul" />
 	</window>
 

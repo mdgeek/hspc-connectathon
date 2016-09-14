@@ -1,64 +1,92 @@
 # Breast feeding scenario
 
 organization:
-    source: resource/organization
+    source: resource/organization.json
     
-patient_newborn:
-    source: resource/patient_intermountain_jose
-    dob:   datetime/N-36h
-    photo: image/male_newborn.jpeg
-  
-patient_infant:
+location:
+    source: resource/location-south-wing.json
+    
+patient-infant:
     source: resource/patient-infant.xml
     dob: date/N-36h
     tob: datetime/N-36h
-    photo: image/male_newborn.jpeg
+    photo: image/infant-male.jpeg
     
-relatedperson_newborn:
+relatedperson-infant:
     source: resource/relatedperson
-    patient: patient_newborn
+    patient: patient-infant
     relationship: value/CHILD
     
-patient_mother:
-    source: resource/patient_intermountain_jane
-    dob:   date/T-25y
-    photo: image/female_adult.jpeg
-    relatedperson: relatedperson_newborn
-  
-patient_mom:
+patient-mother:
     source: resource/patient-mother.xml
-    photo: image/female_adult.jpeg
+    dob:   date/T-25y
+    photo: image/adult-female.jpeg
+    relatedperson: relatedperson-infant
         
-practitioner_fry:
-    source: resource/practitioner_emory_fry
+practitioner-bedside-nurse:
+    source: resource/practitioner-bedside-nurse.xml
 
-location_recovery:
-    source: resource/location_recovery
+practitioner-charge-nurse:
+    source: resource/practitioner-charge-nurse.xml
+
+practitioner-primary-provider:
+    source: resource/practitioner-primary-provider.xml
+
+condition-slb:
+    source: resource/condition-single-live-birth.xml
+    onsetdate: date/N-36h
+
+encounter-live-birth:
+    source: resource/encounter-live-birth.xml
     
-condition_fever:
-    source: resource/condition_generic
-    patient: patient_mother
-    practitioner: practitioner_fry
-    code: snippet/sct_fever
-
-observation_bili0:
-    source: resource/observation_transbilirubin
-    patient: patient_newborn
+observation-bili0:
+    source: resource/observation-transbilirubin.json
+    patient: patient-infant
     time: datetime/N-30h
     
-observation_bili1:
-    source: resource/observation_totalbilirubin1
-    patient: patient_newborn
+observation-bili1:
+    source: resource/observation-totalbilirubin1.json
+    patient: patient-infant
     time: datetime/N-1350n
     
-observation_bili2:
-    source: resource/observation_totalbilirubin2
-    patient: patient_newborn
+observation-bili2:
+    source: resource/observation-totalbilirubin2.json
+    patient: patient-infant
     time: datetime/N-345n
     
-observation_bili3:
-    source: resource/observation_totalbilirubin3
-    patient: patient_newborn
+observation-bili3:
+    source: resource/observation-totalbilirubin3.json
+    patient: patient-infant
     time: datetime/N
+
+library-cds:
+    source: resource/library-exclusive-breastfeeding-cds-logic.xml
     
+library-cqm:
+    source: resource/library-exclusive-breastfeeding-cqm-logic.xml
+    
+library-quick:
+    source: resource/library-quick-model-definition.xml
+
+plan-definition-1:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-01.xml
+    
+plan-definition-2:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-02.xml
+    
+plan-definition-3:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-03.xml
+    
+plan-definition-4:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-04.xml
+    
+questionnaire-readiness:
+    source: resource/questionnaire-breastfeeding-readiness-assessment.xml
+    
+device-cds:
+    source: resource/device-cds-system.xml
+  
+measure:
+    source: resource/measure-exclusive-breastfeeding.xml
+      
     
