@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 *.class
 
 # Mobile Tools for Java (J2ME)
@@ -28,3 +29,7 @@ target/
 # Project-specific
 hapi-fhir-codegen/generated-source/*
 /bin/
+=======
+/cwfdemo-webapp-parent/cwfdemo-webapp-connectathon/target/
+target
+>>>>>>> devices-plugin

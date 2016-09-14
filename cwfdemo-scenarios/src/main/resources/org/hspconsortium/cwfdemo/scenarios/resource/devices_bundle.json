@@ -1,0 +1,187 @@
+{
+  "resourceType": "Bundle",
+  "id": "10189253-6282-4eb0-b10f-7c4f180c4af5",
+  "meta": {
+    "lastUpdated": "2016-09-05T13:07:27.312-07:00"
+  },
+  "type": "searchset",
+  "total": 5,
+  "entry": [
+    {
+      "resource": {
+        "resourceType": "Device",
+        "id": "1-ecde3d4e58532d31",
+        "identifier": [
+          {
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "ecde3d4e58532d31"
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:11073:10101",
+              "code": "531981",
+              "display": "MDC_MOC_VMS_MDS_AHD"
+            }
+          ]
+        }
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Device",
+        "id": "1-001c050100006644",
+        "identifier": [
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "001c050100006644",
+            "assigner": {
+              "reference": "IEEE"
+            }
+          },
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "00:1C:05:00:66:44",
+            "assigner": {
+              "reference": "Bluetooth SIG"
+            }
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:11073:10101",
+              "code": "528388",
+              "display": "MDC_DEV_SPEC_PROFILE_PULS_OXIM"
+            }
+          ]
+        },
+        "manufacturer": "Nonin Medical, Inc.",
+        "model": "Model 9560"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Device",
+        "id": "1-2900000000be7c08",
+        "identifier": [
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "2900000000be7c08",
+            "assigner": {
+              "reference": "IEEE"
+            }
+          },
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "08:7C:BE:00:00:29",
+            "assigner": {
+              "reference": "Bluetooth SIG"
+            }
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:11073:10101",
+              "code": "528391",
+              "display": "MDC_DEV_SPEC_PROFILE_BP"
+            }
+          ]
+        },
+        "manufacturer": "Andon",
+        "model": "KD-926 GG006"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Device",
+        "id": "1-0000000000000000",
+        "identifier": [
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "0000000000000000",
+            "assigner": {
+              "reference": "IEEE"
+            }
+          },
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "C0:03:40:86:81:A8",
+            "assigner": {
+              "reference": "Bluetooth SIG"
+            }
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:11073:10101",
+              "code": "528425",
+              "display": "MDC_DEV_SPEC_PROFILE_HF_CARDIO"
+            }
+          ]
+        },
+        "manufacturer": "IDT",
+        "model": "PE128"
+      },
+      "search": {
+        "mode": "match"
+      }
+    },
+    {
+      "resource": {
+        "resourceType": "Device",
+        "id": "1-006019fffe201ad0",
+        "identifier": [
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "006019fffe201ad0",
+            "assigner": {
+              "reference": "IEEE"
+            }
+          },
+          {
+            "use": "official",
+            "system": "urn:iso:std:iso:11073:10101",
+            "value": "00:60:19:20:1A:D0",
+            "assigner": {
+              "reference": "Bluetooth SIG"
+            }
+          }
+        ],
+        "type": {
+          "coding": [
+            {
+              "system": "urn:iso:std:iso:11073:10101",
+              "code": "528401",
+              "display": "MDC_DEV_SPEC_PROFILE_GLUCOSE"
+            }
+          ]
+        },
+        "manufacturer": "Roche",
+        "model": "498"
+      },
+      "search": {
+        "mode": "match"
+      }
+    }
+  ]
+}
