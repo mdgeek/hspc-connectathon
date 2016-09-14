@@ -28,3 +28,4 @@ target/
 # Project-specific
 hapi-fhir-codegen/generated-source/*
 /bin/
+cwf.properties
