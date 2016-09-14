@@ -24,8 +24,8 @@
 	<active value="true" />
 	<name>
 		<use value="official" />
-		<family value="Mary" />
-		<given value="Peter" />
+		<family value="Jones" />
+		<given value="Mary" />
 	</name>
 	<gender value="female" />
 	<birthDate value="1984-02-24" />
@@ -39,4 +39,8 @@
 		</other>
 		<type value="seealso" />
 	</link>
+	<photo>
+		<contentType value="image/jpeg" />
+		<data value="${photo}" />
+	</photo>
 </Patient>
