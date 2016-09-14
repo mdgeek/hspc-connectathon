@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <Questionnaire xmlns="http://hl7.org/fhir">
   <id value="questionnaire-breastfeeding-readiness-assessment"/>
   <meta>
