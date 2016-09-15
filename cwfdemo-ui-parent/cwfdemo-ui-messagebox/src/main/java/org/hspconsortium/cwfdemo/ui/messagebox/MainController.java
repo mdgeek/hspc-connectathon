@@ -38,7 +38,15 @@ import org.carewebframework.ui.zk.MessageWindow.MessageInfo;
 import org.carewebframework.ui.zk.PromptDialog;
 import org.carewebframework.ui.zk.RowComparator;
 import org.carewebframework.ui.zk.ZKUtil;
-
+import org.hl7.fhir.dstu3.model.Patient;
+import org.hspconsortium.cwf.api.patient.PatientContext;
+import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
+import org.hspconsortium.cwfdemo.api.ucs.MessageService;
+import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
+import org.hspconsortium.cwfdemo.api.ucs.Urgency;
+import org.socraticgrid.hl7.services.uc.model.Message;
+import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
@@ -49,27 +57,17 @@ import org.zkoss.zul.Image;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.event.ListDataEvent;
 import org.zkoss.zul.event.ListDataListener;
 
-import org.hl7.fhir.dstu3.model.Patient;
-import org.hspconsortium.cwf.api.patient.PatientContext;
-import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
-import org.hspconsortium.cwf.fhir.common.FhirUtil;
-import org.hspconsortium.cwfdemo.api.ucs.MessageService;
-import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
-import org.hspconsortium.cwfdemo.api.ucs.Urgency;
-import org.socraticgrid.hl7.services.uc.model.Message;
-import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
-
 /**
  * Controller for main message display.
  */
 public class MainController extends CaptionedForm implements IPatientContextEvent {
-    
     
     private static final long serialVersionUID = 1L;
     
@@ -85,6 +83,12 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         }
     }
     
+    public enum ViewMode {
+        SELECTABLE, // User may set view mode
+        PATIENT, // View mode set to current patient only
+        ALL // View mode set to all patients
+    }
+    
     /**
      * Recognized message actions.
      */
@@ -98,7 +102,6 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     // This is the listener for notification action messages.
     private final IGenericEvent<Object> actionListener = new IGenericEvent<Object>() {
-        
         
         @Override
         public void eventCallback(String eventName, Object eventData) {
@@ -178,6 +181,8 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     private boolean showAll = true;
     
+    private ViewMode viewMode = ViewMode.SELECTABLE;
+    
     private Urgency alertThreshold = Urgency.HIGH;
     
     private int alertDuration = 30;
@@ -211,7 +216,6 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         super.init();
         model.addListDataListener(new ListDataListener() {
             
-            
             @Override
             public void onChange(ListDataEvent event) {
                 updateBadge();
@@ -220,7 +224,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         });
         service.addAlertListener(new AlertListener(this));
         service.addMessageListener(new MessageListener(this));
-        getContainer().registerProperties(this, "showAll", "alertDuration", "alertThreshold");
+        getContainer().registerProperties(this, "viewMode", "alertDuration", "alertThreshold");
         rgFilter.setSelectedItem(showAll ? radAll : radPatient);
         processingController = ProcessingController.create(this);
         lstMessages.setItemRenderer(new MessageRenderer());
@@ -716,5 +720,33 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     public void setProcessing(boolean isProcessing) {
         this.isProcessing = isProcessing;
         updateControls(true);
+    }
+    
+    /**
+     * Returns the view mode.
+     * 
+     * @return The view mode.
+     */
+    public ViewMode getViewMode() {
+        return viewMode;
+    }
+    
+    /**
+     * Sets the view mode.
+     * 
+     * @param viewMode The view mode.
+     */
+    public void setViewMode(ViewMode viewMode) {
+        this.viewMode = viewMode;
+        Listheader header = ZKUtil.findAncestor(rgFilter, Listheader.class);
+        
+        if (viewMode == ViewMode.SELECTABLE) {
+            rgFilter.setVisible(true);
+            header.setLabel(null);
+        } else {
+            rgFilter.setVisible(false);
+            setShowAll(viewMode == ViewMode.ALL);
+            header.setLabel(StrUtil.getLabel("cwfmessagebox.main.header.patient"));
+        }
     }
 }

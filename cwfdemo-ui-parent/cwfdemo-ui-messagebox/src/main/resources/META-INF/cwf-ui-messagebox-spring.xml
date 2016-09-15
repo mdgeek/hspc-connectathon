@@ -37,12 +37,16 @@
 					type="enum" 
 					description="You will be alerted of new messages with priorities at or above this threshold.">
 					<cwp:config>
-						<cwp:entry key="class">org.hspconsortium.cwf.api.ucs.Urgency</cwp:entry>
+						<cwp:entry key="class">org.hspconsortium.cwfdemo.api.ucs.Urgency</cwp:entry>
 					</cwp:config>
 				</cwp:property>
-				<cwp:property id="showAll" name="Show All Messages"
-					type="boolean"
-					description="If true, all messages are shown.  If false, only those associated with the current patient are shown" />
+				<cwp:property id="viewMode" name="Alert View Mode"
+					type="enum"
+					description="Determines if alert view can set by the user or is fixed to either current patient or all patients.">
+					<cwp:config>
+						<cwp:entry key="class">org.hspconsortium.cwfdemo.ui.messagebox.MainController$ViewMode</cwp:entry>
+					</cwp:config>
+				</cwp:property>
 			</cwp:serialization>
 			<cwp:resource>
 				<cwp:help-resource module="cwfMessageboxHelp" />
