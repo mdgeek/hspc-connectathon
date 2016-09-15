@@ -32,18 +32,23 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.core.io.Resource;
 
+/**
+ * Perform initial setup of demo web app. This subclasses BeanPostProcessor to insure that it is
+ * executed early in application startup.
+ */
 public class DemoSetup implements BeanPostProcessor {
     
     private static final Log log = LogFactory.getLog(DemoSetup.class);
     
     public DemoSetup(String connectionUrl, String username, String password, Resource sqlResource) throws Exception {
-        
+        log.info("Performing setup of demo application...");
         Class.forName("org.h2.Driver");
         
         try (Connection conn = DriverManager.getConnection(connectionUrl, username, password);) {
             List<String> lines = IOUtils.readLines(sqlResource.getInputStream());
             PreparedStatement ps = conn.prepareStatement(StrUtil.fromList(lines));
             ps.execute();
+            log.info("Completed setup of demo application.");
         } catch (Exception e) {
             log.error("Error during demo setup.  This can occur if setup has already been processed.\n\n" + e.getMessage());
         }

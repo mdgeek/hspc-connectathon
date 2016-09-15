@@ -69,6 +69,12 @@
 			<groupId>log4j</groupId>
 			<artifactId>log4j</artifactId>
 		</dependency>
+		<!-- Demo Setup -->
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-webapp-setup</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<!-- HSPC Services -->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
