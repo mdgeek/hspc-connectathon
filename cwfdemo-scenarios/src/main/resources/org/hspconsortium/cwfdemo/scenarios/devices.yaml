@@ -1,0 +1,7 @@
+# Live Devices scenario
+
+devices_bundle:
+    source: resource/devices_bundle
+  
+device_components_bundle:
+    source: resource/device_components_bundle

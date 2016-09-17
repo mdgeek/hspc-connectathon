@@ -9,7 +9,8 @@ org.carewebframework.ui.desktop.inactivity.duration.lock=9000000
 #fhir.service.root.url=http://fhirtest.uhn.ca/baseDstu2
 #fhir.service.root.url=https://sandbox.hspconsortium.org/dstu2/hspc-reference-api/data
 #fhir.service.root.url=https://sandbox.hspconsortium.org/dstu2/open-hspc-reference-api/data
-fhir.service.root.url=http://localhost:9090/hapi/baseDstu3
+#fhir.service.root.url=http://localhost:9090/hapi/baseDstu3
+fhir.service.root.url=http://localhost:8080/server-web/baseDstu3
 #fhir.service.authentication.type=JWT
 fhir.service.authentication.key.location=/development.only.keystore.jwks
 fhir.service.authentication.key.issuer=test_client_jwt
@@ -30,10 +31,11 @@ org.socraticgrid.hl7.ucs.nifiHost=localhost
 org.socraticgrid.hl7.ucs.nifiClientCommandPort=8889
 org.socraticgrid.hl7.ucs.nifiAlertingCommandPort=8890
 org.socraticgrid.hl7.ucs.nifiPingPort=8870
-org.socraticgrid.hl7.ucs.clientHost=localhost
+#org.socraticgrid.hl7.ucs.clientHost=localhost
+org.socraticgrid.hl7.ucs.clientHost=172.17.0.1
 
 # EPS settings
-org.socraticgrid.hl7.eps.endpoint=http://127.0.0.1:9090/EPSWebService
+org.socraticgrid.hl7.eps.endpoint=http://127.0.0.1:5050/EPSWebService
 org.socraticgrid.hl7.eps.user=eps
 org.socraticgrid.hl7.eps.password=eps
 org.socraticgrid.hl7.eps.polling=1000
