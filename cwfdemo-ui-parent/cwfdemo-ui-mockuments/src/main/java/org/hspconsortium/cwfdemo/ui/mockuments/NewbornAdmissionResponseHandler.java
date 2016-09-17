@@ -26,7 +26,6 @@ import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterParticipantComponent;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterStatus;
-import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -55,8 +54,7 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
         encounter.setStatus(EncounterStatus.INPROGRESS);
         Coding class_ = new Coding("http://hl7.org/fhir/v3/ActCode", "IMP", "inpatient encounter");
         encounter.setClass_(class_);
-        Identifier ident = ScenarioUtil.createIdentifier("patient", "mother");
-        Patient mother = FhirUtil.getFirst(service.searchResourcesByIdentifier(ident, Patient.class));
+        Patient mother = service.getClient().read(Patient.class, "patient-mother");
         
         if (mother != null) {
             EncounterParticipantComponent participant = encounter.addParticipant();
