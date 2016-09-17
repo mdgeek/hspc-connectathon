@@ -46,11 +46,6 @@ import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
 import ca.uhn.fhir.parser.IParser;
-import java.net.MalformedURLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.hl7.fhir.dstu3.model.Bundle;
-import org.springframework.core.io.UrlResource;
 
 public class Scenario {
     
@@ -179,7 +174,8 @@ public class Scenario {
         scenarioResources.clear();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
-            for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz)) {
+            for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz,
+                Integer.MAX_VALUE)) {
                 addResource(resource);
                 logAction(resource, "Retrieved");
             }
