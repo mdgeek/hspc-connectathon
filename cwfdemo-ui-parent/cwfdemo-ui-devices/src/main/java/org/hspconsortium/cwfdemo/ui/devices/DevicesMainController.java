@@ -30,7 +30,9 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
@@ -95,12 +97,13 @@ public class DevicesMainController extends PluginController {
     private Combobox cboDevice;
     private Combobox cboComponent;
 
+    private Textbox newObservationCodeTxt;
     private Textbox newObservationTxt;
     private Datebox newObservationDate;
     private Timebox newObservationTime;
 
     private Chart chart;
-    private Series series;
+    private Map<String, Series> series = new HashMap<>();
 
     public DevicesMainController() {
     }
@@ -223,6 +226,8 @@ public class DevicesMainController extends PluginController {
         Device device = (Device) cboDevice.getSelectedItem().getValue();
         o.setDevice(new Reference(device));
         
+        o.setCode(new CodeableConcept().addCoding(new Coding("urn:iso:std:iso:11073:10101", newObservationCodeTxt.getValue(), newObservationCodeTxt.getValue())));
+        
         //Publishes Observation to EPS to test the whole pub/sub workflow.
         epsService.publishResourceToTopic(EPS_OBSERVATIONS_TOPIC, o);
     }
@@ -294,21 +299,37 @@ public class DevicesMainController extends PluginController {
 
     private void plotObservation(Observation o) {
         try {
+            
+            String code = o.getCode().getCodingFirstRep().getCode();
+            String display = o.getCode().getCodingFirstRep().getDisplay();
+            
+            Series s = getSeriesOrCreate(code, display == null || display.isEmpty() ? code : display);
+            
             //Remove any necessary point in order to keep the max threshold
-            if (series.data.size() >= cfgPlotThreshold) {
-                int pointsToRemove = cfgPlotThreshold - series.data.size();
+            if (s.data.size() >= cfgPlotThreshold) {
+                int pointsToRemove = cfgPlotThreshold - s.data.size();
                 for (int i = 0; i <= pointsToRemove; i++) {
-                    series.data.remove(0);
+                    s.data.remove(0);
                 }
             }
 
-            series.addDataPoint(o.getEffectiveDateTimeType().getValue().getTime(), o.getValueQuantity().getValue().doubleValue());
-            //update the y-axis label using the info from the last observation drawn
-            chart.getYAxis().title.text = o.getValueQuantity().getUnit();
+            s.addDataPoint(o.getEffectiveDateTimeType().getValue().getTime(), o.getValueQuantity().getValue().doubleValue());
             chart.run();
         } catch (FHIRException e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    private Series getSeriesOrCreate(String name, String label){
+        Series s = this.series.get(name);
+        if (s == null){
+            s = chart.addSeries();
+            s.name = label;
+            s.plotOptions.animation = false;
+            this.series.put(name, s);
+        }
+        
+        return s;
     }
 
     private void initChart() {
@@ -319,10 +340,9 @@ public class DevicesMainController extends PluginController {
         chart.getXAxis().type = "datetime";
 
         chart.getYAxis().gridLineWidth = 1;
-        chart.getYAxis().title.text = "Y axis";
+        chart.getYAxis().title.text = "Value";
 
-        series = chart.addSeries();
-        series.plotOptions.animation = false;
+        series = new HashMap<>();
 
         chart.run();
     }
@@ -333,25 +353,6 @@ public class DevicesMainController extends PluginController {
      * @return
      */
     private List<Device> fetchDevices() {
-
-        //TODO: use fhirService to fetch Devices
-        /////Mock
-//        List<Device> devices = new ArrayList<>();
-//        Device d1 = new Device(new CodeableConcept().addCoding(new Coding("Some System", "Some Code", "Device 1")));
-//        d1.setId("Device 1");
-//        d1.setManufacturer("M1");
-//        d1.setVersion("V1");
-//        d1.setUserData("seed", 1);
-//
-//        Device d2 = new Device(new CodeableConcept().addCoding(new Coding("Some System", "Some Code", "Device 2")));
-//        d2.setId("Device 2");
-//        d2.setManufacturer("M1");
-//        d2.setVersion("V2");
-//        d2.setUserData("seed", 2);
-//
-//        devices.add(d1);
-//        devices.add(d2);
-        ////
         return fhirService.searchResourcesByType(Device.class);
     }
 

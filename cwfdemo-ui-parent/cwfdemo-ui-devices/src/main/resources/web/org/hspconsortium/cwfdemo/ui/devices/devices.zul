@@ -33,8 +33,12 @@
             <south size="10%" border="none" splittable="false" collapsible="true">
                 <hlayout spacing="20px">
                     <hlayout spacing="7px">
+                        <label value="Code:"/>
+                        <textbox id="newObservationCodeTxt" value="ABC"/>
+                    </hlayout>
+                    <hlayout spacing="7px">
                         <label value="Value:"/>
-                        <textbox id="newObservationTxt"/>
+                        <textbox id="newObservationTxt" value="10"/>
                     </hlayout>
                     <hlayout spacing="7px">
                         <label value="Timestamp:"/>
