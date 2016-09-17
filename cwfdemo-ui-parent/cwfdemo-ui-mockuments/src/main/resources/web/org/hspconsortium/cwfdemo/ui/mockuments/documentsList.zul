@@ -4,7 +4,7 @@
 	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
 
 	<panel id="panel" height="100%" width="100%">
-		<toolbar align="center">
+		<toolbar id="toolbar" align="center">
 			<span id="options" style="float:left">
 				<label id="lblFilter" sclass="z-panel-header" visible="false" style="font-size:12px;padding-right:15px;border:none; background:none"/>
 				<combobox id="cboFilter" readonly="true"

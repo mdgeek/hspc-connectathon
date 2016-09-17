@@ -50,6 +50,7 @@ import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModel;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Toolbar;
 
 /**
  * Controller for the list-based display of clinical documents.
@@ -76,6 +77,8 @@ public class DocumentListController extends AbstractListController<Document, Doc
     }
     
     private static final long serialVersionUID = 1L;
+    
+    private Toolbar toolbar;
     
     private Combobox cboFilter;
     
@@ -276,6 +279,7 @@ public class DocumentListController extends AbstractListController<Document, Doc
     
     @Override
     protected void onPatientChanged(Patient patient) {
+        toolbar.setVisible(patient != null);
         setSelectedDocument(null);
         super.onPatientChanged(patient);
     }
