@@ -30,9 +30,7 @@ import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.carewebframework.api.property.IPropertyService;
-
 import org.socraticgrid.hl7.services.uc.interfaces.AlertingIntf;
 import org.socraticgrid.hl7.services.uc.interfaces.UCSAlertingIntf;
 import org.socraticgrid.hl7.services.uc.interfaces.UCSClientIntf;
@@ -52,7 +50,6 @@ import org.socraticgrid.hl7.ucs.nifi.common.util.AlertMessageBuilder;
  */
 public class MessageService {
     
-    
     private static final Log log = LogFactory.getLog(MessageService.class);
     
     private static final AlertStatus[] IGNORED_STATUSES = { AlertStatus.Acknowledged, AlertStatus.Expired,
@@ -62,7 +59,7 @@ public class MessageService {
      * The UCS session associated with the service. This UCS session will be shared by all servlet
      * sessions.
      */
-    private UCSNiFiSession session;
+    private volatile UCSNiFiSession session;
     
     /**
      * The UCS client associated with this session. This property MUST ALWAYS be accessed via it
@@ -140,6 +137,14 @@ public class MessageService {
      * @return The UCS session.
      */
     protected UCSNiFiSession getSession() {
+        if (session == null) {
+            init();
+        }
+        
+        if (session == null) {
+            throw new RuntimeException("Unable to create a UCS session.");
+        }
+        
         return session;
     }
     
@@ -161,39 +166,39 @@ public class MessageService {
      */
     private synchronized ClientImpl initClient() {
         if (client == null) {
-            client = (ClientImpl) session.getNewClient();
+            client = (ClientImpl) getSession().getNewClient();
         }
         
         return client;
     }
     
     /**
-     * Creates a new session after disposing of an existing session.
+     * Creates a new session.
      */
-    public void init() {
-        try {
-            destroy();
-            
-            // @formatter:off
-            session = new UCSNiFiSession.UCSNiFiSessionBuilder()
-                    .withNifiHost(config.getNifiHost())
-                    .withNifiClientCommandPort(config.getNifiClientCommandPort())
-                    .withNifiAlertingCommandPort(config.getNifiAlertingCommandPort())
-                    .withNifiConversationCommandPort(config.getNifiConversationCommandPort())
-                    .withNifiManagementCommandPort(config.getNifiManagementCommandPort())
-                    .withNifiSendMessageCommandPort(config.getNifiSendMessageCommandPort())
-                    .withClientHost(config.getClientHost())
-                    .withClientCallbackPort(config.getClientPort())
-                    .withClientAlertingCallbackPort(config.getAlertingPort())
-                    .withClientManagementCallbackPort(config.getManagementPort())
-                    .withClientConversationCallbackPort(config.getConversationPort())
-                    .withUCSClientListener(messageBroadcaster)
-                    .withUCSAlertingListener(alertBroadcaster)
-                    .build();//TODO Create singleton session with broadcast
-            // @formatter:on
-        } catch (Exception e) {
-            log.error("Error initializing UCS Session", e);
-            throw new RuntimeException(e.getMessage(), e);
+    public synchronized void init() {
+        if (session == null) {
+            try {
+                // @formatter:off
+                session = new UCSNiFiSession.UCSNiFiSessionBuilder()
+                        .withNifiHost(config.getNifiHost())
+                        .withNifiClientCommandPort(config.getNifiClientCommandPort())
+                        .withNifiAlertingCommandPort(config.getNifiAlertingCommandPort())
+                        .withNifiConversationCommandPort(config.getNifiConversationCommandPort())
+                        .withNifiManagementCommandPort(config.getNifiManagementCommandPort())
+                        .withNifiSendMessageCommandPort(config.getNifiSendMessageCommandPort())
+                        .withClientHost(config.getClientHost())
+                        .withClientCallbackPort(config.getClientPort())
+                        .withClientAlertingCallbackPort(config.getAlertingPort())
+                        .withClientManagementCallbackPort(config.getManagementPort())
+                        .withClientConversationCallbackPort(config.getConversationPort())
+                        .withUCSClientListener(messageBroadcaster)
+                        .withUCSAlertingListener(alertBroadcaster)
+                        .build();//TODO Create singleton session with broadcast
+                // @formatter:on
+            } catch (Exception e) {
+                log.error("Error initializing UCS Session", e);
+                //throw new RuntimeException(e.getMessage(), e);
+            }
         }
     }
     
@@ -346,7 +351,7 @@ public class MessageService {
      * @param messageIds Unique ids of messages to acknowledge.
      */
     public void acknowledgeMessages(List<String> messageIds) {
-        AlertingIntf alertingIntf = session.getNewAlerting();
+        AlertingIntf alertingIntf = getSession().getNewAlerting();
         
         for (String messageId : messageIds) {
             acknowledgeMessage(messageId, alertingIntf);
@@ -371,7 +376,7 @@ public class MessageService {
     protected void acknowledgeMessage(String messageId, AlertingIntf alertingIntf) {
         try {
             if (alertingIntf == null) {
-                alertingIntf = session.getNewAlerting();
+                alertingIntf = getSession().getNewAlerting();
             }
             
             AlertStatus status = AlertStatus.Acknowledged;
