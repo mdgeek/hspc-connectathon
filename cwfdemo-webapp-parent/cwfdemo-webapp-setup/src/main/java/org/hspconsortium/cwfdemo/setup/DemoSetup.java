@@ -19,6 +19,7 @@
  */
 package org.hspconsortium.cwfdemo.setup;
 
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -43,8 +44,8 @@ public class DemoSetup implements BeanPostProcessor {
     public DemoSetup(BasicDataSource ds, Resource sqlResource) throws Exception {
         log.info("Performing setup of demo application...");
         
-        try (Connection conn = ds.getConnection();) {
-            List<String> lines = IOUtils.readLines(sqlResource.getInputStream());
+        try (Connection conn = ds.getConnection(); InputStream is = sqlResource.getInputStream()) {
+            List<String> lines = IOUtils.readLines(is);
             PreparedStatement ps = conn.prepareStatement(StrUtil.fromList(lines));
             ps.execute();
             log.info("Completed setup of demo application.");
