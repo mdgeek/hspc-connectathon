@@ -20,10 +20,10 @@
 package org.hspconsortium.cwfdemo.setup;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.List;
 
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -40,11 +40,10 @@ public class DemoSetup implements BeanPostProcessor {
     
     private static final Log log = LogFactory.getLog(DemoSetup.class);
     
-    public DemoSetup(String connectionUrl, String username, String password, Resource sqlResource) throws Exception {
+    public DemoSetup(BasicDataSource ds, Resource sqlResource) throws Exception {
         log.info("Performing setup of demo application...");
-        Class.forName("org.h2.Driver");
         
-        try (Connection conn = DriverManager.getConnection(connectionUrl, username, password);) {
+        try (Connection conn = ds.getConnection();) {
             List<String> lines = IOUtils.readLines(sqlResource.getInputStream());
             PreparedStatement ps = conn.prepareStatement(StrUtil.fromList(lines));
             ps.execute();
