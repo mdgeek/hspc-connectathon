@@ -24,7 +24,8 @@ fhir.service.authentication.token.provider=https://sandbox.hspconsortium.org/dst
 fhir.client.prettyprint=false
 
 #H2 Settings
-org.carewebframework.hibernate.url=jdbc:h2:~/.cwf/database
+org.carewebframework.hibernate.h2.mode=local
+org.carewebframework.hibernate.url=jdbc:h2:tcp://localhost:8321/~/.cwf/database
 
 # UCS settings
 org.socraticgrid.hl7.ucs.nifiHost=localhost

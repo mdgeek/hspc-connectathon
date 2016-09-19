@@ -6,7 +6,7 @@
 		 http://www.springframework.org/schema/beans/spring-beans.xsd">
 
 	<beans profile="root">
-		<bean class="org.hspconsortium.cwfdemo.setup.DemoSetup">
+		<bean class="org.hspconsortium.cwfdemo.setup.DemoSetup" depends-on="cwfHibernateDataSource">
 			<constructor-arg value="${org.carewebframework.hibernate.url}" />
 			<constructor-arg value="${org.carewebframework.hibernate.username}" />
 			<constructor-arg value="${org.carewebframework.hibernate.password}" />
