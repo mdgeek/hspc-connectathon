@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.carewebframework.common.DateUtil;
 import org.carewebframework.common.MiscUtil;
 import org.hl7.fhir.dstu3.model.BaseDateTimeType;
+import org.hl7.fhir.dstu3.model.Bundle;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.DateType;
 import org.hl7.fhir.instance.model.api.IBaseCoding;
@@ -244,6 +245,16 @@ public class Scenario {
      * @return The resource, possibly modified.
      */
     public IBaseResource createOrUpdateResource(IBaseResource resource) {
+        if (resource instanceof Bundle) {
+            List<IBaseResource> resources = FhirUtil.getEntries((Bundle) resource, IBaseResource.class);
+            
+            for (IBaseResource res : resources) {
+                createOrUpdateResource(res);
+            }
+            
+            return resource;
+        }
+        
         addTags(resource);
         resource = fhirService.createOrUpdateResource(resource);
         addResource(resource);
