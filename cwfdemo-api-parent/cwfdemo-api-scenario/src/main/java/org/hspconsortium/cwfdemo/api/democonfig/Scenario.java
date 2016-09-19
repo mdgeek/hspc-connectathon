@@ -45,6 +45,7 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.springframework.core.io.Resource;
 import org.yaml.snakeyaml.Yaml;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.parser.IParser;
 
 public class Scenario {
@@ -59,7 +60,9 @@ public class Scenario {
     
     private final IBaseCoding scenarioTag;
     
-    private final Map<String, IBaseResource> scenarioResources = new HashMap<>();
+    private final Map<String, IBaseResource> resourcesById = new HashMap<>();
+    
+    private final Map<String, IBaseResource> resourcesByName = new HashMap<>();
     
     private final BaseService fhirService;
     
@@ -116,7 +119,7 @@ public class Scenario {
      * @return List of loaded resources.
      */
     public Collection<IBaseResource> getResources() {
-        return Collections.unmodifiableCollection(scenarioResources.values());
+        return Collections.unmodifiableCollection(resourcesById.values());
     }
     
     /**
@@ -125,7 +128,7 @@ public class Scenario {
      * @return Count of loaded resources.
      */
     public int getResourceCount() {
-        return scenarioResources.size();
+        return resourcesById.size();
     }
     
     public boolean isLoaded() {
@@ -140,27 +143,41 @@ public class Scenario {
      */
     public synchronized int initialize() {
         destroy();
-        IParser jsonParser = fhirService.getClient().getFhirContext().newJsonParser();
-        IParser xmlParser = fhirService.getClient().getFhirContext().newXmlParser();
-        Map<String, IBaseResource> resourceMap = new HashMap<>();
         
         for (String name : scenarioConfig.keySet()) {
             Map<String, String> map = scenarioConfig.get(name);
-            String source = map.get("source");
-            
-            if (source == null) {
-                throw new RuntimeException("No source specified in scenario.");
-            }
-            
-            source = addExtension(source, "json");
-            IBaseResource resource = parseResource(source, map, source.endsWith(".xml") ? xmlParser : jsonParser,
-                resourceMap);
-            resource = createOrUpdateResource(resource);
-            resourceMap.put(name, resource);
-            logAction(resource, "Created");
+            IBaseResource resource = initialize(map.get("source"), map);
+            resourcesByName.put(name, resource);
         }
         
-        return scenarioResources.size();
+        return resourcesById.size();
+    }
+    
+    /**
+     * Creates a resource based on config data.
+     * 
+     * @param source The source file for the resource to be created.
+     * @param params Optional parameters to use to resolve placeholders.
+     * @return The created resource.
+     */
+    public synchronized IBaseResource initialize(String source, Map<String, String> params) {
+        if (source == null) {
+            throw new RuntimeException("A source must be specified.");
+        }
+        
+        return initialize(parseResource(source, params));
+    }
+    
+    /**
+     * Tags and creates a resource.
+     * 
+     * @param resource The resource to create
+     * @return The created resource.
+     */
+    public synchronized IBaseResource initialize(IBaseResource resource) {
+        resource = createOrUpdateResource(resource);
+        logAction(resource, "Created");
+        return resource;
     }
     
     /**
@@ -171,7 +188,7 @@ public class Scenario {
     @SuppressWarnings("unchecked")
     public synchronized int load() {
         isLoaded = true;
-        scenarioResources.clear();
+        resourcesById.clear();
         
         for (Class<? extends IBaseResource> clazz : ScenarioUtil.getResourceClasses()) {
             for (IBaseResource resource : fhirService.searchResourcesByTag(scenarioTag, (Class<IBaseResource>) clazz,
@@ -181,7 +198,7 @@ public class Scenario {
             }
         }
         
-        return scenarioResources.size();
+        return resourcesById.size();
     }
     
     /**
@@ -196,13 +213,14 @@ public class Scenario {
         
         while (deleted) {
             deleted = false;
-            Iterator<IBaseResource> iterator = scenarioResources.values().iterator();
+            Iterator<IBaseResource> iterator = resourcesById.values().iterator();
             
             while (iterator.hasNext()) {
                 IBaseResource resource = iterator.next();
                 
                 try {
                     fhirService.deleteResource(resource);
+                    resourcesByName.values().remove(resource);
                     iterator.remove();
                     deleted = true;
                     count++;
@@ -211,10 +229,11 @@ public class Scenario {
             }
         }
         
-        for (IBaseResource resource : scenarioResources.values()) {
+        for (IBaseResource resource : resourcesById.values()) {
             logAction(resource, "Failed to delete");
         }
         
+        resourcesByName.clear();
         return count;
     }
     
@@ -237,7 +256,7 @@ public class Scenario {
      * @param resource Scenario to add.
      */
     public synchronized void addResource(IBaseResource resource) {
-        scenarioResources.put(resource.getIdElement().getValue(), resource);
+        resourcesById.put(resource.getIdElement().getValue(), resource);
     }
     
     private InputStream getResourceAsStream(String name) {
@@ -253,8 +272,10 @@ public class Scenario {
         log.info(operation + " resource: " + resource.getIdElement().getValue());
     }
     
-    private IBaseResource parseResource(String source, Map<String, String> map, IParser parser,
-                                        Map<String, IBaseResource> resourceMap) {
+    public IBaseResource parseResource(String source, Map<String, String> params) {
+        source = addExtension(source, "json");
+        FhirContext ctx = fhirService.getClient().getFhirContext();
+        IParser parser = source.endsWith(".xml") ? ctx.newXmlParser() : ctx.newJsonParser();
         StringBuilder sb = new StringBuilder();
         
         try (InputStream is = getResourceAsStream(source);) {
@@ -274,7 +295,7 @@ public class Scenario {
                         key = key.substring(0, p3);
                     }
                     
-                    String value = map.get(key);
+                    String value = params.get(key);
                     
                     if (value == null && !dflt.isEmpty()) {
                         value = dflt;
@@ -284,7 +305,7 @@ public class Scenario {
                         throw new RuntimeException("Reference not found: " + key);
                     }
                     
-                    String r = eval(value, resourceMap);
+                    String r = eval(value, resourcesByName);
                     s = s.substring(0, p1) + r + s.substring(p2 + 1);
                 }
                 

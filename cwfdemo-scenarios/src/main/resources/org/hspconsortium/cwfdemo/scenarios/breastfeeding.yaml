@@ -14,6 +14,7 @@ patient-infant:
     
 relatedperson-infant:
     source: resource/relatedperson
+    id: value/relatedperson-infant
     patient: patient-infant
     relationship: value/CHILD
     
@@ -23,6 +24,12 @@ patient-mother:
     photo: image/adult-female.jpeg
     relatedperson: relatedperson-infant
         
+relatedperson-mother:
+    source: resource/relatedperson.json
+    id: value/relatedperson-mother
+    patient: patient-mother
+    relationship: value/MOTHER
+    
 practitioner-bedside-nurse:
     source: resource/practitioner-bedside-nurse.xml
 

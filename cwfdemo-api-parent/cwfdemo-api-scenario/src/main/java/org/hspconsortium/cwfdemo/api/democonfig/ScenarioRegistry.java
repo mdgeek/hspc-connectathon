@@ -26,7 +26,13 @@ import org.carewebframework.api.spring.BeanRegistry;
  */
 public class ScenarioRegistry extends BeanRegistry<String, Scenario> {
     
-    public ScenarioRegistry() {
+    private static final ScenarioRegistry instance = new ScenarioRegistry();
+    
+    public static ScenarioRegistry getInstance() {
+        return instance;
+    }
+    
+    private ScenarioRegistry() {
         super(Scenario.class);
     }
     

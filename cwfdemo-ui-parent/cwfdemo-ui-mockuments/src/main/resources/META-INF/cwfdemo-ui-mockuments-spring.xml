@@ -37,13 +37,9 @@
 			<constructor-arg ref="fhirDocumentService" />
 		</bean>
 		
-		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.NewbornAdmissionResponseHandler">
-			<constructor-arg ref="fhirDocumentService" />
-		</bean>
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.NewbornAdmissionResponseHandler" />
 		
-		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.ProcedureRequestHandler">
-			<constructor-arg ref="fhirDocumentService" />
-		</bean>
+		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.ProcedureRequestHandler" />
 		
 		<bean class="org.hspconsortium.cwfdemo.ui.mockuments.RiskAssessmentHandler">
 			<constructor-arg ref="fhirDocumentService" />

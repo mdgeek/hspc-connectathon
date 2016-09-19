@@ -115,10 +115,11 @@ public class ViewResourcesController extends FrameworkController {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         scenario = (Scenario) arg.get("scenario");
-        ((Window) comp).getCaption().setLabel(scenario.getName());
         model.addAll(scenario.getResources());
+        model.sort(ascendingComparator, true);
         lboxResources.setItemRenderer(resourceRenderer);
         lboxResources.setModel(model);
+        updateCaption();
     }
     
     public void onSelect$lboxResources() {
@@ -130,17 +131,24 @@ public class ViewResourcesController extends FrameworkController {
     }
     
     public void onClick$btnDelete() {
-        if (PromptDialog.confirm("Delete selected resource?", "Delete")) {
+        IBaseResource resource = getSelectedResource();
+        
+        if (PromptDialog.confirm("Delete " + FhirUtil.getResourceIdPath(resource, true) + "?", "Delete Resource")) {
             try {
-                IBaseResource resource = getSelectedResource();
                 fhirService.deleteResource(resource);
                 model.remove(resource);
                 root.setAttribute("modified", true);
+                updateCaption();
                 displayResource();
             } catch (Exception e) {
                 PromptDialog.showError("Error deleting resource:\n\n" + ZKUtil.formatExceptionForDisplay(e));
             }
         }
+    }
+    
+    private void updateCaption() {
+        ((Window) root).getCaption()
+                .setLabel(scenario.getName() + " (" + model.size() + " resource" + (model.size() == 1 ? ")" : "s)"));
     }
     
     private IBaseResource getSelectedResource() {

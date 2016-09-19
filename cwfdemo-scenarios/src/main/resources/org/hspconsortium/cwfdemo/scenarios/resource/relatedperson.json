@@ -1,4 +1,5 @@
 {
+	"id": "${id}",
     "resourceType":"RelatedPerson",
     "patient":{
         "reference":"${patient}"

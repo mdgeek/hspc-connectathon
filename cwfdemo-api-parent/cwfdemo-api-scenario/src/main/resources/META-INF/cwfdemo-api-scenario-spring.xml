@@ -9,7 +9,7 @@
 
 	<beans profile="root">
 	
-		<bean id="cwfDemoConfigScenarioRegistry" 
+		<bean id="cwfDemoConfigScenarioRegistry" factory-method="getInstance"
 			class="org.hspconsortium.cwfdemo.api.democonfig.ScenarioRegistry" />
 		
 	</beans>

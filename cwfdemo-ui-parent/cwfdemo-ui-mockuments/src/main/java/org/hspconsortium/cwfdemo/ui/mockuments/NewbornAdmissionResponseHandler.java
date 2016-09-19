@@ -20,49 +20,29 @@
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
-import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
-import org.hl7.fhir.dstu3.model.Encounter.EncounterParticipantComponent;
-import org.hl7.fhir.dstu3.model.Encounter.EncounterStatus;
-import org.hl7.fhir.dstu3.model.Patient;
-import org.hl7.fhir.dstu3.model.Period;
 import org.hl7.fhir.dstu3.model.Reference;
-import org.hl7.fhir.dstu3.model.RelatedPerson;
-import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
-import org.hspconsortium.cwf.fhir.document.DocumentService;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
     
-    private final DocumentService service;
-    
-    NewbornAdmissionResponseHandler(DocumentService service) {
+    NewbornAdmissionResponseHandler() {
         super("newborn-admission");
-        this.service = service;
     }
     
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
-        final Encounter encounter = new Encounter();
-        ScenarioUtil.copyDemoTags(document.getReference(), encounter);
-        encounter.setPatient(document.getReference().getSubject());
-        encounter.setPeriod(new Period());
-        encounter.setStatus(EncounterStatus.INPROGRESS);
-        Coding class_ = new Coding("http://hl7.org/fhir/v3/ActCode", "IMP", "inpatient encounter");
-        encounter.setClass_(class_);
-        Patient mother = service.getClient().read(Patient.class, "patient-mother");
-        
-        if (mother != null) {
-            EncounterParticipantComponent participant = encounter.addParticipant();
-            RelatedPerson rp = new RelatedPerson(new Reference(FhirUtil.getResourceIdPath(mother)));
-            ScenarioUtil.copyDemoTags(mother, rp);
-            participant.setIndividual(new Reference(rp));
-            participant.addType(FhirUtil.createCodeableConcept("participant_type", "mother", "mother"));
-        }
+        Scenario scenario = ScenarioUtil.getScenario(document.getReference());
+        Map<String, String> params = new HashMap<>();
+        params.put("mother", "value/relatedperson-mother");
+        final Encounter encounter = (Encounter) scenario.parseResource("resource/encounter-newborn-admission.xml", params);
         
         processResponses(responses, new IResponseProcessor() {
             
@@ -79,7 +59,7 @@ public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {
             
         });
         
-        service.createResource(encounter);
+        scenario.createOrUpdateResource(encounter);
     }
     
 }

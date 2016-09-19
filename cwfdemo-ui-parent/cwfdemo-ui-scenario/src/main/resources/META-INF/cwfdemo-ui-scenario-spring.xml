@@ -12,8 +12,7 @@
 
 	<beans profile="root">
 		
-		<!-- This is the sample definition for a CareWeb plugin -->
-		<cwp:plugin id="cwfDemoConfig" name="Configure Demo" 
+		<cwp:plugin id="cwfDemoConfig" name="Configure Scenario" 
 			url="~./org/hspconsortium/cwfdemo/ui/democonfig/demoConfig.zul">
 			<cwp:resource>
 				<cwp:action-resource id="cwfDemoConfigShow"

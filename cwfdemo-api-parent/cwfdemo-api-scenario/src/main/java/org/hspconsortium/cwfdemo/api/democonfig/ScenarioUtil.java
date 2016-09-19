@@ -171,6 +171,24 @@ public class ScenarioUtil {
     }
     
     /**
+     * Returns the scenario associated with the resource.
+     * 
+     * @param resource The resource to examine.
+     * @return The associated scenario, or null if none.
+     */
+    public static Scenario getScenario(IBaseResource resource) {
+        Scenario scenario = null;
+        
+        for (IBaseCoding tag : FhirUtil.getTagsBySystem(resource, DEMO_URN)) {
+            if ((scenario = ScenarioRegistry.getInstance().get(tag.getCode())) != null) {
+                break;
+            }
+        }
+        
+        return scenario;
+    }
+    
+    /**
      * This is a bit of a hack to enumerate all valid DSTU3 resource classes. It's used right now
      * because many FHIR servers don't implement cross-resource searches.
      * 

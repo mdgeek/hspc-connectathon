@@ -19,35 +19,33 @@
  */
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.hl7.fhir.dstu3.model.Annotation;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.ProcedureRequest;
 import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
-import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestStatus;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
-import org.hspconsortium.cwf.fhir.document.DocumentService;
+import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
 import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class ProcedureRequestHandler extends BaseQuestionnaireHandler {
     
-    private final DocumentService service;
-    
-    ProcedureRequestHandler(DocumentService service) {
+    ProcedureRequestHandler() {
         super("procedure-request");
-        this.service = service;
     }
     
     @Override
     public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
-        final ProcedureRequest pr = new ProcedureRequest();
-        ScenarioUtil.copyDemoTags(document.getReference(), pr);
-        pr.setSubject(document.getReference().getSubject());
-        pr.setStatus(ProcedureRequestStatus.REQUESTED);
-        pr.setOrderedOn(new Date());
+        Scenario scenario = ScenarioUtil.getScenario(document.getReference());
+        Map<String, String> params = new HashMap<>();
+        params.put("orderedOn", "time/N");
+        final ProcedureRequest pr = (ProcedureRequest) scenario
+                .parseResource("resource/procedurerequest-lactation-education.xml", params);
+        
         processResponses(responses, new IResponseProcessor() {
             
             @Override
@@ -69,7 +67,7 @@ public class ProcedureRequestHandler extends BaseQuestionnaireHandler {
             
         });
         
-        service.createResource(pr);
+        scenario.createOrUpdateResource(pr);
     }
     
 }

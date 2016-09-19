@@ -1,0 +1,19 @@
+
+<ProcedureRequest xmlns="http://hl7.org/fhir">
+	<subject>
+		<reference value="Patient/patient-mother" />
+	</subject>
+	<code>
+		<coding>
+			<system value="http://snomed.info/sct" />
+			<code value="243094003" />
+			<display value="Lactation Education" />
+		</coding>
+	</code>
+	<status value="requested" />
+	<notes>
+		<text value="This is a test" />
+	</notes>
+	<orderedOn value="${orderedOn}" />
+	<priority value="routine" />
+</ProcedureRequest>

@@ -12,8 +12,8 @@
                 label="Refresh" />
             <menuitem
                 action="zscript:org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController.show();"
-                hint="Configure demo data."
-                label="Configure Demo" />
+                hint="Manage scenario data."
+                label="Manage Scenarios" />
         </menuitem>
     </_menubar>
     <_toolbar>
