@@ -28,8 +28,8 @@ import org.hl7.fhir.dstu3.model.ProcedureRequest;
 import org.hl7.fhir.dstu3.model.ProcedureRequest.ProcedureRequestPriority;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
-import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
-import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
+import org.hspconsortium.cwf.api.scenario.Scenario;
+import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class ProcedureRequestHandler extends BaseQuestionnaireHandler {

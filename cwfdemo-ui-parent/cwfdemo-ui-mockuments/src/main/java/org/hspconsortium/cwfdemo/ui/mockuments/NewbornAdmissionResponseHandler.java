@@ -27,8 +27,8 @@ import org.hl7.fhir.dstu3.model.Encounter;
 import org.hl7.fhir.dstu3.model.Encounter.EncounterLocationComponent;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hspconsortium.cwf.fhir.document.Document;
-import org.hspconsortium.cwfdemo.api.democonfig.Scenario;
-import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
+import org.hspconsortium.cwf.api.scenario.Scenario;
+import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.zkoss.zk.ui.Component;
 
 public class NewbornAdmissionResponseHandler extends BaseQuestionnaireHandler {

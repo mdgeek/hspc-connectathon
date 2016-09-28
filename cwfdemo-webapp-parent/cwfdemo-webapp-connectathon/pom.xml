@@ -167,7 +167,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-ui-scenario</artifactId>
+			<artifactId>cwf-ui-scenario</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
 		<dependency>

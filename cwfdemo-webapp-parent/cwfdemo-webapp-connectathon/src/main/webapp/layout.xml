@@ -11,7 +11,7 @@
                 hint="Refresh patient data."
                 label="Refresh" />
             <menuitem
-                action="zscript:org.hspconsortium.cwfdemo.ui.democonfig.DemoConfigController.show();"
+                action="zscript:org.hspconsortium.cwf.ui.scenario.ScenarioManagerController.show();"
                 hint="Manage scenario data."
                 label="Manage Scenarios" />
         </menuitem>

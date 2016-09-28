@@ -12,7 +12,6 @@
 	<packaging>pom</packaging>
 
 	<modules>
-		<module>cwfdemo-api-scenario</module>
 		<module>cwfdemo-api-eps</module>
 		<module>cwfdemo-api-ucs</module>
 		<module>cwfdemo-api-cds</module>

@@ -42,7 +42,7 @@ import org.hspconsortium.cwf.fhir.document.DocumentContent;
 import org.hspconsortium.cwf.fhir.document.DocumentListDataService;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwf.ui.reporting.controller.AbstractListController;
-import org.hspconsortium.cwfdemo.api.democonfig.ScenarioUtil;
+import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.DocumentAction;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Combobox;
