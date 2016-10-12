@@ -66,6 +66,11 @@ observation-bili3:
     patient: patient-infant
     time: datetime/N
 
+observation-gestational-age:
+    source: resource/observation-gestational-age.json
+    patient: patient-infant
+    time: datetime/N-36h
+
 library-cds:
     source: resource/library-exclusive-breastfeeding-cds-logic.xml
     

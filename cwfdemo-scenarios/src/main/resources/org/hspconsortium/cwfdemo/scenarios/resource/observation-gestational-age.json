@@ -1,0 +1,25 @@
+{
+	"resourceType": "Observation",
+	"text": {
+		"status": "generated",
+		"div": "<div xmlns=\"http://www.w3.org/1999/xhtml\">Gestational age of 39.29 weeks</div>"
+	},
+	"status": "final",
+	"code": {
+		"coding": [
+			{
+				"system": "http://loinc.org",
+				"code": "33901-0",
+				"display": "Gestational age"
+			}
+		]
+	},
+	"subject": {
+		"reference": "${patient}"
+	},
+    "effectiveDateTime": "${time}",
+	"valueQuantity": {
+		"value": 39.29,
+		"unit": "wk"
+	}
+}
