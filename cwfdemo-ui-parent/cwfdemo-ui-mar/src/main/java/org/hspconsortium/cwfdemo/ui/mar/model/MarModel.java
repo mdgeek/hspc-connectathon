@@ -42,14 +42,12 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
-import org.zkoss.zul.ListModelList;
-
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
+import org.hl7.fhir.dstu3.model.MedicationRequest;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwfdemo.ui.mar.render.MarRenderer;
+import org.zkoss.zul.ListModelList;
 
 /**
  * Simple model for a dynamic grid that can expand its columns and rows in order to represent a
@@ -64,7 +62,6 @@ import org.hspconsortium.cwfdemo.ui.mar.render.MarRenderer;
  * @author Claude Nanjo
  */
 public class MarModel {
-    
     
     private static final Log log = LogFactory.getLog(MarModel.class);
     
@@ -92,7 +89,7 @@ public class MarModel {
     /**
      * Map of Orders by ID
      */
-    private Map<String, MedicationOrder> orderIndex;
+    private Map<String, MedicationRequest> orderIndex;
     
     public static final String checkboxPlaceholder = "x";
     
@@ -108,7 +105,7 @@ public class MarModel {
      * 
      * @param medAdmins
      */
-    public MarModel(List<MedicationOrder> medOrders, List<MedicationAdministration> medAdmins) {
+    public MarModel(List<MedicationRequest> medOrders, List<MedicationAdministration> medAdmins) {
         this();
         init(medOrders, medAdmins);
         System.out.println(medAdmins);
@@ -156,19 +153,19 @@ public class MarModel {
      * 
      * @param medAdmins
      */
-    private void init(List<MedicationOrder> medOrders, List<MedicationAdministration> medAdmins) {
+    private void init(List<MedicationRequest> medOrders, List<MedicationAdministration> medAdmins) {
         Map<String, Integer> headerIndex = new HashMap<String, Integer>();
         headers = new ListModelList<String>();
         rows = new ListModelList<List<Object>>();
         medicationRowIndex = new HashMap<String, List<Object>>();
-        orderIndex = new HashMap<String, MedicationOrder>();
+        orderIndex = new HashMap<String, MedicationRequest>();
         
         headers.add("Medication");
         int index = 0;
         for (MedicationAdministration medAdmin : medAdmins) {
             String timeHeader;
             try {
-                timeHeader = dateFormat.format(medAdmin.getEffectiveTimeDateTimeType());
+                timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
             } catch (FHIRException e) {
                 timeHeader = "";
             }
@@ -180,7 +177,7 @@ public class MarModel {
         
         // Index the orders by ID for easy retrieval
         // TODO May wish to filter somehow in future
-        for (MedicationOrder order : medOrders) {
+        for (MedicationRequest order : medOrders) {
             if (order.getId() != null || order.getIdElement().getValue() == null) {
                 orderIndex.put(order.getIdElement().getIdPart(), order);
                 String sentence = MarRenderer.generateMedicationOrderSentence(order);
@@ -203,13 +200,13 @@ public class MarModel {
             } catch (FHIRException e) {
                 
             }
-            MedicationOrder associatedPrescription = orderIndex
+            MedicationRequest associatedPrescription = orderIndex
                     .get(medAdmin.getPrescription().getReferenceElement().getIdPart());// TODO Surface reference in generated code
             String sentence = MarRenderer.generateMedicationOrderSentence(associatedPrescription);
             List<Object> row = medicationRowIndex.get(sentence);
             String timeHeader;
             try {
-                timeHeader = dateFormat.format(medAdmin.getEffectiveTimeDateTimeType());
+                timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
             } catch (FHIRException e) {
                 timeHeader = "";
             }

@@ -25,7 +25,7 @@ import java.util.Map;
 import org.carewebframework.ui.zk.PopupDialog;
 import org.carewebframework.ui.zk.ZKUtil;
 
-import org.hl7.fhir.dstu3.model.MedicationOrder;
+import org.hl7.fhir.dstu3.model.MedicationRequest;
 
 public class MedicationActionUtil {
     
@@ -48,7 +48,7 @@ public class MedicationActionUtil {
      * @param prescription The prescription to associate with an administration for the prefilling
      *            of the medication administration template
      */
-    public static void show(boolean isOrder, MedicationOrder prescription) {
+    public static void show(boolean isOrder, MedicationRequest prescription) {
         String zul = null;
         if (isOrder) {
             zul = MED_ORDER_ZUL;

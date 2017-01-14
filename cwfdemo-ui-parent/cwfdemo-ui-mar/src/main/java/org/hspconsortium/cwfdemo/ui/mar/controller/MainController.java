@@ -41,7 +41,7 @@ import org.zkoss.zul.Grid;
 
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
+import org.hl7.fhir.dstu3.model.MedicationRequest;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.fhir.medication.MedicationService;
@@ -137,7 +137,7 @@ public class MainController extends PluginController implements PatientContext.I
         Patient patient = PatientContext.getActivePatient();
         if (patient != null) {
             List<MedicationAdministration> medAdmins = medicationService.searchMedicationAdministrationsForPatient(patient);
-            List<MedicationOrder> medOrders = medicationService.searchMedicationOrdersForPatient(patient);
+            List<MedicationRequest> medOrders = medicationService.searchMedicationOrdersForPatient(patient);
             MarModel model = new MarModel(medOrders, medAdmins);
             MarRenderer.populateGrid(marGrid, model, marRowRenderer);
         } else {

@@ -37,18 +37,18 @@ import org.apache.commons.logging.LogFactory;
 import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.ui.zk.PromptDialog;
-import org.hl7.fhir.dstu3.exceptions.FHIRException;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DateTimeType;
+import org.hl7.fhir.dstu3.model.DosageInstruction;
 import org.hl7.fhir.dstu3.model.Identifier;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.MedicationAdministration.MedicationAdministrationDosageComponent;
-import org.hl7.fhir.dstu3.model.MedicationOrder;
-import org.hl7.fhir.dstu3.model.MedicationOrder.MedicationOrderDosageInstructionComponent;
+import org.hl7.fhir.dstu3.model.MedicationRequest;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Quantity;
 import org.hl7.fhir.dstu3.model.Timing;
 import org.hl7.fhir.dstu3.model.Timing.TimingRepeatComponent;
+import org.hl7.fhir.exceptions.FHIRException;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.medication.MedicationService;
@@ -257,7 +257,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * 
      * @param order
      */
-    public void populateMedSelector(MedicationOrder order) {//TODO For demo only. In future, reference a repository
+    public void populateMedSelector(MedicationRequest order) {//TODO For demo only. In future, reference a repository
         Map<String, Comboitem> meds = new HashMap<String, Comboitem>();
         medSelector.getItems().clear();
         Comboitem metoprolol = new Comboitem();
@@ -329,7 +329,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * 
      * @param order
      */
-    public void populateDoseUnitSelector(MedicationOrder order) {//TODO For demo only. In future, reference a knowledge base
+    public void populateDoseUnitSelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
         doseUnitSelector.getItems().clear();
         Comboitem tablet = new Comboitem();
         tablet.setValue("{tbl}");
@@ -356,7 +356,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * 
      * @param order
      */
-    public void populateFrequencySelector(MedicationOrder order) {//TODO For demo only. In future, reference a knowledge base
+    public void populateFrequencySelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
         if (frequencySelector != null) {//frequencySelector will be null for medication administrations
             frequencySelector.getItems().clear();
             Comboitem qd = new Comboitem();
@@ -375,7 +375,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * 
      * @param order
      */
-    public void populateRouteOfAdminSelector(MedicationOrder order) {//TODO For demo only. In future, reference a knowledge base
+    public void populateRouteOfAdminSelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
         routeOfAdminSelector.getItems().clear();
         Comboitem oral = new Comboitem();
         oral.setValue("26643006");
@@ -465,7 +465,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         try {
-            MedicationOrder order = (MedicationOrder) arg.get(MedicationActionUtil.MED_ORDER_KEY);
+            MedicationRequest order = (MedicationRequest) arg.get(MedicationActionUtil.MED_ORDER_KEY);
             populateMedSelector(order);
             populateDoseUnitSelector(order);
             populateFrequencySelector(order);
@@ -566,7 +566,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
         formHelper.initialize();
         
         if (formHelper.meetsOrderRequirements()) {
-            MedicationOrder order = buildMedicationOrder(formHelper, patient);
+            MedicationRequest order = buildMedicationOrder(formHelper, patient);
             try {
                 medicationService.createMedicationOrder(order);
             } catch (Exception e) {
@@ -589,12 +589,12 @@ public class SimpleMedicationAdministrationController extends PluginController {
      */
     public MedicationAdministration buildMedicationAdministration(MedicationInterventionFormHelper formHelper,
                                                                   Patient patient) {
-        MedicationOrder order = (MedicationOrder) arg.get(MedicationActionUtil.MED_ORDER_KEY);
+        MedicationRequest order = (MedicationRequest) arg.get(MedicationActionUtil.MED_ORDER_KEY);
         MedicationAdministration administration = new MedicationAdministration();
         administration.setPrescriptionTarget(order);
         administration.setMedication(formHelper.getSelectedMedication());
         DateTimeType administrationTime = new DateTimeType();
-        administration.setEffectiveTime(administrationTime);
+        administration.setEffective(administrationTime);
         MedicationAdministrationDosageComponent dose = new MedicationAdministrationDosageComponent();
         administration.setDosage(dose);
         dose.setDose(formHelper.getDoseQuantity());
@@ -611,13 +611,13 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * @param patient
      * @return
      */
-    public MedicationOrder buildMedicationOrder(MedicationInterventionFormHelper formHelper, Patient patient) {
-        MedicationOrder order = new MedicationOrder();
+    public MedicationRequest buildMedicationOrder(MedicationInterventionFormHelper formHelper, Patient patient) {
+        MedicationRequest order = new MedicationRequest();
         order.addIdentifier(generatedMedOrderIdentifier);
         order.setMedication(formHelper.getSelectedMedication());
         Date administrationTime = new Date();
         order.setDateWritten(administrationTime);
-        MedicationOrderDosageInstructionComponent dosageInstructions = new MedicationOrderDosageInstructionComponent();
+        DosageInstruction dosageInstructions = new DosageInstruction();
         order.addDosageInstruction(dosageInstructions);
         dosageInstructions.setDose(formHelper.getDoseQuantity());//TODO Fix getAdaptee indirection in code generator
         //dosageInstructions.setAsNeeded(formHelper.getIsPRNMed());
