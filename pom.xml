@@ -31,7 +31,7 @@
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<org.carewebframework.core.version>5.0.0-SNAPSHOT</org.carewebframework.core.version>
+		<org.carewebframework.core.version>5.0.0-RC1</org.carewebframework.core.version>
 		<org.carewebframework.highcharts.version>4.1.9</org.carewebframework.highcharts.version>
 		<org.springframework.version>4.2.5.RELEASE</org.springframework.version>
 		<org.springframework.security.version>4.0.4.RELEASE</org.springframework.security.version>
