@@ -190,12 +190,12 @@
 		<dependency> <groupId>org.hspconsortium.carewebframework</groupId> 
 			<artifactId>cwfdemo-api-cds</artifactId> <version>${project.parent.version}</version> 
 			</dependency>
+    -->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-messagebox</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		-->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-mockuments</artifactId>
@@ -216,11 +216,11 @@
 			<artifactId>cwfdemo-scenarios</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency>
+<!--		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-cdstest</artifactId>
 			<version>${project.parent.version}</version>
-		</dependency>
+		</dependency>-->
 		<!-- CareWeb Framework components -->
 		<dependency>
 			<groupId>org.carewebframework</groupId>
