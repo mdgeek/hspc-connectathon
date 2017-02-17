@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -96,7 +96,7 @@ public class MessageService {
     
     /**
      * Adds a new alert Listener to this UCS session
-     * 
+     *
      * @param alertListener Alert listener to add.
      */
     public void addAlertListener(UCSAlertingIntf alertListener) {
@@ -105,7 +105,7 @@ public class MessageService {
     
     /**
      * Removes an alert Listener from this UCS session
-     * 
+     *
      * @param alertListener Alert listener to remove.
      */
     public void removeAlertListener(UCSAlertingIntf alertListener) {
@@ -114,7 +114,7 @@ public class MessageService {
     
     /**
      * Adds a new message listener to this UCS session.
-     * 
+     *
      * @param messageListener Message listener to add.
      */
     public void addMessageListener(UCSClientIntf messageListener) {
@@ -123,7 +123,7 @@ public class MessageService {
     
     /**
      * Removes a message listener from this UCS session.
-     * 
+     *
      * @param messageListener Message listener to remove.
      */
     public void removeMessageListener(UCSClientIntf messageListener) {
@@ -133,7 +133,7 @@ public class MessageService {
     /**
      * Returns the UCS session associated with this service. Should not be called outside the
      * service framework.
-     * 
+     *
      * @return The UCS session.
      */
     protected UCSNiFiSession getSession() {
@@ -152,7 +152,7 @@ public class MessageService {
      * Returns the UCS client associated with the UCS session or creates a new one if there is none.
      * Should not be called outside the service framework. The idea behind this getter is to delay
      * the connection to UCS until is required.
-     * 
+     *
      * @return The client.
      */
     protected ClientImpl getClient() {
@@ -161,7 +161,7 @@ public class MessageService {
     
     /**
      * Initialize the client in a thread-safe way.
-     * 
+     *
      * @return The newly initialized client.
      */
     private synchronized ClientImpl initClient() {
@@ -223,7 +223,7 @@ public class MessageService {
     
     public void sendMessage(Message message) {
         try {
-            getClient().sendMessage(new MessageModel<Message>(message));
+            getClient().sendMessage(new MessageModel<>(message));
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -231,7 +231,7 @@ public class MessageService {
     
     /**
      * Cancels multiple messages.
-     * 
+     *
      * @param messages List of messages to cancel.
      * @param retract If true, messages are retracted.
      */
@@ -245,7 +245,7 @@ public class MessageService {
     
     /**
      * Cancels a single message
-     * 
+     *
      * @param message Message to cancel.
      * @param retract If true, message is retracted.
      */
@@ -266,16 +266,21 @@ public class MessageService {
     /**
      * Returns all messages in the UCS broker. Use this call with caution. Use filtered variant
      * instead. TODO Add common filtered variant invocations.
-     * 
+     *
+     * @param type Restrict to only messages of this type. Null for all message types.
      * @return Return all messages from from server.
      */
-    public List<Message> getAllMessages() {
+    public List<Message> getAllMessages(Class<? extends Message> type) {
         try {
             List<Message> messages = getClient().listMessages();
             Iterator<Message> iter = messages.iterator();
             
             while (iter.hasNext()) {
                 Message message = iter.next();
+                
+                if (type != null && !(type.isInstance(message))) {
+                    continue;
+                }
                 
                 if (isAlert(message)) {
                     AlertStatus status = ((AlertMessage) message).getHeader().getAlertStatus();
@@ -303,7 +308,7 @@ public class MessageService {
     public List<Message> getMessagesByRecipient(String recipientId, String aboutId) {
         List<Message> result = new ArrayList<>();
         
-        for (Message message : getAllMessages()) {
+        for (Message message : getAllMessages(AlertMessage.class)) {
             if (aboutId != null) {
                 Properties props = message.getHeader().getProperties();
                 String messageAbout = props == null ? null : props.getProperty(MessageProperty.MESSAGE_ABOUT_ID.toString());
@@ -328,7 +333,7 @@ public class MessageService {
     
     public Message getMessageWithId(String messageId) {
         try {
-            List<Message> messages = getAllMessages();
+            List<Message> messages = getAllMessages(null);
             
             for (Message message : messages) {
                 String msgId = message.getHeader().getMessageId();
@@ -347,7 +352,7 @@ public class MessageService {
     
     /**
      * Acknowledges a list of messages.
-     * 
+     *
      * @param messageIds Unique ids of messages to acknowledge.
      */
     public void acknowledgeMessages(List<String> messageIds) {
@@ -360,7 +365,7 @@ public class MessageService {
     
     /**
      * Acknowledges a single message
-     * 
+     *
      * @param messageId The unique id of the message to acknowledge.
      */
     public void acknowledgeMessage(String messageId) {
@@ -369,7 +374,7 @@ public class MessageService {
     
     /**
      * Acknowledges a message.
-     * 
+     *
      * @param messageId The unique id of the message to acknowledge.
      * @param alertingIntf The alert handler.
      */
