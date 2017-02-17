@@ -77,9 +77,6 @@
                                  cfgFHIRUsername="connectathon"
                                  cfgPlotThreshold="10"/>
                 </tabpane>
-                <tabpane label="CDS Test">
-                    <cwfCDSTest />
-                </tabpane>
             </tabview>
         </splitterpane>
         <splitterpane relative="false" size="26.0">
