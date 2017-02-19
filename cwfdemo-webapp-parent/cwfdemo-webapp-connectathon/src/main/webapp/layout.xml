@@ -38,6 +38,9 @@
                 </tabpane>
                 <tabpane label="Chart">
                     <treeview open="true" selectionStyle="PRIMARY">
+                        <treepane label="User Profile">
+                            <userProfile />
+                        </treepane>
                         <treepane label="Observations">
                             <cwfObservations/>
                         </treepane>

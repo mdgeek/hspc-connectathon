@@ -19,7 +19,12 @@
 				<row style="background:#FFFFFF;">
 					<label value="Id:" />
 					<cell colspan="3">
-						<textbox id="txId" cols="60" value="eafry"/>
+            <listbox id="lbId" mold="select" hflex="1">
+                <listitem label="eafry"/>
+                <listitem label="PatientId-1234"/>
+                <listitem label="PatientId-1235"/>
+                <listitem label="PractitionerId-4"/>
+            </listbox>
 					</cell>
 				</row>
 				<row style="background:#FFFFFF;">
@@ -31,7 +36,7 @@
 				<row style="background:#FFFFFF;">
 					<label value="Cellphone:" />
 					<cell colspan="3">
-						<textbox id="txCell" cols="60" value="19717130576"/>
+						<textbox id="txCell" cols="60" value="5035507932"/>
 					</cell>
 				</row>
 				<row style="background:#FFFFFF;">

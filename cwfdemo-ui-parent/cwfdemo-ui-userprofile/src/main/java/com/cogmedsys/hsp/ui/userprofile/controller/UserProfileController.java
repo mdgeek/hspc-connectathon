@@ -42,6 +42,8 @@ import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
 import org.glassfish.jersey.client.ClientConfig;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
+import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Textbox;
 
 
@@ -59,10 +61,12 @@ public class UserProfileController extends PluginController {
     
     private static final Log log = LogFactory.getLog(UserProfileController.class);
     
-    private Textbox txId;
+    private Listbox lbId;
     private Textbox txEmail;
     private Textbox txChat;
     private Textbox txCell;
+    
+    private String url;
 
     /**
      * @see org.carewebframework.ui.FrameworkController#doAfterCompose(org.zkoss.zk.ui.Component)
@@ -71,6 +75,9 @@ public class UserProfileController extends PluginController {
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         log.trace("Controller composed");
+        
+        String port = ( Executions.getCurrent().getServerPort() == 80 ) ? "" : (":" + Executions.getCurrent().getServerPort());
+        url = Executions.getCurrent().getScheme() + "://" + Executions.getCurrent().getServerName() + port + Executions.getCurrent().getContextPath();
     }
     
     /**
@@ -105,7 +112,7 @@ public class UserProfileController extends PluginController {
     }
     
     public void onClick$btnSaveProfile() {
-    	String id = txId.getText();
+    	String id = lbId.getSelectedItem().getLabel();
     	String email = txEmail.getText();
     	String chat = txChat.getText();
     	String cell = txCell.getText();
@@ -114,7 +121,7 @@ public class UserProfileController extends PluginController {
         form.param("contact",id + "," + email + "," + cell + "," + chat + "," + cell);
     	ClientConfig config = new ClientConfig();
         Client client = ClientBuilder.newClient(config);
-        WebTarget service = client.target("http://localhost:8080/healthservicesportal");
+        WebTarget service = client.target(url);
     	Response response = service.path("service").path("registry").path("user").path(id).request().post(Entity.entity(form,MediaType.APPLICATION_FORM_URLENCODED),Response.class);
     	System.out.println(response.getStatus());
     	
