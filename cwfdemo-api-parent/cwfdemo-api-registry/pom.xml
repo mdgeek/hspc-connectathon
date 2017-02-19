@@ -12,7 +12,7 @@
 
 	<artifactId>cwfdemo-api-registry</artifactId>
 	<name>Registry API</name>
-	
+
 	<dependencies>
 		<dependency>
 			<groupId>javax.servlet</groupId>

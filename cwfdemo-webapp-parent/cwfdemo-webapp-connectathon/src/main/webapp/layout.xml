@@ -68,6 +68,12 @@
                         <treepane label="Bilirubin Risk">
                             <bilirubin_chart/>
                         </treepane>
+                    <treepane label="Vitals Flowsheet">
+                            <cwfFlowsheet/>
+                        </treepane>
+                        <treepane label="Medication Administration Record">
+                            <cwfMar/>
+                        </treepane>
                     </treeview>
                 </tabpane>
                 <tabpane label="Devices">
