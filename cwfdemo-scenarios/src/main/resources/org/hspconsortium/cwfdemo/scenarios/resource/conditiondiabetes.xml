@@ -1,0 +1,12 @@
+<Condition xmlns="http://hl7.org/fhir">
+    <id value="conditiondiabetes" />
+    <code>
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="44054006"/>
+            <display value="Type 2 Diabetes"/>
+        </coding>
+    </code>
+    <subject id="PatientId-1234"/>
+    <onsetDateTime value="2010-04-03T00:00:00-07:00"/>
+</Condition>

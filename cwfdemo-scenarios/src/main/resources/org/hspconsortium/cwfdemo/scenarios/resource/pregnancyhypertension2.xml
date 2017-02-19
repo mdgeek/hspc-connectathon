@@ -1,0 +1,12 @@
+<Condition xmlns="http://hl7.org/fhir">
+    <id value="pregnancyhypertension2" />
+    <code>
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="48194001"/>
+            <display value="Pregnancy Induced Hypertension"/>
+        </coding>
+    </code>
+    <subject id="PatientId-1235"/>
+    <onsetDateTime value="2017-01-03T00:00:00-08:00"/>
+</Condition>

@@ -1,0 +1,11 @@
+<MedicationRequest xmlns="http://hl7.org/fhir">
+    <id value="medicationrequest-gluco2" />
+    <medicationCodeableConcept>
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="C0939007"/>
+            <display value="Glucovance (Glyburide 2.5 MG / Metformin hydrochloride 500 MG Tablet) 1 tab po bid"/>
+        </coding>
+    </medicationCodeableConcept>
+    <patient id="PatientId-1235"/>
+</MedicationRequest>

@@ -1,0 +1,34 @@
+<Practitioner xmlns="http://hl7.org/fhir">
+    <id value="PractionerId-4" />
+    <name>
+        <family value="Doolittle"/>
+    </name>
+    <telecom>
+        <value value="503 987 6543"/>
+        <use value="work"/>
+    </telecom>
+    <telecom>
+        <value value="503 550 7932"/>
+        <use value="mobile"/>
+    </telecom>
+    <address>
+        <use value="home"/>
+        <text value="908 Mystic Drive Lane, Youngstown, OR 97123"/>
+        <line value="908 Mystic Drive Lane"/>
+        <city value="Youngstown"/>
+        <state value="OR"/>
+        <postalCode value="97123"/>
+        <country value="US"/>
+    </address>
+    <gender value="male"/>
+    <birthDate value="1970-04-10"/>
+    <role>
+        <specialty>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="11935004"/>
+                <display value="Obstetrician"/>
+            </coding>
+        </specialty>
+    </role>
+</Practitioner>

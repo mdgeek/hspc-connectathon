@@ -1,0 +1,12 @@
+<Condition xmlns="http://hl7.org/fhir">
+    <id value="conditionrenal2" />
+    <code>
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="42399005"/>
+            <display value="Renal Insufficiency"/>
+        </coding>
+    </code>
+    <subject id="PatientId-1235"/>
+    <onsetDateTime value="2005-12-03T00:00:00-08:00"/>
+</Condition>

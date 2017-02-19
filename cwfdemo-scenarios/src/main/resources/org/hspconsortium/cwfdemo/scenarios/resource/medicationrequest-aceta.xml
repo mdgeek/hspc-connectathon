@@ -1,0 +1,11 @@
+<MedicationRequest xmlns="http://hl7.org/fhir">
+    <id value="medicationrequest-aceta" />
+    <medicationCodeableConcept>
+        <coding>
+            <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
+            <code value="C0711228"/>
+            <display value="Acetaminophen 500mg Tablet, 1-2 tab po q 4-6 prn"/>
+        </coding>
+    </medicationCodeableConcept>
+    <patient id="PatientId-1234"/>
+</MedicationRequest>

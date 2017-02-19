@@ -1,0 +1,12 @@
+<AllergyIntolerance xmlns="http://hl7.org/fhir">
+    <id value="allergypenicillin" />
+    <type value="allergy"/>
+    <code>
+        <coding>
+            <system value="http://snomed.info/sct"/>
+            <code value="91936005"/>
+            <display value="Penicillin"/>
+        </coding>
+    </code>
+    <patient id="PatientId-1234"/>
+</AllergyIntolerance>

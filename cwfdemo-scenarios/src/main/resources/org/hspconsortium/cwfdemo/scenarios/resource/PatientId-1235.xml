@@ -1,0 +1,57 @@
+<Patient xmlns="http://hl7.org/fhir">
+	<id value="PatientId-1235" />
+	<text>
+		<status value="generated" />
+		<div xmlns="http://www.w3.org/1999/xhtml">Mary Jones - Mother</div>
+	</text>
+	<identifier>
+		<use value="usual" />
+		<type>
+			<coding>
+				<system value="http://hl7.org/fhir/v2/0203" />
+				<code value="MR" />
+			</coding>
+		</type>
+		<system value="urn:oid:1.2.36.146.595.217.0.1" />
+		<value value="ACME-0000001235" />
+		<period>
+			<start value="2016-03-07" />
+		</period>
+		<assigner>
+			<display value="Acme Healthcare" />
+		</assigner>
+	</identifier>
+	<active value="true" />
+	<name>
+		<use value="official" />
+		<family value="Cooper" />
+		<given value="Hollie" />
+	</name>
+	<gender value="female" />
+	<birthDate value="1990-06-09" />
+	<deceasedBoolean value="false" />
+	<managingOrganization>
+		<reference value="Organization/organization-test" />
+	</managingOrganization>
+	<telecom>
+		<value value="503 123 4567"/>
+		<use value="home"/>
+	</telecom>
+	<telecom>
+		<value value="503 550 7932"/>
+		<use value="mobile"/>
+	</telecom>
+	<address>
+		<use value="home"/>
+		<text value="908 Mystic Drive Lane, Youngstown, OR 97123"/>
+		<line value="123 Waterfall Lane"/>
+		<city value="Youngstown"/>
+		<state value="OR"/>
+		<postalCode value="97123"/>
+		<country value="US"/>
+	</address>
+	<photo>
+		<contentType value="image/jpeg" />
+		<data value="${photo}" />
+	</photo>
+</Patient>

@@ -1,0 +1,159 @@
+# Blood Pressure scenario
+
+organization:
+    source: resource/organization.json
+    
+location:
+    source: resource/location-south-wing.json
+
+patient-infant:
+    source: resource/patient-infant.xml
+    dob: date/N-36h
+    tob: datetime/N-36h
+    photo: image/infant-male.jpeg
+    
+relatedperson-infant:
+    source: resource/relatedperson.json
+    id: value/relatedperson-infant
+    patient: patient-infant
+    relationship: value/CHILD
+    
+patient-mother:
+    source: resource/patient-mother.xml
+    dob:   date/T-25y
+    photo: image/adult-female.jpeg
+    relatedperson: relatedperson-infant
+
+relatedperson-mother:
+    source: resource/relatedperson.json
+    id: value/relatedperson-mother
+    patient: patient-mother
+    relationship: value/MOTHER
+
+PatientId-1234:
+    source: resource/PatientId-1234.xml
+    dob:   date/T-25y
+    photo: image/adult-female-bp.jpeg
+
+PatientId-1235:
+    source: resource/PatientId-1235.xml
+    dob:   date/T-25y
+    photo: image/adult-female-bp.jpeg
+
+PractionerId-4:
+    source: resource/PractionerId-4.xml
+
+medicationrequest-gluco:
+    source: resource/medicationrequest-gluco.xml
+
+medicationrequest-gluco2:
+    source: resource/medicationrequest-gluco2.xml
+
+pregnancyhypertension:
+    source: resource/pregnancyhypertension.xml
+
+pregnancyhypertension2:
+    source: resource/pregnancyhypertension2.xml
+
+medicationrequest-aceta:
+    source: resource/medicationrequest-aceta.xml
+
+medicationrequest-aceta2:
+    source: resource/medicationrequest-aceta2.xml
+
+conditionrenal:
+    source: resource/conditionrenal.xml
+
+conditionrenal2:
+    source: resource/conditionrenal2.xml
+
+conditiondiabetes:
+    source: resource/conditiondiabetes.xml
+
+conditiondiabetes2:
+    source: resource/conditiondiabetes2.xml
+
+allergybee:
+    source: resource/allergybee.xml
+
+allergybee2:
+    source: resource/allergybee2.xml
+
+allergypenicillin:
+    source: resource/allergypenicillin.xml
+
+allergypenicillin2:
+    source: resource/allergypenicillin2.xml
+
+practitioner-bedside-nurse:
+    source: resource/practitioner-bedside-nurse.xml
+
+practitioner-charge-nurse:
+    source: resource/practitioner-charge-nurse.xml
+
+practitioner-primary-provider:
+    source: resource/practitioner-primary-provider.xml
+
+condition-slb:
+    source: resource/condition-single-live-birth.xml
+    onsetdate: date/N-36h
+
+encounter-live-birth:
+    source: resource/encounter-live-birth.xml
+    
+observation-bili0:
+    source: resource/observation-transbilirubin.json
+    patient: patient-infant
+    time: datetime/N-30h
+    
+observation-bili1:
+    source: resource/observation-totalbilirubin1.json
+    patient: patient-infant
+    time: datetime/N-1350n
+    
+observation-bili2:
+    source: resource/observation-totalbilirubin2.json
+    patient: patient-infant
+    time: datetime/N-345n
+    
+observation-bili3:
+    source: resource/observation-totalbilirubin3.json
+    patient: patient-infant
+    time: datetime/N
+
+observation-gestational-age:
+    source: resource/observation-gestational-age.json
+    patient: patient-infant
+    time: datetime/N-36h
+
+library-cds:
+    source: resource/library-exclusive-breastfeeding-cds-logic.xml
+    
+library-cqm:
+    source: resource/library-exclusive-breastfeeding-cqm-logic.xml
+    
+library-quick:
+    source: resource/library-quick-model-definition.xml
+
+plan-definition-1:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-01.xml
+    
+plan-definition-2:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-02.xml
+    
+plan-definition-3:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-03.xml
+    
+plan-definition-4:
+    source: resource/plandefinition-exclusive-breastfeeding-intervention-04.xml
+    
+questionnaire-readiness:
+    source: resource/questionnaire-breastfeeding-readiness-assessment.xml
+    
+device-cds:
+    source: resource/device-cds-system.xml
+  
+measure:
+    source: resource/measure-exclusive-breastfeeding.xml
+      
+    
