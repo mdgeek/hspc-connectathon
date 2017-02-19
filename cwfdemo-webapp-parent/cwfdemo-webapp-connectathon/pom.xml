@@ -186,7 +186,6 @@
 			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 		<!-- Demo Components -->
-		<!--
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-api-eps</artifactId>
@@ -197,10 +196,6 @@
 			<artifactId>cwfdemo-api-ucs</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<dependency> <groupId>org.hspconsortium.carewebframework</groupId> 
-			<artifactId>cwfdemo-api-cds</artifactId> <version>${project.parent.version}</version> 
-			</dependency>
-    -->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-messagebox</artifactId>
@@ -226,11 +221,6 @@
 			<artifactId>cwfdemo-scenarios</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-<!--		<dependency>
-			<groupId>org.hspconsortium.carewebframework</groupId>
-			<artifactId>cwfdemo-ui-cdstest</artifactId>
-			<version>${project.parent.version}</version>
-		</dependency>-->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-api-registry</artifactId>
