@@ -15,5 +15,6 @@
 		<module>cwfdemo-ui-messagebox</module>
 		<module>cwfdemo-ui-mockuments</module>
 		<module>cwfdemo-ui-devices</module>
+		<module>cwfdemo-ui-userprofile</module>
 	</modules>
 </project>

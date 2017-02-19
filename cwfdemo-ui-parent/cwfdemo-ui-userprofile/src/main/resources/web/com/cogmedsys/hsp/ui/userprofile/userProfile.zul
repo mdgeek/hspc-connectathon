@@ -1,0 +1,55 @@
+<?taglib uri="http://www.carewebframework.org/tld/security" prefix="sec"?>
+<?taglib uri="http://www.carewebframework.org/tld/core" prefix="rc"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul"
+	xmlns:h="http://www.w3.org/1999/xhtml"
+	xmlns:w="http://www.zkoss.org/2005/zk/client"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+
+	<div apply="${userProfileController}">
+		<grid hflex="min">
+			<columns>
+				<column hflex="min" align="right" />
+				<column hflex="min" />
+				<column hflex="min" align="right" />
+				<column hflex="min" />
+			</columns>
+			<rows>
+				<row style="background:#FFFFFF;">
+					<label value="Id:" />
+					<cell colspan="3">
+						<textbox id="txId" cols="60" value="eafry"/>
+					</cell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label value="Email:" />
+					<cell colspan="3">
+						<textbox id="txEmail" cols="60" value="eafry@cognitivemedicine.com"/>
+					</cell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label value="Cellphone:" />
+					<cell colspan="3">
+						<textbox id="txCell" cols="60" value="19717130576"/>
+					</cell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label value="Chat ID:" />
+					<cell colspan="3">
+						<textbox id="txChat" cols="60" value="eafry@socraticgrid.org"/>
+					</cell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<cell colspan="4">
+						<span style="float:right;">
+							<button id="btnSaveProfile"
+								label="${labels.userprofile.button.save.label}"
+								tooltiptext="${labels.userprofile.button.save.tooltip}" />
+						</span>
+					</cell>
+				</row>
+			</rows>
+		</grid>
+	</div>
+</zk>

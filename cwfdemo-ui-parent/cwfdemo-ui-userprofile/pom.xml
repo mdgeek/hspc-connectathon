@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.hspconsortium.carewebframework</groupId>
+        <artifactId>cwfdemo-ui-parent</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>cwfdemo-ui-userprofile</artifactId>
+    <name>User Profile</name>
+
+    <properties>
+        <!-- Uncomment and update maven.carewebframework.help.x properties when
+            your plugin has help content -->
+        <!-- <maven.carewebframework.help.moduleId>userprofileHelp</maven.carewebframework.help.moduleId> -->
+        <!-- <maven.carewebframework.help.moduleName>userProfile Help</maven.carewebframework.help.moduleName> -->
+        <!-- <maven.carewebframework.help.moduleSource>userProfile-Help.jar</carewebframework.careweb.help.moduleSource> -->
+        <!-- <maven.carewebframework.help.moduleFormat>javahelp</carewebframework.careweb.help.moduleFormat> -->
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>javax.ws.rs</groupId>
+            <artifactId>javax.ws.rs-api</artifactId>
+            <version>2.0.1</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.carewebframework</groupId>
+            <artifactId>org.carewebframework.shell</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.hspconsortium.carewebframework</groupId>
+            <artifactId>cwf-ui-reporting</artifactId>
+            <version>${project.parent.version}</version>
+        </dependency>
+    </dependencies>
+</project>

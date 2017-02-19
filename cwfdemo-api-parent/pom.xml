@@ -14,6 +14,7 @@
 	<modules>
 		<module>cwfdemo-api-eps</module>
 		<module>cwfdemo-api-ucs</module>
+		<module>cwfdemo-api-registry</module>
 	</modules>
 	
 	<dependencyManagement>

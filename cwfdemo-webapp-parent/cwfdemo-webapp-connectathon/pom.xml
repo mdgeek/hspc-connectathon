@@ -221,6 +221,16 @@
 			<artifactId>cwfdemo-ui-cdstest</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>-->
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-api-registry</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.hspconsortium.carewebframework</groupId>
+			<artifactId>cwfdemo-ui-userprofile</artifactId>
+			<version>${project.parent.version}</version>
+		</dependency>
 		<!-- CareWeb Framework components -->
 		<dependency>
 			<groupId>org.carewebframework</groupId>

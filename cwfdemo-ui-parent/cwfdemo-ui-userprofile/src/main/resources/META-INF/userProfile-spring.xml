@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:cwp="http://www.carewebframework.org/schema/plugin"
+	xsi:schemaLocation="
+		http://www.springframework.org/schema/beans 
+		http://www.springframework.org/schema/beans/spring-beans-3.1.xsd 
+		http://www.carewebframework.org/schema/plugin
+		http://www.carewebframework.org/schema/plugin/plugin-extensions.xsd">
+
+<!-- This profile is processed during web server startup -->
+
+	<beans profile="root">
+		
+		<!-- This is the sample definition for a CareWeb plugin -->
+		<cwp:plugin id="userProfile" name="User Profile" 
+			url="~./com/cogmedsys/hsp/ui/userprofile/userProfile.zul">
+			<cwp:resource>
+			</cwp:resource>
+			<!-- You may specify plugin level security constraints here:
+			<cwp:security requiresAll="false">
+				<cwp:authority name="PRIV_PRIVNAME"/>
+				<cwp:authority name="ROLE_ROLENAME"/>
+			</cwp:security>
+			-->
+		</cwp:plugin>
+		
+	</beans>
+	
+<!-- This profile is processed for each managed desktop. -->
+
+	<beans profile="desktop">
+
+		<bean id="userProfileController" 
+			class="com.cogmedsys.hsp.ui.userprofile.controller.UserProfileController" 
+			scope="prototype"/>
+	
+	</beans>
+</beans>
