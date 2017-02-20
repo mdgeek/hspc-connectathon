@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -45,6 +45,7 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwfdemo.api.ucs.MessageService;
 import org.hspconsortium.cwfdemo.api.ucs.MessageWrapper;
 import org.hspconsortium.cwfdemo.api.ucs.Urgency;
+import org.socraticgrid.hl7.services.uc.model.AlertMessage;
 import org.socraticgrid.hl7.services.uc.model.Message;
 import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
 import org.zkoss.util.resource.Labels;
@@ -353,6 +354,10 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      * @param message Message.
      */
     protected void addMessage(MessageWrapper message) {
+        if (!(message.getMessage() instanceof AlertMessage)) {
+            return;
+        }
+        
         int i = indexOfMessage(message.getId());
         
         if (i >= 0) {
@@ -375,8 +380,9 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     /**
      * Removes a message from this list, if it exists.
-     * 
+     *
      * @param id The message id.
+     * @param modelOnly If true, remove from model only, not from server.
      */
     protected void removeMessage(String id, boolean modelOnly) {
         int i = indexOfMessage(id);
@@ -636,7 +642,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     /**
      * Invokes an action on the specified target in the event thread.
-     * 
+     *
      * @param action An action to perform.
      * @param target Target of the action. This may be a message id or a wrapped or unwrapped
      *            message;
@@ -724,7 +730,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     /**
      * Returns the view mode.
-     * 
+     *
      * @return The view mode.
      */
     public ViewMode getViewMode() {
@@ -733,7 +739,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     
     /**
      * Sets the view mode.
-     * 
+     *
      * @param viewMode The view mode.
      */
     public void setViewMode(ViewMode viewMode) {
