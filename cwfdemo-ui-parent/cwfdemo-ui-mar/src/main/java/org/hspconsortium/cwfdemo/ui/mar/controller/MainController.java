@@ -36,6 +36,7 @@ import org.apache.commons.logging.LogFactory;
 import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
 
+import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Grid;
 

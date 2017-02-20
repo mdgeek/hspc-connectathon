@@ -208,7 +208,7 @@ public class MarModel {
                 List<Object> row = medicationRowIndex.get(sentence);
                 String timeHeader;
                 try {
-                    timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
+                    timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType().getValue());
                 } catch (FHIRException e) {
                     timeHeader = "";
                 }
@@ -227,7 +227,7 @@ public class MarModel {
                 } catch(Exception e) {
                     //Do nothing
                 }
-                log.error("Medication administration " + display + " has no associated prescriptions");
+                log.info("Medication administration " + display + " has no associated prescriptions");
             }
         }
     }

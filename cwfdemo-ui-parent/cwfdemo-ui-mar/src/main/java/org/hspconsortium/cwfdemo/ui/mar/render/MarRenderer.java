@@ -271,16 +271,22 @@ public class MarRenderer implements RowRenderer<List<Object>> {
         } else {
             item += "|";
         }
-        Quantity adminQty = medAdmin.getDosage().getDose();
-        Quantity orderQty = (Quantity) order.getDosageInstruction().get(0).getDose();
-        if (!FhirUtil.equalQuantities(adminQty, orderQty)) {
-            item += "Dose adj. " + adminQty.getValue() + " " + getUnitLabel(adminQty.getUnit()) + " at ";
+        MedicationAdministration.MedicationAdministrationDosageComponent medAdminDosage = medAdmin.getDosage();
+        if(medAdminDosage != null && order.getDosageInstruction() != null && order.getDosageInstruction().size() > 0) {
+            Quantity adminQty = medAdminDosage.getDose();
+            Quantity orderQty = (Quantity) order.getDosageInstruction().get(0).getDose();
+            if (!FhirUtil.equalQuantities(adminQty, orderQty)) {
+                item += "Dose adj. " + adminQty.getValue() + " " + getUnitLabel(adminQty.getUnit()) + " at ";
+            }
+            try {
+                DateTimeType eff = medAdmin.getEffectiveDateTimeType();
+                item += hourMinuteFormatter.format(eff);
+            } catch (FHIRException e) {
+            }
+            item += " by " + username;
+        } else {
+            item += "Dosage info missing";
         }
-        try {
-            DateTimeType eff = medAdmin.getEffectiveDateTimeType();
-            item += hourMinuteFormatter.format(eff);
-        } catch (FHIRException e) {}
-        item += " by " + username;
         row.set(index, item);
     }
 }
