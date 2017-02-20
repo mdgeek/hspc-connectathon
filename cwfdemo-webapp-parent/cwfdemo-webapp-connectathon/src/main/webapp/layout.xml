@@ -1,5 +1,5 @@
-<layout helpViewerMode="POPUP" icon="images/fhir_icon.png" name="FHIRWorks"
-        style="DEFAULT" title="FHIRWorks" version="3.0">
+<layout helpViewerMode="POPUP" icon="images/hspc-logo-smaller.png" name="FHIRWorks"
+        style="DEFAULT" version="3.0">
     <_menubar>
         <menuitem label="Actions">
             <menuitem
@@ -85,6 +85,7 @@
                         </treepane>
                     </treeview>
                 </tabpane>
+                <!--
                 <tabpane label="Devices">
                     <cwfDevices cfgEPSEndpoint="http://64.87.15.70:8087/EPSWebService"
                                  cfgFHIREndpoint="http://64.87.15.70:8087/server-web/baseDstu3"
@@ -92,6 +93,7 @@
                                  cfgFHIRUsername="connectathon"
                                  cfgPlotThreshold="10"/>
                 </tabpane>
+                -->
             </tabview>
         </splitterpane>
         <splitterpane relative="false" size="26.0">
