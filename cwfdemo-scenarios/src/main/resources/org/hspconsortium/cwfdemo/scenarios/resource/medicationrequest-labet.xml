@@ -11,4 +11,28 @@
         <reference value="Patient/PatientId-1234"/>
     </patient>
     <dateWritten value="2017-02-19T09:47:32-08:00"/>
+    <dosageInstruction>
+        <sequence value="1"/>
+        <text value="1 tab po bid"/>
+        <timing>
+            <repeat>
+                <frequency value="2"/>
+                <period value="1"/>
+                <periodUnit value="d"/>
+            </repeat>
+        </timing>
+        <route>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="26643006"/>
+                <display value="Oral Route"/>
+            </coding>
+        </route>
+        <doseQuantity>
+            <value value="1"/>
+            <unit value="TAB"/>
+            <system value="http://hl7.org/fhir/ValueSet/v3-orderableDrugForm"/>
+            <code value="{tbl}"/>
+        </doseQuantity>
+    </dosageInstruction>
 </MedicationRequest>

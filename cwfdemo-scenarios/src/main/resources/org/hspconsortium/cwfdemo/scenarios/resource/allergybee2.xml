@@ -1,14 +1,41 @@
 <AllergyIntolerance xmlns="http://hl7.org/fhir">
     <id value="allergybee2" />
     <type value="allergy"/>
+    <criticality value="high"/>
     <code>
         <coding>
             <system value="http://snomed.info/sct"/>
             <code value="424213003"/>
-            <display value="Bee Venom"/>
+            <display value="Allergy to bee venom"/>
         </coding>
     </code>
     <patient>
         <reference value="Patient/PatientId-1235"/>
     </patient>
+    <onsetDateTime value="2004-01-01"/>
+    <reaction>
+        <substance>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="288328004"/>
+                <display value="Bee venom"/>
+            </coding>
+        </substance>
+        <certainty value="confirmed"/>
+        <manifestation>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="267036007"/>
+                <display value="Dyspnea"/>
+            </coding>
+        </manifestation>
+        <manifestation>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="65124004"/>
+                <display value="Swelling"/>
+            </coding>
+        </manifestation>
+        <severity value="severe"/>
+    </reaction>
 </AllergyIntolerance>

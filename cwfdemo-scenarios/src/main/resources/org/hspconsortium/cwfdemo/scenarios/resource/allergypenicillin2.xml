@@ -1,14 +1,34 @@
 <AllergyIntolerance xmlns="http://hl7.org/fhir">
     <id value="allergypenicillin2" />
     <type value="allergy"/>
+    <criticality value="high"/>
     <code>
         <coding>
             <system value="http://snomed.info/sct"/>
             <code value="91936005"/>
-            <display value="Penicillin"/>
+            <display value="Allergy to penicillin"/>
         </coding>
     </code>
     <patient>
         <reference value="Patient/PatientId-1235"/>
     </patient>
+    <onsetDateTime value="2000-07-01"/>
+    <reaction>
+        <substance>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="373270004"/>
+                <display value="Penicillin class of antibiotics"/>
+            </coding>
+        </substance>
+        <certainty value="confirmed"/>
+        <manifestation>
+            <coding>
+                <system value="http://snomed.info/sct"/>
+                <code value="39579001"/>
+                <display value="Anaphylactic reaction"/>
+            </coding>
+        </manifestation>
+        <severity value="severe"/>
+    </reaction>
 </AllergyIntolerance>
