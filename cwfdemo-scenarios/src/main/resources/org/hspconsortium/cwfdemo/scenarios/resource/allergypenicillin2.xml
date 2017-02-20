@@ -8,5 +8,7 @@
             <display value="Penicillin"/>
         </coding>
     </code>
-    <patient id="PatientId-1235"/>
+    <patient>
+        <reference value="Patient/PatientId-1235"/>
+    </patient>
 </AllergyIntolerance>

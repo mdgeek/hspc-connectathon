@@ -94,6 +94,12 @@ practitioner-charge-nurse:
 practitioner-primary-provider:
     source: resource/practitioner-primary-provider.xml
 
+medicationrequest-labet:
+    source: resource/medicationrequest-labet.xml
+
+medicationrequest-labet2:
+    source: resource/medicationrequest-labet2.xml
+
 condition-slb:
     source: resource/condition-single-live-birth.xml
     onsetdate: date/N-36h

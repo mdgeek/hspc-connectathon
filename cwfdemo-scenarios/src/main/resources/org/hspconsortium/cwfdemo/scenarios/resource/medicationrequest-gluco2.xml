@@ -2,10 +2,13 @@
     <id value="medicationrequest-gluco2" />
     <medicationCodeableConcept>
         <coding>
-            <system value="http://snomed.info/sct"/>
+            <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
             <code value="C0939007"/>
-            <display value="Glucovance (Glyburide 2.5 MG / Metformin hydrochloride 500 MG Tablet) 1 tab po bid"/>
+            <display value="Glucovance (Glyburide 2.5 MG / Metformin hydrochloride 500 MG Tablet)"/>
         </coding>
     </medicationCodeableConcept>
-    <patient id="PatientId-1235"/>
+    <patient>
+        <reference value="Patient/PatientId-1235"/>
+    </patient>
+    <dateWritten value="2017-02-19T09:47:32-08:00"/>
 </MedicationRequest>

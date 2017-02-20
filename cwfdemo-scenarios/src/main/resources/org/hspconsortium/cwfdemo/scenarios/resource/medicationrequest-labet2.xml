@@ -1,14 +1,14 @@
 <MedicationRequest xmlns="http://hl7.org/fhir">
-    <id value="medicationrequest-gluco" />
+    <id value="medicationrequest-labet2" />
     <medicationCodeableConcept>
         <coding>
             <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
-            <code value="C0939007"/>
-            <display value="Glucovance (Glyburide 2.5 MG / Metformin hydrochloride 500 MG Tablet)"/>
+            <code value="C2732018"/>
+            <display value="Labetalol hydrochloride 100 MG Oral Tablet"/>
         </coding>
     </medicationCodeableConcept>
     <patient>
-        <reference value="Patient/PatientId-1234"/>
+        <reference value="Patient/PatientId-1235"/>
     </patient>
     <dateWritten value="2017-02-19T09:47:32-08:00"/>
 </MedicationRequest>

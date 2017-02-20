@@ -7,6 +7,8 @@
             <display value="Renal Insufficiency"/>
         </coding>
     </code>
-    <subject id="PatientId-1234"/>
+    <subject>
+        <reference value="Patient/PatientId-1234"/>
+    </subject>
     <onsetDateTime value="2005-12-03T00:00:00-08:00"/>
 </Condition>

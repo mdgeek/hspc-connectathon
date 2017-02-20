@@ -4,8 +4,12 @@
         <coding>
             <system value="http://www.nlm.nih.gov/research/umls/rxnorm"/>
             <code value="C0711228"/>
-            <display value="Acetaminophen 500mg Tablet, 1-2 tab po q 4-6 prn"/>
+            <display value="Acetaminophen 500mg Tablet"/>
         </coding>
     </medicationCodeableConcept>
-    <patient id="PatientId-1235"/>
+    <patient>
+        <reference value="Patient/PatientId-1235"/>
+    </patient>
+    <dateWritten value="2017-02-19T09:47:32-08:00"/>
+
 </MedicationRequest>

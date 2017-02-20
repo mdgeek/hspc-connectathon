@@ -7,6 +7,8 @@
             <display value="Type 2 Diabetes"/>
         </coding>
     </code>
-    <subject id="PatientId-1234"/>
+    <subject>
+        <reference value="Patient/PatientId-1234"/>
+    </subject>
     <onsetDateTime value="2010-04-03T00:00:00-07:00"/>
 </Condition>
