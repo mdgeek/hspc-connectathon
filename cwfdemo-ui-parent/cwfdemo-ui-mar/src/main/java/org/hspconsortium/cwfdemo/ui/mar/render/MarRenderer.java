@@ -272,7 +272,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
             item += "|";
         }
         MedicationAdministration.MedicationAdministrationDosageComponent medAdminDosage = medAdmin.getDosage();
-        if(medAdminDosage != null && order.getDosageInstruction() != null && order.getDosageInstruction().size() > 0) {
+        if(medAdminDosage != null && medAdminDosage.getDose() != null && medAdminDosage.getDose().getValue() != null && order.getDosageInstruction() != null && order.getDosageInstruction().size() > 0) {
             Quantity adminQty = medAdminDosage.getDose();
             Quantity orderQty = (Quantity) order.getDosageInstruction().get(0).getDose();
             if (!FhirUtil.equalQuantities(adminQty, orderQty)) {
