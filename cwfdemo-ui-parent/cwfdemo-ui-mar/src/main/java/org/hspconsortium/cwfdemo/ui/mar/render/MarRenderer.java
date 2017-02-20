@@ -280,12 +280,16 @@ public class MarRenderer implements RowRenderer<List<Object>> {
             }
             try {
                 DateTimeType eff = medAdmin.getEffectiveDateTimeType();
-                item += hourMinuteFormatter.format(eff);
+                item += hourMinuteFormatter.format(eff.getValue());
             } catch (FHIRException e) {
             }
             item += " by " + username;
         } else {
-            item += "Dosage info missing";
+            try {
+                DateTimeType eff = medAdmin.getEffectiveDateTimeType();
+                item += hourMinuteFormatter.format(eff.getValue());
+            } catch (FHIRException e) {
+            }
         }
         row.set(index, item);
     }
