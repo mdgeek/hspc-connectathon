@@ -300,6 +300,10 @@ public class SimpleMedicationAdministrationController extends PluginController {
         acetazolamide.setValue("197304");
         acetazolamide.setLabel("Acetazolamide 250 MG Oral Tablet");
         meds.put("197304", acetazolamide);
+        Comboitem labetalol = new Comboitem();
+        labetalol.setValue("896758");
+        labetalol.setLabel("Labetalol hydrochloride 100 MG Oral Tablet");
+        meds.put("896758", labetalol);
         
         medSelector.appendChild(metoprolol);
         medSelector.appendChild(atenolol);
@@ -311,6 +315,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
         medSelector.appendChild(hydrochlorothiazide);
         medSelector.appendChild(bisacodyl);
         medSelector.appendChild(acetazolamide);
+        medSelector.appendChild(labetalol);
         
         Coding selectedMed = null;
         if (order != null) {

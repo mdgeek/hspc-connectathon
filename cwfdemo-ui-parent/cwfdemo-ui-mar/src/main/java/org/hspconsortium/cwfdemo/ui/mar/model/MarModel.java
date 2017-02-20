@@ -42,6 +42,7 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
 import org.hl7.fhir.dstu3.model.MedicationRequest;
 import org.hl7.fhir.exceptions.FHIRException;
@@ -165,7 +166,7 @@ public class MarModel {
         for (MedicationAdministration medAdmin : medAdmins) {
             String timeHeader;
             try {
-                timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
+                timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType().getValue());
             } catch (FHIRException e) {
                 timeHeader = "";
             }
@@ -202,19 +203,32 @@ public class MarModel {
             }
             MedicationRequest associatedPrescription = orderIndex
                     .get(medAdmin.getPrescription().getReferenceElement().getIdPart());// TODO Surface reference in generated code
-            String sentence = MarRenderer.generateMedicationOrderSentence(associatedPrescription);
-            List<Object> row = medicationRowIndex.get(sentence);
-            String timeHeader;
-            try {
-                timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
-            } catch (FHIRException e) {
-                timeHeader = "";
+            if(associatedPrescription != null) {
+                String sentence = MarRenderer.generateMedicationOrderSentence(associatedPrescription);
+                List<Object> row = medicationRowIndex.get(sentence);
+                String timeHeader;
+                try {
+                    timeHeader = dateFormat.format(medAdmin.getEffectiveDateTimeType());
+                } catch (FHIRException e) {
+                    timeHeader = "";
+                }
+                int ind = headerIndex.get(timeHeader);
+                // row.set(ind + 1, checkboxPlaceholder);
+                //			row.set(ind + 1, "eafry: " + medAdmin.getDosage().getQuantity().getValue() + " "
+                //					+ medAdmin.getDosage().getQuantity().getUnit());
+                MarRenderer.recordAdministrationNotes(row, ind + 1, medAdmin, associatedPrescription, "eafry");
+            } else {
+                String display = "Not found";
+                try {
+                    CodeableConcept codeableConcept = medAdmin.getMedicationCodeableConcept();
+                    if(codeableConcept != null) {
+                        display = codeableConcept.getCoding().get(0).getDisplay();
+                    }
+                } catch(Exception e) {
+                    //Do nothing
+                }
+                log.error("Medication administration " + display + " has no associated prescriptions");
             }
-            int ind = headerIndex.get(timeHeader);
-            // row.set(ind + 1, checkboxPlaceholder);
-            //			row.set(ind + 1, "eafry: " + medAdmin.getDosage().getQuantity().getValue() + " "
-            //					+ medAdmin.getDosage().getQuantity().getUnit());
-            MarRenderer.recordAdministrationNotes(row, ind + 1, medAdmin, associatedPrescription, "eafry");
         }
     }
     
