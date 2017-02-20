@@ -41,24 +41,32 @@
                         <treepane label="User Profile">
                             <userProfile />
                         </treepane>
+                        <!--
                         <treepane label="Observations">
                             <cwfObservations/>
                         </treepane>
+                        -->
                         <treepane label="Orders">
                             <cwfOrders/>
                         </treepane>
+                        <treepane label="MAR">
+                            <cwfMar/>
+                        </treepane>
+                        <!--
                         <treepane label="Procedures">
                             <cwfProcedures/>
                         </treepane>
                         <treepane label="Family History">
                             <cwfFamilyHistory/>
                         </treepane>
+                        -->
                         <treepane label="Adverse Reactions">
                             <cwfAdverseReactions/>
                         </treepane>
                         <treepane label="Conditions">
                             <cwfConditions/>
                         </treepane>
+                        <!--
                         <treepane label="Medication Orders">
                             <cwfMedicationOrders/>
                         </treepane>
@@ -71,11 +79,9 @@
                         <treepane label="Bilirubin Risk">
                             <bilirubin_chart/>
                         </treepane>
-                    <treepane label="Vitals Flowsheet">
+                        -->
+                    <treepane label="Vital Signs">
                             <cwfFlowsheet/>
-                        </treepane>
-                        <treepane label="Medication Administration Record">
-                            <cwfMar/>
                         </treepane>
                     </treeview>
                 </tabpane>
