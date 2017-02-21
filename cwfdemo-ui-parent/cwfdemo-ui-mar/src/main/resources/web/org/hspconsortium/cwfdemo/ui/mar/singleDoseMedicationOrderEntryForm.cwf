@@ -1,0 +1,70 @@
+<window title="${@msg.marplugin.button.verbalorder.label}" width="400px"
+	height="250px" controller="${cwfMarAdminController}"
+	class="flavor:panel-primary cwf-demoConfig">
+	<div name="medEntryForm">
+		<grid height="100%" width="100%">
+			<columns>
+				<column style="text-align:right" />
+				<column />
+				<column style="text-align:right" />
+				<column />
+			</columns>
+			<rows>
+				<row style="background:#FFFFFF;">
+					<label label="Dispensable:" />
+					<rowcell colspan="3">
+						<combobox name="medSelector" readonly="true"
+							hint="Ordered medications"/>
+					</rowcell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label label="Route:" />
+					<combobox name="routeOfAdminSelector"
+						readonly="true" hint="Route of administration"/>
+					<label label="Frequency:" />
+					<combobox name="frequencySelector" readonly="true"
+						hint="Frequency"/>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label label="Duration:" />
+					<decimalbox name="duration" />
+					<label value="Unit of time" />
+					<combobox name="unitOfTimeSelector" readonly="true"
+						text="Select ..." hint="Units of duration"/>
+				</row>
+				<row style="background:#FFFFFF;">
+					<rowcell colspan="2">
+						<span style="float:middle;">
+							<checkbox name="isPRN" label="Is PRN" />
+						</span>
+					</rowcell>
+					<label label="PRN Reason" />
+					<combobox name="prnReasonSelector" readonly="true"
+						text="Select ..." hint="PRN Reason"/>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label label="Dose Quantity:" />
+					<decimalbox name="doseQuantity" />
+					<label label="Dose Unit" />
+					<combobox name="doseUnitSelector" readonly="true"
+						hint="Dose unit"/>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label label="Notes:" />
+					<rowcell colspan="3">
+						<textbox name="txReason"/>
+					</rowcell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<rowcell colspan="4">
+						<span style="float:right;">
+							<button name="btnOrderMedication"
+								label="${@msg.marplugin.button.order.label}"
+								hint="${@msg.marplugin.button.order.hint}" />
+						</span>
+					</rowcell>
+				</row>
+			</rows>
+		</grid>
+	</div>
+</window>

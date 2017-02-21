@@ -22,22 +22,35 @@ package org.hspconsortium.cwfdemo.ui.messagebox;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.carewebframework.api.context.ISurveyResponse;
 import org.carewebframework.api.context.UserContext;
 import org.carewebframework.api.event.IGenericEvent;
 import org.carewebframework.common.NumUtil;
 import org.carewebframework.common.StrUtil;
-import org.carewebframework.shell.layout.UIElementBase;
-import org.carewebframework.shell.layout.UIElementZKBase;
-import org.carewebframework.ui.sharedforms.CaptionedForm;
-import org.carewebframework.ui.zk.Badge;
-import org.carewebframework.ui.zk.MessageWindow;
-import org.carewebframework.ui.zk.MessageWindow.MessageInfo;
-import org.carewebframework.ui.zk.PromptDialog;
-import org.carewebframework.ui.zk.RowComparator;
-import org.carewebframework.ui.zk.ZKUtil;
+import org.carewebframework.shell.plugins.PluginController;
+import org.carewebframework.ui.dialog.DialogControl.IPromptCallback;
+import org.carewebframework.ui.dialog.PromptDialog;
+import org.carewebframework.ui.util.CWFUtil;
+import org.carewebframework.web.ancillary.Badge;
+import org.carewebframework.web.annotation.EventHandler;
+import org.carewebframework.web.annotation.WiredComponent;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Button;
+import org.carewebframework.web.component.Column;
+import org.carewebframework.web.component.Grid;
+import org.carewebframework.web.component.Image;
+import org.carewebframework.web.component.Label;
+import org.carewebframework.web.component.MessagePane;
+import org.carewebframework.web.component.Radiobutton;
+import org.carewebframework.web.component.Radiogroup;
+import org.carewebframework.web.component.Row;
+import org.carewebframework.web.event.ClickEvent;
+import org.carewebframework.web.event.Event;
+import org.carewebframework.web.model.ListModel;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
@@ -48,29 +61,11 @@ import org.hspconsortium.cwfdemo.api.ucs.Urgency;
 import org.socraticgrid.hl7.services.uc.model.AlertMessage;
 import org.socraticgrid.hl7.services.uc.model.Message;
 import org.socraticgrid.hl7.services.uc.model.UserContactInfo;
-import org.zkoss.util.resource.Labels;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Image;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listheader;
-import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Radio;
-import org.zkoss.zul.Radiogroup;
-import org.zkoss.zul.event.ListDataEvent;
-import org.zkoss.zul.event.ListDataListener;
 
 /**
  * Controller for main message display.
  */
-public class MainController extends CaptionedForm implements IPatientContextEvent {
-    
-    private static final long serialVersionUID = 1L;
+public class MainController extends PluginController implements IPatientContextEvent {
     
     /**
      * Response types for information-only message processing.
@@ -80,7 +75,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         
         @Override
         public String toString() {
-            return Labels.getLabel("cwfmessagebox.response.label." + name());
+            return StrUtil.getLabel("cwfmessagebox.response.label." + name());
         }
     }
     
@@ -135,7 +130,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
                     
                     if (message != null) {
                         highlightMessage(message);
-                        getContainer().bringToFront();
+                        getPlugin().bringToFront();
                     }
                     
                     break;
@@ -152,33 +147,46 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         
     };
     
-    private Listbox lstMessages;
+    @WiredComponent
+    private Grid grdMessages;
     
+    @WiredComponent
     private Radiogroup rgFilter;
     
-    private Radio radAll;
+    @WiredComponent
+    private Radiobutton radAll;
     
-    private Radio radPatient;
+    @WiredComponent
+    private Radiobutton radPatient;
     
+    @WiredComponent
     private Button btnAll;
     
+    @WiredComponent
     private Button btnSelected;
     
+    @WiredComponent
     private Button btnInfoAll;
     
+    @WiredComponent
     private Button btnForward;
     
+    @WiredComponent
     private Button btnDelete;
     
+    @WiredComponent
+    private Button btnRefresh;
+    
+    @WiredComponent
     private Image imgIndicator;
     
-    private UIElementBase uiElement;
+    private Badge badge;
     
     private MessageService service;
     
     private ProcessingController processingController;
     
-    private final ListModelList<MessageWrapper> model = new ListModelList<>();
+    private final ListModel<MessageWrapper> model = new ListModel<>();
     
     private boolean showAll = true;
     
@@ -196,8 +204,8 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      * Expose icon urls for auto-wiring.
      */
     @Override
-    public void doBeforeComposeChildren(Component comp) throws Exception {
-        super.doBeforeComposeChildren(comp);
+    public void afterInitialized(BaseComponent comp) {
+        super.afterInitialized(comp);
         comp.setAttribute("iconInfoOnly", Constants.ICON_INFO);
         comp.setAttribute("iconInfoOnly", Constants.ICON_INFO);
         comp.setAttribute("iconActionable", Constants.ICON_ACTIONABLE);
@@ -207,33 +215,19 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         comp.setAttribute("iconUrgencyHigh", Constants.ICON_URGENCY_HIGH);
         comp.setAttribute("iconUrgencyMedium", Constants.ICON_URGENCY_MEDIUM);
         comp.setAttribute("iconUrgencyLow", Constants.ICON_URGENCY_LOW);
-    }
-    
-    /**
-     * Set up display.
-     */
-    @Override
-    public void init() {
-        super.init();
-        model.addListDataListener(new ListDataListener() {
-            
-            @Override
-            public void onChange(ListDataEvent event) {
-                updateBadge();
-            }
-            
+        badge = new Badge(root);
+        model.addEventListener((type, start, end) -> {
+            updateBadge();
         });
         service.addAlertListener(new AlertListener(this));
         service.addMessageListener(new MessageListener(this));
-        getContainer().registerProperties(this, "viewMode", "alertDuration", "alertThreshold");
-        rgFilter.setSelectedItem(showAll ? radAll : radPatient);
+        getPlugin().registerProperties(this, "viewMode", "alertDuration", "alertThreshold");
+        (showAll ? radAll : radPatient).setChecked(true);
         processingController = ProcessingController.create(this);
-        lstMessages.setItemRenderer(new MessageRenderer());
-        RowComparator.autowireColumnComparators(lstMessages.getListhead().getChildren());
-        model.setMultiple(true);
+        grdMessages.getRows().setRenderer(new MessageRenderer(grdMessages));
         updatePatient(true);
         subscribe(true);
-        root.getFellow("mnuRefresh").addForward(Events.ON_CLICK, "btnRefresh", null);
+        root.findByName("mnuRefresh").addEventForward(ClickEvent.TYPE, btnRefresh, null);
     }
     
     @Override
@@ -247,20 +241,14 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     @Override
     public void refresh() {
         showBusy(null);
-        lstMessages.setModel((ListModel<?>) null);
+        grdMessages.getRows().setModel(null);
         loadMessages(!radAll.isChecked());
-        lstMessages.setModel(model);
-        Clients.resize(lstMessages);
+        grdMessages.getRows().setModel(model);
         updateControls(false);
     }
     
     private void updateBadge() {
-        if (uiElement == null) {
-            uiElement = UIElementZKBase.getAssociatedUIElement(getContainer());
-        }
-        
-        Badge badge = model.isEmpty() ? null : new Badge(Integer.toString(model.getSize()), "btn-success");
-        uiElement.notifyParent("badge", badge, false);
+        badge.setCount(model.size());
     }
     
     private void loadMessages(boolean currentPatientOnly) {
@@ -276,7 +264,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
             }
             showBusy(null);
         } catch (Exception e) {
-            showBusy(ZKUtil.formatExceptionForDisplay(e));
+            showBusy(CWFUtil.formatExceptionForDisplay(e));
         }
     }
     
@@ -289,14 +277,14 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         btnAll.setDisabled(isProcessing || model.isEmpty());
         btnDelete.setDisabled(isProcessing || !canDeleteSelected());
         btnInfoAll.setDisabled(isProcessing || !hasInfoOnly());
-        btnSelected.setDisabled(isProcessing || model.getSelection().isEmpty());
+        btnSelected.setDisabled(isProcessing || grdMessages.getRows().getSelectedCount() == 0);
         btnForward.setDisabled(isProcessing || btnSelected.isDisabled());
-        radAll.setStyle(radAll.isChecked() ? Constants.BOLD : Constants.NO_BOLD);
-        radPatient.setStyle(radPatient.isChecked() ? Constants.BOLD : Constants.NO_BOLD);
+        radAll.addStyles(radAll.isChecked() ? Constants.BOLD : Constants.NO_BOLD);
+        radPatient.addStyles(radPatient.isChecked() ? Constants.BOLD : Constants.NO_BOLD);
         
         if (processingUpdate) {
-            lstMessages.setDisabled(isProcessing);
-            ZKUtil.disableChildren(lstMessages, isProcessing);
+            grdMessages.setDisabled(isProcessing);
+            CWFUtil.disableChildren(grdMessages, isProcessing);
         }
     }
     
@@ -306,7 +294,9 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      * @return True if any selected message may be deleted.
      */
     private boolean canDeleteSelected() {
-        for (MessageWrapper message : model.getSelection()) {
+        for (Row row : grdMessages.getRows().getSelected()) {
+            MessageWrapper message = (MessageWrapper) row.getData();
+            
             if (message.canDelete()) {
                 return true;
             }
@@ -335,10 +325,14 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      *
      * @param prompt Text prompt.
      * @param responses Valid responses.
-     * @return Selected response.
+     * @param callback Callback to report response.
      */
-    private Response getResponse(String prompt, Response... responses) {
-        return PromptDialog.show(prompt, null, responses);
+    private void getResponse(String prompt, IPromptCallback<Response> callback, Response... responses) {
+        PromptDialog.show(prompt, null, null, responses, null, null, null, (response) -> {
+            if (callback != null) {
+                callback.onComplete(response);
+            }
+        });
     }
     
     protected void addMessage(Message message) {
@@ -371,10 +365,10 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         }
         
         if (alertThreshold != null && message.getUrgency().ordinal() <= alertThreshold.ordinal()) {
-            MessageInfo mi = new MessageInfo(message.getDisplayText(), "New Message",
-                    UrgencyRenderer.getColor(message.getUrgency()), alertDuration * 1000, null,
-                    "cwf.fireLocalEvent('MESSAGE.INFO', '" + message.getAlertId() + "');");
-            getEventManager().fireLocalEvent(MessageWindow.EVENT_SHOW, mi);
+            MessagePane mi = new MessagePane("New Message", "messagebox", alertDuration * 1000, true);
+            mi.addChild(new Label(message.getDisplayText()));
+            mi.addClass("flavor:panel-" + UrgencyRenderer.getColor(message.getUrgency()));
+            mi.show();
         }
     }
     
@@ -427,10 +421,9 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         int i = message == null ? -1 : model.indexOf(message);
         
         if (i >= 0) {
-            Listitem item = lstMessages.getItemAtIndex(i);
-            imgIndicator.setParent(item.getFirstChild());
+            Row row = (Row) grdMessages.getRows().getChildAt(i);
+            imgIndicator.setParent(row.getFirstChild());
             imgIndicator.setVisible(true);
-            Clients.scrollIntoView(item);
         } else {
             imgIndicator.setVisible(false);
         }
@@ -440,99 +433,117 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      * Clears all selections.
      */
     private void clearSelection() {
-        lstMessages.clearSelection();
+        grdMessages.getRows().clearSelected();
         updateControls(false);
     }
     
     /**
      * Update controls when the selection changes.
      */
-    public void onSelect$lstMessages() {
+    @EventHandler(value = "change", target = "@grdMessages")
+    private void onChange$grdMessages() {
         updateControls(false);
     }
     
     /**
      * Refresh the display.
      */
-    public void onClick$btnRefresh() {
+    @EventHandler(value = "click", target = "@btnRefresh")
+    @EventHandler(value = "change", target = "@rgFilter")
+    private void doRefresh() {
         refresh();
     }
     
     /**
      * Delete selected messages.
      */
-    public void onClick$btnDelete() {
-        boolean silent = false;
-        Set<MessageWrapper> selected = new HashSet<>(model.getSelection());
+    @EventHandler(value = "click", target = "@btnDelete")
+    private void onClick$btnDelete() {
+        nextMessage(grdMessages.getRows().getSelected().iterator(), false);
+    }
+
+    /**
+     * Iterates through all selected messages.
+     *
+     * @param iter
+     * @param silent
+     */
+    private void nextMessage(Iterator<Row> iter, boolean silent) {
+        if (!iter.hasNext()) {
+            return;
+        }
+
+        Row row = iter.next();
+        MessageWrapper message = (MessageWrapper) row.getData();
+        String s = message.getDisplayText();
         
-        LOOP: for (MessageWrapper message : selected) {
-            String s = message.getDisplayText();
-            
-            if (message.canDelete()) {
-                if (!silent) {
-                    String msg = StrUtil.getLabel("cwfmessagebox.main.delete.confirm.prompt", s);
+        if (message.canDelete()) {
+            if (silent) {
+                removeMessage(message.getId(), false);
+                nextMessage(iter, silent);
+            } else {
+                String msg = StrUtil.getLabel("cwfmessagebox.main.delete.confirm.prompt", s);
+                getResponse(msg, (response) -> {
+                    boolean newSilent = silent;
                     
-                    switch (getResponse(msg, Response.YES, Response.NO, Response.ALL, Response.CANCEL)) {
+                    switch (response.getResponse()) {
                         case NO:
-                            continue;
+                            break;
+
+                        case CANCEL:
+                            return;
                         
                         case ALL:
-                            silent = true;
-                            break;
-                        
-                        case CANCEL:
-                            break LOOP;
+                            newSilent = true;
+                            // Fall-through is intentional here.
+
+                        default:
+                            removeMessage(message.getId(), false);
                     }
-                }
-                removeMessage(message.getId(), false);
-            } else {
-                String msg = StrUtil.getLabel("cwfmessagebox.main.delete.unable.prompt", s);
-                
-                if (getResponse(msg, Response.YES, Response.CANCEL) != Response.YES) {
-                    break;
-                }
+                    
+                    nextMessage(iter, newSilent);
+                }, Response.YES, Response.NO, Response.ALL, Response.CANCEL);
+                return;
             }
+        } else {
+            String msg = StrUtil.getLabel("cwfmessagebox.main.delete.unable.prompt", s);
+            getResponse(msg, (response) -> {
+                if (response.getResponse() == Response.YES) {
+                    nextMessage(iter, silent);
+                }
+            }, Response.YES, Response.CANCEL);
         }
-    }
-    
-    /**
-     * Refresh the display when the filter changes.
-     */
-    public void onCheck$radAll() {
-        refresh();
-    }
-    
-    /**
-     * Refresh the display when the filter changes.
-     */
-    public void onCheck$radPatient() {
-        refresh();
+        
     }
     
     /**
      * Invoke the scheduled message management dialog.
      */
-    public void onClick$btnSchedule() {
+    @EventHandler(value = "click", target = "btnSchedule")
+    private void onClick$btnSchedule() {
         SchedulingController.show();
     }
     
     /**
      * Process all messages.
      */
-    public void onClick$btnAll() {
+    @EventHandler(value = "click", target = "@btnAll")
+    private void onClick$btnAll() {
         processingController.process(model);
     }
     
     /**
      * Process all information-only messages.
      */
-    public void onClick$btnInfoAll() {
+    @EventHandler(value = "click", target = "btnInfoAll")
+    private void onClick$btnInfoAll() {
         processingController.process(getMessagesToProcess(true));
     }
     
     /**
      * Process selected messages.
      */
+    @EventHandler(value = "click", target = "@btnSelected")
     public void onClick$btnSelected() {
         processingController.process(getMessagesToProcess(false));
     }
@@ -542,28 +553,29 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      *
      * @param event The process item event.
      */
-    public void onProcessItem$lstMessages(Event event) {
-        event = ZKUtil.getEventOrigin(event);
-        Listitem item = (Listitem) event.getTarget();
-        MessageWrapper message = (MessageWrapper) item.getValue();
+    @EventHandler(value = "processItem", target = "@grdMessages")
+    private void onProcessItem$grdMessages(Event event) {
+        Row row = (Row) event.getTarget();
+        MessageWrapper message = (MessageWrapper) row.getData();
         processingController.process(Collections.singleton(message));
     }
     
     /**
      * Forward selected messages.
      */
-    public void onClick$btnForward() {
+    @EventHandler(value = "click", target = "@btnForward")
+    private void onClick$btnForward() {
         Set<UserContactInfo> recipients = new HashSet<>();
-        String comment = RecipientsController.showWithComment(recipients);
-        
-        if (comment != null && !recipients.isEmpty()) {
-            List<MessageWrapper> messages = getMessagesToProcess(false);
-            clearSelection();
-            
-            for (MessageWrapper message : messages) {
-                service.forwardMessage(message.getMessage(), recipients, comment);
+        RecipientsController.showWithComment(recipients, (comment) -> {
+            if (comment != null && !recipients.isEmpty()) {
+                List<MessageWrapper> messages = getMessagesToProcess(false);
+                clearSelection();
+
+                for (MessageWrapper message : messages) {
+                    service.forwardMessage(message.getMessage(), recipients, comment);
+                }
             }
-        }
+        });
     }
     
     /**
@@ -575,11 +587,12 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      */
     private List<MessageWrapper> getMessagesToProcess(boolean infoOnly) {
         List<MessageWrapper> list = new ArrayList<>();
-        
-        for (MessageWrapper message : model) {
-            if (!infoOnly && model.isSelected(message)) {
-                list.add(message);
-            } else if (infoOnly && !message.isActionable()) {
+        Iterable<Row> rows = infoOnly ? grdMessages.getRows().getChildren(Row.class) : grdMessages.getRows().getSelected();
+
+        for (Row row : rows) {
+            MessageWrapper message = (MessageWrapper) row.getData();
+            
+            if (!infoOnly || !message.isActionable()) {
                 list.add(message);
             }
         }
@@ -591,8 +604,8 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      * Conditionally suppress patient context changes.
      */
     @Override
-    public String pending(boolean silent) {
-        return null;
+    public void pending(ISurveyResponse response) {
+        response.accept();
     }
     
     /**
@@ -611,7 +624,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
     private void updatePatient(boolean refresh) {
         patient = PatientContext.getActivePatient();
         
-        radPatient.setLabel(patient == null ? Labels.getLabel("cwfmessagebox.main.patient.not.selected")
+        radPatient.setLabel(patient == null ? StrUtil.getLabel("cwfmessagebox.main.patient.not.selected")
                 : FhirUtil.formatName(patient.getName()));
         
         if (refresh) {
@@ -680,7 +693,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
         showAll = value;
         
         if (rgFilter != null) {
-            rgFilter.setSelectedItem(showAll ? radAll : radPatient);
+            (showAll ? radAll : radPatient).setChecked(true);
             refresh();
         }
     }
@@ -744,7 +757,7 @@ public class MainController extends CaptionedForm implements IPatientContextEven
      */
     public void setViewMode(ViewMode viewMode) {
         this.viewMode = viewMode;
-        Listheader header = ZKUtil.findAncestor(rgFilter, Listheader.class);
+        Column header = rgFilter.getAncestor(Column.class);
         
         if (viewMode == ViewMode.SELECTABLE) {
             rgFilter.setVisible(true);

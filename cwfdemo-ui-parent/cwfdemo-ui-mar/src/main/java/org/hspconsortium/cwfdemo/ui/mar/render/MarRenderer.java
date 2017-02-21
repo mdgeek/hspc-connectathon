@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,6 +23,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.carewebframework.web.component.Cell;
+import org.carewebframework.web.component.Column;
+import org.carewebframework.web.component.Div;
+import org.carewebframework.web.component.Grid;
+import org.carewebframework.web.component.Image;
+import org.carewebframework.web.component.Label;
+import org.carewebframework.web.component.Row;
+import org.carewebframework.web.event.Event;
+import org.carewebframework.web.event.IEventListener;
+import org.carewebframework.web.model.IComponentRenderer;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.DosageInstruction;
 import org.hl7.fhir.dstu3.model.MedicationAdministration;
@@ -33,25 +43,15 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
 import org.hspconsortium.cwfdemo.ui.mar.controller.MainController;
 import org.hspconsortium.cwfdemo.ui.mar.model.MarModel;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.MouseEvent;
-import org.zkoss.zul.Cell;
-import org.zkoss.zul.Column;
-import org.zkoss.zul.Grid;
-import org.zkoss.zul.Image;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.Row;
-import org.zkoss.zul.RowRenderer;
-import org.zkoss.zul.Vbox;
 
 /**
  * Medication Administration Record Grid Renderer. Renderer identifies grid cells with the
  * placeholder text, generally an "x" and replace the placeholder with an icon specified by the
  * image path 'imagePath'.
- * 
+ *
  * @author cnanjo
  */
-public class MarRenderer implements RowRenderer<List<Object>> {
+public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
     
     /**
      * Formats dates to the form 12:05 PM
@@ -70,7 +70,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     private MainController marController;
     
-    public class SignMedAdminListener implements EventListener<MouseEvent> {
+    public class SignMedAdminListener implements IEventListener {
         
         private MedicationRequest prescription;
         
@@ -82,7 +82,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
         }
         
         @Override
-        public void onEvent(MouseEvent event) {
+        public void onEvent(Event event) {
             MedicationActionUtil.show(false, prescription);
             marController.initializeMar();
         }
@@ -101,7 +101,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     /**
      * Constructor
-     * 
+     *
      * @param marController
      * @param imagePlaceholder The placeholder for the image
      * @param imagePath The path of the image
@@ -117,40 +117,43 @@ public class MarRenderer implements RowRenderer<List<Object>> {
      * Renders a MAR in the grid
      */
     @Override
-    public void render(Row row, List<Object> data, int index) {
+    public Row render(List<Object> data) {
+        Row row = new Row();
+        
         for (Object s : data) {
             if (s instanceof MedicationRequest) {
                 //    			Button sign = new Button("Administer");
                 //    			sign.addEventListener("onClick", new SignMedAdminListener((MedicationRequest)s));
                 //    			row.appendChild(sign);
                 Cell cell = new Cell();
-                cell.addEventListener("onClick", new SignMedAdminListener(marController, (MedicationRequest) s));
-                row.appendChild(cell);
+                cell.addEventListener("click", new SignMedAdminListener(marController, (MedicationRequest) s));
+                row.addChild(cell);
             } else if (s != null && !s.equals(imagePlaceholder) && s instanceof String) {
                 String entry = (String) s;
                 String[] entries = entry.split("\\|");
                 Cell cell = new Cell();
-                Vbox vbox = new Vbox();
-                cell.appendChild(vbox);
+                Div vbox = new Div();
+                vbox.addClass("cwf-layout-vertical");
+                cell.addChild(vbox);
                 for (String item : entries) {
                     Label label = new Label(item);
-                    //    			label.setPre(true);
-                    //    			label.setMultiline(true);
-                    vbox.appendChild(label);
+                    vbox.addChild(label);
                 }
-                row.appendChild(cell);
+                row.addChild(cell);
             } else {
                 Image image = new Image();
                 image.setSrc(imagePath);
                 
-                row.appendChild(image);
+                row.addChild(image);
             }
         }
+
+        return row;
     }
     
     /**
      * Returns the path to the image
-     * 
+     *
      * @return
      */
     public String getImagePath() {
@@ -159,7 +162,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     /**
      * Sets the path to the image icon
-     * 
+     *
      * @param imagePath
      */
     public void setImagePath(String imagePath) {
@@ -168,7 +171,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     /**
      * Returns the placeholder for the image
-     * 
+     *
      * @return
      */
     public String getImagePlaceholder() {
@@ -177,7 +180,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     /**
      * Sets the image placeholder text
-     * 
+     *
      * @param imagePlaceholder
      */
     public void setImagePlaceholder(String imagePlaceholder) {
@@ -194,22 +197,22 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     
     /**
      * Convenience method to initialize a ZK grid based on the information contained in this model.
-     * 
+     *
      * @param grid
      * @param marModel
      * @param marRenderer
      */
     public static void populateGrid(Grid grid, MarModel marModel, MarRenderer marRenderer) {
         if (marRenderer != null) {
-            grid.setRowRenderer(marRenderer);
+            grid.getRows().setRenderer(marRenderer);
         }
         grid.getColumns().getChildren().clear();
         marModel.getHeaders();
         for (String header : marModel.getHeaders()) {
-            grid.getColumns().appendChild(new Column(header));
+            grid.getColumns().addChild(new Column(header));
         }
-        grid.getColumns().appendChild(new Column("Current Time"));
-        grid.setModel(marModel.getRows());
+        grid.getColumns().addChild(new Column("Current Time"));
+        grid.getRows().setModel(marModel.getRows());
         
         //Set width of medication column
         ((Column) grid.getColumns().getChildren().get(0)).setWidth("200px");
@@ -218,12 +221,12 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     /**
      * Method takes a list of valid medication orders and convert that list into a list of order
      * sentences for the given orders.
-     * 
+     *
      * @param orders
      * @return
      */
     public static List<String> getOrderSentences(List<MedicationRequest> orders) {
-        List<String> sentences = new ArrayList<String>();
+        List<String> sentences = new ArrayList<>();
         for (MedicationRequest order : orders) {
             sentences.add(generateMedicationOrderSentence(order));
         }
@@ -233,7 +236,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
     /**
      * Method takes a medication order and converts it into an order sentence of the form:
      * dispensable route frequency TODO Adjust template as necessary
-     * 
+     *
      * @param order
      * @return
      */
@@ -272,7 +275,7 @@ public class MarRenderer implements RowRenderer<List<Object>> {
             item += "|";
         }
         MedicationAdministration.MedicationAdministrationDosageComponent medAdminDosage = medAdmin.getDosage();
-        if(medAdminDosage != null && order.getDosageInstruction() != null && order.getDosageInstruction().size() > 0) {
+        if (medAdminDosage != null && order.getDosageInstruction() != null && order.getDosageInstruction().size() > 0) {
             Quantity adminQty = medAdminDosage.getDose();
             Quantity orderQty = (Quantity) order.getDosageInstruction().get(0).getDose();
             if (!FhirUtil.equalQuantities(adminQty, orderQty)) {
@@ -281,15 +284,13 @@ public class MarRenderer implements RowRenderer<List<Object>> {
             try {
                 DateTimeType eff = medAdmin.getEffectiveDateTimeType();
                 item += hourMinuteFormatter.format(eff.getValue());
-            } catch (FHIRException e) {
-            }
+            } catch (FHIRException e) {}
             item += " by " + username;
         } else {
             try {
                 DateTimeType eff = medAdmin.getEffectiveDateTimeType();
                 item += hourMinuteFormatter.format(eff.getValue());
-            } catch (FHIRException e) {
-            }
+            } catch (FHIRException e) {}
         }
         row.set(index, item);
     }

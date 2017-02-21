@@ -1,21 +1,21 @@
 <idspace sclass="cwf-radio-wrap" height="100%" width="100%" 
-	apply="${cwfMockumentsQuestionnaireController}">
+	controller="${cwfMockumentsQuestionnaireController}">
 	<custom-attributes 
-		handler_id="procedure-request"
+		handler_name="procedure-request"
 	/>
   
 	<grid sizedByContent="true" width="100%">
 		<columns>
-			<column align="right"/>
+			<column style="text-align:right"/>
 			<column/>
 			<column/>
 			<column hflex="1"/>
 		</columns>
 		<rows>
 			<row style="text-align:left!important">
-				<label id="lblPatientName" value="Patient: Last, First" style="font-weight:bold"/>
-				<combobox id="cboProcedureType" readonly="true"/>
-				<combobox id="cboProcedureName" readonly="true">
+				<label name="lblPatientName" value="Patient: Last, First" style="font-weight:bold"/>
+				<combobox name="cboProcedureType" readonly="true"/>
+				<combobox name="cboProcedureName" readonly="true">
 					<custom-attributes type="coding" />
 					<comboitem label="Lactation Education"
 						value="http://snomed.info/sct|243094003|${self.label}">
@@ -25,7 +25,7 @@
 			<row>
 				<label value="Priority:" style="font-weight:bold"/>
 				<cell colspan="3">
-					<combobox id="cboPriority">
+					<combobox name="cboPriority">
 						<custom-attributes type="priority" />
 						<comboitem label="Routine"/>
 						<comboitem label="Urgent"/>
@@ -37,16 +37,16 @@
 			<row>
 				<label value="Reason:" style="font-weight:bold"/>
 				<cell colspan="3">
-					<textbox id="txtNotes" multiline="true" width="100%" height="200px">
+					<textbox name="txtNotes" multiline="true" width="100%" height="200px">
 						<custom-attributes type="notes"/>
 					</textbox>
 				</cell>
 			</row>
 		</rows>
 	</grid>
-	<toolbar id="toolbar" visible="false">
-		<button id="btnSave" zclass="btn" sclass="btn-success btn-xs" label="Save Draft"/>
-		<button id="btnDelete" zclass="btn" sclass="btn-danger btn-xs" label="Delete"/>
-		<button id="btnSign" zclass="btn" sclass="btn-primary btn-xs" label="Sign"/>
+	<toolbar name="toolbar" visible="false">
+		<button name="btnSave" zclass="btn" sclass="btn-success btn-xs" label="Save Draft"/>
+		<button name="btnDelete" zclass="btn" sclass="btn-danger btn-xs" label="Delete"/>
+		<button name="btnSign" zclass="btn" sclass="btn-primary btn-xs" label="Sign"/>
 	</toolbar>
 </idspace>

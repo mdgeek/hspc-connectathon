@@ -11,7 +11,7 @@
 		
 		<!-- This is the sample definition for a CareWeb plugin -->
 		<cwp:plugin id="cwfMar" name="Medication Administration" 
-			url="~./org/hspconsortium/cwfdemo/ui/mar/main.zul">
+			url="web/org/hspconsortium/cwfdemo/ui/mar/main.cwf">
 			<cwp:serialization>
 				<cwp:property name="Banner" id="banner" type="text" description="This is my new custom banner property"/>
 				<cwp:property name="Color" id="color" type="color" description="This is my new custom color property"/>
@@ -22,7 +22,7 @@
 	
 <!-- This profile is processed for each managed desktop. -->
 
-	<beans profile="desktop">
+	<beans profile="child">
 		<bean id="cwfMarMainController" scope="prototype"
 			class="org.hspconsortium.cwfdemo.ui.mar.controller.MainController">
 			<constructor-arg ref="cwfEPSService" />

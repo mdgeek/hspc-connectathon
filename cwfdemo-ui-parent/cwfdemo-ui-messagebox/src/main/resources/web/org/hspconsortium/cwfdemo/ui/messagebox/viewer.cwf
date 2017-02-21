@@ -1,0 +1,17 @@
+<window width="500px" class="flavor:panel-primary panel-sm" sizable="true"
+	controller="${@cwfMessageboxViewerController}" visible="false"
+	title="${@msg.cwfmessagebox.viewer.title}">
+	<div class="cwf-layout-vertical">
+		<label name="lblHeader" style="font-weight:bold"/>
+		<memobox name="txtMessage" readonly="true" style="min-height:80px;max-height:250px"/>
+		<toolbar alignment="center" style="border-top: 1px solid lightgray">
+			<label label="${@msg.cwfmessagebox.viewer.action.select}" style="display:block"/>
+			<button name="btnDelete" label="${@msg.cwfmessagebox.viewer.button.delete.label}"/>
+			<button name="btnSkip" label="${@msg.cwfmessagebox.viewer.button.skip.label}"/>
+			<button name="btnCancel" label="${@msg.cwfmessagebox.viewer.button.cancel.label}"/>
+			<button name="btnDeleteAll" label="${@msg.cwfmessagebox.viewer.button.deleteall.label}"/>
+			<button name="btnSkipAll" label="${@msg.cwfmessagebox.viewer.button.skipall.label}"/>
+			<button name="btnView" label="${@msg.cwfmessagebox.viewer.button.view.label}"/>
+		</toolbar>
+	</div>
+</window>

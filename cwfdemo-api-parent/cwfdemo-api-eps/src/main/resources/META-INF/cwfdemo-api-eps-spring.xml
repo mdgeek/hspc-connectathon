@@ -17,7 +17,7 @@
 		
 	</beans>
 
-	<beans profile="desktop">
+	<beans profile="child">
 
 
 	</beans>

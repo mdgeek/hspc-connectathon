@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.hspconsortium.carewebframework</groupId>
         <artifactId>cwfdemo-ui-parent</artifactId>
-        <version>1.0.0-SNAPSHOT</version>
+        <version>2.0.0-SNAPSHOT</version>
     </parent>
 
     <artifactId>cwfdemo-ui-userprofile</artifactId>

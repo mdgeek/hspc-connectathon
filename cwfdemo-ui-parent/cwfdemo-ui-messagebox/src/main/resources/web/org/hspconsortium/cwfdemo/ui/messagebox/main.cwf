@@ -1,0 +1,87 @@
+<page>
+	<div width="100%" height="100%" controller="${@cwfMessageboxMainController}"
+		class="cwfMessagebox">
+		<paneview width="100%" height="100%">
+			<pane>
+				<grid name="grdMessages" flex="1" style="border:none">
+					<columns>
+						<column width="32px" style="text-align:right"/>
+						<column name="getUrgency" style="text-align:center" width="30px"
+							image="${iconUrgency}"/>
+						<column name="isActionable" style="text-align:center" width="30px"
+							image="${iconType}"/>
+						<column name="getPatientName" flex="2">
+							<radiogroup name="rgFilter" orient="horizontal">
+								<radiobutton name="radAll"
+									label="${@msg.cwfmessagebox.main.button.all.label}"/>
+								<radiobutton name="radPatient" selected="true"/>
+							</radiogroup>
+						</column>
+						<column name="getSender" flex="2"
+							label="${@msg.cwfmessagebox.main.header.sender}"/>
+						<column name="getSubject" flex="3"
+							label="${@msg.cwfmessagebox.main.header.subject}"/>
+						<column name="getDeliveryDate" width="150px"
+							label="${@msg.cwfmessagebox.main.header.delivered}"/>
+					</columns>
+					<rows selectable="multiple"/>
+				</grid>
+			</pane>
+			<pane width="120px">
+				<div flex="1">
+					<groupbox class="cwfMessagebox-legend"
+						title="${@msg.cwfmessagebox.main.group.legend.caption}">
+						<a image="${iconUrgency}" disabled="true"
+							label="${@msg.cwfmessagebox.main.legend.urgency}"/>
+						<div class="cwf-layout-vertical">
+							<a image="${iconUrgencyHigh}" disabled="true"
+								label="${@msg.cwfmessagebox.urgency.label.HIGH}"/>
+							<a image="${iconUrgencyMedium}" disabled="true"
+								label="${@msg.cwfmessagebox.urgency.label.MEDIUM}"/>
+							<a image="${iconUrgencyLow}" disabled="true"
+								label="${@msg.cwfmessagebox.urgency.label.LOW}"/>
+							<space/>
+						</div>
+						<a image="${iconType}" disabled="true"
+							label="${@msg.cwfmessagebox.main.legend.type}"/>
+						<div class="cwf-layout-vertical">
+							<a image="${iconInfoOnly}" disabled="true"
+								label="${@msg.cwfmessagebox.main.legend.infoonly}"/>
+							<a image="${iconActionable}" disabled="true"
+								label="${@msg.cwfmessagebox.main.legend.actionable}"/>
+						</div>
+					</groupbox>
+					<div flex="1"/>
+					<groupbox title="${@msg.cwfmessagebox.main.group.options.caption}">
+						<div style="text-align:center" class="btn-group-vertical" width="100%">
+							<button name="btnSchedule"
+								label="${@msg.cwfmessagebox.main.button.schedule.label}"/>
+							<button name="btnRefresh"
+								label="${@msg.cwfmessagebox.main.button.refresh.label}"/>
+						</div>
+					</groupbox>
+					<groupbox title="${@msg.cwfmessagebox.main.group.process.caption}">
+						<div style="text-align:center" class="btn-group-vertical" width="100%">
+							<button name="btnAll"
+								label="${@msg.cwfmessagebox.main.button.all.label}"/>
+							<button name="btnSelected"
+								label="${@msg.cwfmessagebox.main.button.selected.label}"/>
+							<button name="btnInfoAll"
+								label="${@msg.cwfmessagebox.main.button.infoonly.label}"/>
+							<button name="btnForward"
+								label="${@msg.cwfmessagebox.main.button.forward.label}"/>
+							<button name="btnDelete"
+								label="${@msg.cwfmessagebox.main.button.delete.label}"/>
+						</div>
+					</groupbox>
+				</div>
+			</pane>
+		</paneview>
+		<image name="imgIndicator" src="${iconIndicator}" style="position:absolute;left:0"
+			visible="false"/>
+	</div>
+
+	<menupopup>
+		<menuitem name="mnuRefresh" label="${@msg.cwf.btn.refresh.label}"/>
+	</menupopup>
+</page>

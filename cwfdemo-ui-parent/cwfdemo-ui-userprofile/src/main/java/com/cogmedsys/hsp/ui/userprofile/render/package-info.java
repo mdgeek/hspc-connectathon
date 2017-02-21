@@ -26,7 +26,7 @@
  * </p>
  * <code>
  * <pre>
- *  import org.zkoss.zul.RowRenderer;
+ *  import org.zkoss.cwf.RowRenderer;
  *  import java.io.Serializable;
  *  
  *  public class ExampleRowRendererImpl implements RowRenderer, Serializable {

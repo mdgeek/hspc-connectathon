@@ -14,7 +14,7 @@
 		
 		<!-- This is the sample definition for a CareWeb plugin -->
 		<cwp:plugin id="userProfile" name="User Profile" 
-			url="~./com/cogmedsys/hsp/ui/userprofile/userProfile.zul">
+			url="web/com/cogmedsys/hsp/ui/userprofile/userProfile.cwf">
 			<cwp:resource>
 			</cwp:resource>
 			<!-- You may specify plugin level security constraints here:
@@ -29,7 +29,7 @@
 	
 <!-- This profile is processed for each managed desktop. -->
 
-	<beans profile="desktop">
+	<beans profile="child">
 
 		<bean id="userProfileController" 
 			class="com.cogmedsys.hsp.ui.userprofile.controller.UserProfileController" 

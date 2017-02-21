@@ -1,17 +1,17 @@
-<zk xmlns="http://www.zkoss.org/2005/zul"
+<zk xmlns="http://www.zkoss.org/2005/cwf"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:w="http://www.zkoss.org/2005/zk/client"
-	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	xsi:schemaLocation="http://www.zkoss.org/2005/cwf http://www.zkoss.org/2005/cwf/cwf.xsd">
 
-	<splitterview apply="${cwfMockumentsMainController}" height="100%" width="100%"
+	<splitterview controller="${cwfMockumentsMainController}" height="100%" width="100%"
 		horizontal="false">
 		<splitterpane relativeSize="30">
-			<include id="documentList" height="100%" width="100%"
-				src="~./org/hspconsortium/cwfdemo/ui/mockuments/documentsList.zul" />
+			<include name="documentList" height="100%" width="100%"
+				src="web/org/hspconsortium/cwfdemo/ui/mockuments/documentsList.cwf" />
 		</splitterpane>
 		<splitterpane relativeSize="70">
-			<include id="documentDisplay" height="100%" width="100%"
-				src="~./org/hspconsortium/cwfdemo/ui/mockuments/documentsDisplay.zul" />
+			<include name="documentDisplay" height="100%" width="100%"
+				src="web/org/hspconsortium/cwfdemo/ui/mockuments/documentsDisplay.cwf" />
 		</splitterpane>
 	</splitterview>
 

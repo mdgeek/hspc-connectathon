@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,27 +19,25 @@
  */
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
-import org.zkoss.zk.ui.Component;
-
+import org.carewebframework.web.component.BaseComponent;
 import org.hspconsortium.cwf.fhir.document.Document;
 
 public interface IQuestionnaireHandler {
     
-    
     /**
      * The unique id of the questionnaire handled.
-     * 
+     *
      * @return The questionnaire's unique id.
      */
     String getId();
-    
+
     /**
      * Process questionnaire responses post finalization of questionnaire. This operation might
      * generate secondary FHIR resources, for example.
-     * 
+     *
      * @param document The clinical document.
      * @param root The root component of the questionnaire.
      * @param responses The questionnaire responses.
      */
-    void processResponses(Document document, Component root, org.w3c.dom.Document responses);
+    void processResponses(Document document, BaseComponent root, org.w3c.dom.Document responses);
 }

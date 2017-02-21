@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,7 +25,6 @@
 package org.hspconsortium.cwfdemo.ui.devices;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -34,11 +33,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-import org.carewebframework.shell.plugins.PluginContainer;
+import org.carewebframework.shell.elements.UIElementPlugin;
 import org.carewebframework.shell.plugins.PluginController;
-import org.carewebframework.ui.highcharts.Chart;
-import org.carewebframework.ui.highcharts.Series;
-import org.carewebframework.ui.thread.ZKThread;
+import org.carewebframework.ui.thread.ThreadEx;
+import org.carewebframework.web.annotation.EventHandler;
+import org.carewebframework.web.annotation.WiredComponent;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Combobox;
+import org.carewebframework.web.component.Datebox;
+import org.carewebframework.web.component.Textbox;
+import org.carewebframework.web.component.Timebox;
+import org.carewebframework.web.event.ChangeEvent;
+import org.carewebframework.web.event.Event;
+import org.carewebframework.web.event.EventUtil;
+import org.carewebframework.web.highcharts.Chart;
+import org.carewebframework.web.highcharts.Series;
+import org.carewebframework.web.model.ListModel;
 import org.hl7.fhir.dstu3.model.CodeableConcept;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DateTimeType;
@@ -60,17 +70,6 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwfdemo.api.eps.EPSService;
 import org.socraticgrid.hl7.services.eps.model.Message;
 import org.springframework.util.StringUtils;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.GenericEventListener;
-import org.zkoss.zk.ui.event.SelectEvent;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Datebox;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Timebox;
 
 import ca.uhn.fhir.context.FhirVersionEnum;
 
@@ -101,18 +100,25 @@ public class DevicesMainController extends PluginController {
     
     private EPSService epsService;
     
+    @WiredComponent
     private Combobox cboDevice;
     
+    @WiredComponent
     private Combobox cboComponent;
     
+    @WiredComponent
     private Textbox newObservationCodeTxt;
     
+    @WiredComponent
     private Textbox newObservationTxt;
     
+    @WiredComponent
     private Datebox newObservationDate;
     
+    @WiredComponent
     private Timebox newObservationTime;
     
+    @WiredComponent
     private Chart chart;
     
     private Map<String, Series> series = new HashMap<>();
@@ -121,20 +127,19 @@ public class DevicesMainController extends PluginController {
     }
     
     @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
-        
+    public void afterInitialized(BaseComponent comp) {
+        super.afterInitialized(comp);
         initChart();
     }
-    
+
     @Override
     public void onActivate() {
         super.onActivate();
         
-        startBackgroundThread(new ZKThread.ZKRunnable() {
+        startBackgroundThread(new ThreadEx.IRunnable() {
             
             @Override
-            public void run(ZKThread thread) throws Exception {
+            public void run(ThreadEx thread) throws Exception {
                 thread.setAttribute(THREAD_KEY_DEVICES, fetchDevices());
             }
             
@@ -143,10 +148,10 @@ public class DevicesMainController extends PluginController {
             }
         });
         
-        startBackgroundThread(new ZKThread.ZKRunnable() {
+        startBackgroundThread(new ThreadEx.IRunnable() {
             
             @Override
-            public void run(ZKThread thread) throws Exception {
+            public void run(ThreadEx thread) throws Exception {
                 if (epsService != null) {
                     epsService.subscribe(EPS_OBSERVATIONS_TOPIC, new EPSService.IEventCallback() {
                         
@@ -163,20 +168,15 @@ public class DevicesMainController extends PluginController {
                                 if (cboDevice.getSelectedItem() == null) {
                                     return;
                                 }
-                                Device device = (Device) cboDevice.getSelectedItem().getValue();
+                                Device device = (Device) cboDevice.getSelectedItem().getData();
                                 
                                 String selectedDeviceId = FhirUtil.getIdAsString(device, true);
                                 String observationDeviceId = observation.getDevice().getReference();
                                 
                                 if (selectedDeviceId.endsWith(observationDeviceId)
                                         || observationDeviceId.endsWith(selectedDeviceId)) {
-                                    Executions.schedule(desktop, new EventListener() {
-                                        
-                                        @Override
-                                        public void onEvent(Event event) throws Exception {
-                                            plotObservation(observation);
-                                        }
-                                    }, null);
+                                    Event obsevent = new Event("observation", root, observation);
+                                    EventUtil.post(obsevent);
                                 }
                             }
                         }
@@ -191,32 +191,35 @@ public class DevicesMainController extends PluginController {
     }
     
     @Override
-    public void onLoad(PluginContainer container) {
-        super.onLoad(container);
-        container.registerProperties(this, "cfgPlotThreshold", "cfgEPSEndpoint", "cfgFHIREndpoint", "cfgFHIRUsername",
+    public void onLoad(UIElementPlugin plugin) {
+        super.onLoad(plugin);
+        plugin.registerProperties(this, "cfgPlotThreshold", "cfgEPSEndpoint", "cfgFHIREndpoint", "cfgFHIRUsername",
             "cfgFHIRPassword");
         
         configureServices();
     }
     
-    public void onCreate$cboDevice(Event e) {
-        cboDevice.addEventListener("onInitRenderLater", new GenericEventListener<Event>() {
-            
-            @Override
-            public void onEvent(Event evt) throws Exception {
-                if (cboDevice.getItemCount() > 0) {
-                    cboDevice.setSelectedIndex(0);
-                    //setSelectedIndex() doesn't fire the onSelect event, so
-                    //we have to manually call the method bellow.
-                    onSelect$cboDevice(new SelectEvent<Combobox, Device>("onSelect", cboDevice, null));
-                }
+    @EventHandler("observation")
+    private void onObservation(Event event) {
+        Observation observation = (Observation) event.getData();
+        plotObservation(observation);
+    }
+    
+    @EventHandler(value = "create", target = "@cboDevice")
+    private void onCreate$cboDevice(Event e) {
+        cboDevice.addEventListener("initRenderLater", (event) -> {
+            if (cboDevice.getChildCount() > 0) {
+                cboDevice.setSelectedIndex(0);
+                //setSelectedIndex() doesn't fire the onSelect event, so
+                //we have to manually call the method bellow.
+                onSelect$cboDevice(new ChangeEvent(cboDevice, null));
             }
         });
     }
     
-    public void onSelect$cboDevice(SelectEvent<Combobox, Device> e) {
+    public void onSelect$cboDevice(ChangeEvent e) {
         List<DeviceComponent> components = fetchDeviceComponents(
-            (Device) ((Combobox) e.getTarget()).getSelectedItem().getValue());
+            (Device) ((Combobox) e.getTarget()).getSelectedItem().getData());
         if (components != null) {
             populateComponentsDropdown(components);
         }
@@ -225,8 +228,8 @@ public class DevicesMainController extends PluginController {
         initChart();
     }
     
-    public void onSelect$cboComponent(SelectEvent<Combobox, DeviceComponent> e) {
-        chart.setTitle(((DeviceComponent) ((Combobox) e.getTarget()).getSelectedItem().getValue()).getType()
+    public void onSelect$cboComponent(ChangeEvent e) {
+        chart.setTitle(((DeviceComponent) ((Combobox) e.getTarget()).getSelectedItem().getData()).getType()
                 .getCodingFirstRep().getDisplay());
     }
     
@@ -244,7 +247,7 @@ public class DevicesMainController extends PluginController {
         o.setEffective(new DateTimeType(c1.getTime()));
         o.setValue(new Quantity(Double.parseDouble(newObservationTxt.getValue())).setUnit("bpm"));
         
-        Device device = (Device) cboDevice.getSelectedItem().getValue();
+        Device device = (Device) cboDevice.getSelectedItem().getData();
         o.setDevice(new Reference(device));
         
         o.setCode(new CodeableConcept().addCoding(
@@ -255,7 +258,8 @@ public class DevicesMainController extends PluginController {
     }
     
     @Override
-    protected void threadFinished(ZKThread thread) {
+    protected void threadFinished(ThreadEx thread) {
+        @SuppressWarnings("unchecked")
         List<Device> devices = (List<Device>) thread.getAttribute(THREAD_KEY_DEVICES);
         if (devices != null) {
             populateDevicesDropdown(devices);
@@ -373,7 +377,7 @@ public class DevicesMainController extends PluginController {
     /**
      * Fetch all the devices from the FHIR service
      *
-     * @return
+     * @return A list of devices.
      */
     private List<Device> fetchDevices() {
         return fhirService.searchResourcesByType(Device.class);
@@ -382,7 +386,8 @@ public class DevicesMainController extends PluginController {
     /**
      * Fetch all the DeviceComponents for a Device from the FHIR service
      *
-     * @return
+     * @param device The device whose components are sought.
+     * @return A list of device components.
      */
     private List<DeviceComponent> fetchDeviceComponents(Device device) {
         
@@ -406,19 +411,21 @@ public class DevicesMainController extends PluginController {
     }
     
     private void populateDevicesDropdown(List<Device> devices) {
-        ListModelList<Device> model = new ListModelList<>(devices);
-        if (!devices.isEmpty()) {
-            model.setSelection(Arrays.asList(devices.get(0)));
-        }
+        ListModel<Device> model = new ListModel<>(devices);
         cboDevice.setModel(model);
+
+        if (!model.isEmpty()) {
+            cboDevice.setSelectedIndex(0);
+        }
     }
     
     private void populateComponentsDropdown(List<DeviceComponent> components) {
-        ListModelList<DeviceComponent> model = new ListModelList<>(components);
-        if (!components.isEmpty()) {
-            model.setSelection(Arrays.asList(components.get(0)));
-        }
+        ListModel<DeviceComponent> model = new ListModel<>(components);
         cboComponent.setModel(model);
+
+        if (!model.isEmpty()) {
+            cboComponent.setSelectedIndex(0);
+        }
     }
     
     public FhirConfigurator getFhirConfig() {

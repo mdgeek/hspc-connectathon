@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,7 +21,7 @@
  * This Source Code Form is subject to the terms of the Mozilla Public License, v. 2.0.
  * If a copy of the MPL was not distributed with this file, You can obtain one at
  * http://mozilla.org/MPL/2.0/.
- * 
+ *
  * This Source Code Form is also subject to the terms of the Health-Related Additional
  * Disclaimer of Warranty and Limitation of Liability available at
  * http://www.carewebframework.org/licensing/disclaimer.
@@ -34,9 +34,16 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.carewebframework.shell.plugins.PluginContainer;
 import org.carewebframework.shell.plugins.PluginController;
-import org.carewebframework.ui.zk.PromptDialog;
+import org.carewebframework.ui.dialog.DialogUtil;
+import org.carewebframework.web.annotation.EventHandler;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Checkbox;
+import org.carewebframework.web.component.Combobox;
+import org.carewebframework.web.component.Comboitem;
+import org.carewebframework.web.component.Decimalbox;
+import org.carewebframework.web.component.Textbox;
+import org.carewebframework.web.event.Event;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.DateTimeType;
 import org.hl7.fhir.dstu3.model.DosageInstruction;
@@ -54,20 +61,11 @@ import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.medication.MedicationService;
 import org.hspconsortium.cwfdemo.api.eps.EPSService;
 import org.hspconsortium.cwfdemo.ui.mar.MedicationActionUtil;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zul.Checkbox;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.Decimalbox;
-import org.zkoss.zul.Textbox;
 
 /**
- * 
+ *
  */
 public class SimpleMedicationAdministrationController extends PluginController {
-    
-    private static final long serialVersionUID = 1908890098540845685L;
     
     private static final Log log = LogFactory.getLog(SimpleMedicationAdministrationController.class);
     
@@ -156,7 +154,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * No-arg constructor
-     * 
+     *
      * @param epsService
      * @param medicationService
      */
@@ -165,13 +163,10 @@ public class SimpleMedicationAdministrationController extends PluginController {
         this.medicationService = medicationService;
     }
     
-    /*********************************************************************************************
+    /* ********************************************************************************************
      * Accessor Methods
      *********************************************************************************************/
     
-    /**
-     * @return
-     */
     public Decimalbox getDoseQuantity() {
         return doseQuantity;
     }
@@ -254,12 +249,12 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * Method populates the administrable medications for the patient
-     * 
+     *
      * @param order
      */
     public void populateMedSelector(MedicationRequest order) {//TODO For demo only. In future, reference a repository
-        Map<String, Comboitem> meds = new HashMap<String, Comboitem>();
-        medSelector.getItems().clear();
+        Map<String, Comboitem> meds = new HashMap<>();
+        medSelector.clear();
         Comboitem metoprolol = new Comboitem();
         metoprolol.setValue("372891");
         metoprolol.setLabel("metoprolol tartrate 25 MG Oral Tablet");
@@ -305,17 +300,17 @@ public class SimpleMedicationAdministrationController extends PluginController {
         labetalol.setLabel("Labetalol hydrochloride 100 MG Oral Tablet");
         meds.put("C2732018", labetalol);
         
-        medSelector.appendChild(metoprolol);
-        medSelector.appendChild(atenolol);
-        medSelector.appendChild(bisoprolol);
-        medSelector.appendChild(clopidogrel);
-        medSelector.appendChild(amlodipine);
-        medSelector.appendChild(acetaminophen);
-        medSelector.appendChild(aspirin);
-        medSelector.appendChild(hydrochlorothiazide);
-        medSelector.appendChild(bisacodyl);
-        medSelector.appendChild(acetazolamide);
-        medSelector.appendChild(labetalol);
+        medSelector.addChild(metoprolol);
+        medSelector.addChild(atenolol);
+        medSelector.addChild(bisoprolol);
+        medSelector.addChild(clopidogrel);
+        medSelector.addChild(amlodipine);
+        medSelector.addChild(acetaminophen);
+        medSelector.addChild(aspirin);
+        medSelector.addChild(hydrochlorothiazide);
+        medSelector.addChild(bisacodyl);
+        medSelector.addChild(acetazolamide);
+        medSelector.addChild(labetalol);
         
         Coding selectedMed = null;
         if (order != null) {
@@ -331,39 +326,39 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * Populates Dose Unit code set
-     * 
+     *
      * @param order
      */
     public void populateDoseUnitSelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
-        doseUnitSelector.getItems().clear();
+        doseUnitSelector.clear();
         Comboitem tablet = new Comboitem();
         tablet.setValue("{tbl}");
         tablet.setLabel("Tablet");
         Comboitem mg = new Comboitem();
         mg.setValue("mg");
         mg.setLabel("Milligram");
-        doseUnitSelector.appendChild(tablet);
-        doseUnitSelector.appendChild(mg);
+        doseUnitSelector.addChild(tablet);
+        doseUnitSelector.addChild(mg);
         
         if (order != null) {
             Quantity qty = (Quantity) order.getDosageInstruction().get(0).getDose();//TODO Fix in code generator
-            for (Comboitem item : doseUnitSelector.getItems()) {
+            for (Comboitem item : doseUnitSelector.getChildren(Comboitem.class)) {
                 if (item.getValue().equals(qty.getUnit())) {
                     doseUnitSelector.setSelectedItem(item);
                 }
-                doseQuantity.setValue(qty.getValue());
+                doseQuantity.setData(qty.getValue());
             }
         }
     }
     
     /**
      * Populates frequency code set
-     * 
+     *
      * @param order
      */
     public void populateFrequencySelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
         if (frequencySelector != null) {//frequencySelector will be null for medication administrations
-            frequencySelector.getItems().clear();
+            frequencySelector.clear();
             Comboitem qd = new Comboitem();
             qd.setValue("1");
             qd.setLabel("QD");
@@ -376,32 +371,32 @@ public class SimpleMedicationAdministrationController extends PluginController {
             Comboitem q46 = new Comboitem();
             q46.setValue("3");
             q46.setLabel("Q4-6h");
-            frequencySelector.appendChild(qd);
-            frequencySelector.appendChild(q8h);
-            frequencySelector.appendChild(bid);
-            frequencySelector.appendChild(q46);
+            frequencySelector.addChild(qd);
+            frequencySelector.addChild(q8h);
+            frequencySelector.addChild(bid);
+            frequencySelector.addChild(q46);
         }
     }
     
     /**
      * Populates route of administration code set
-     * 
+     *
      * @param order
      */
     public void populateRouteOfAdminSelector(MedicationRequest order) {//TODO For demo only. In future, reference a knowledge base
-        routeOfAdminSelector.getItems().clear();
+        routeOfAdminSelector.clear();
         Comboitem oral = new Comboitem();
         oral.setValue("26643006");
         oral.setLabel("Oral route");
         Comboitem topical = new Comboitem();
         topical.setValue("6064005");
         topical.setLabel("Topical route");
-        routeOfAdminSelector.appendChild(oral);
-        routeOfAdminSelector.appendChild(topical);
+        routeOfAdminSelector.addChild(oral);
+        routeOfAdminSelector.addChild(topical);
         
         if (order != null) {
             Coding route = FhirUtil.getFirst(order.getDosageInstruction().get(0).getRoute().getCoding());//TODO Fix in code generator
-            for (Comboitem item : routeOfAdminSelector.getItems()) {
+            for (Comboitem item : routeOfAdminSelector.getChildren(Comboitem.class)) {
                 if (item.getValue().equals(route.getCode())) {
                     routeOfAdminSelector.setSelectedItem(item);
                 }
@@ -414,7 +409,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      */
     public void populateUnitOfTimeSelector() {//TODO For demo only. In future, reference a knowledge base
         if (unitOfTimeSelector != null) {//unitOfTimeSelector will be null for medication administrations
-            unitOfTimeSelector.getItems().clear();
+            unitOfTimeSelector.clear();
             Comboitem min = new Comboitem();
             min.setValue("min");
             min.setLabel("Minute");
@@ -427,10 +422,10 @@ public class SimpleMedicationAdministrationController extends PluginController {
             Comboitem week = new Comboitem();
             week.setValue("wk");
             week.setLabel("Week");
-            unitOfTimeSelector.appendChild(min);
-            unitOfTimeSelector.appendChild(hour);
-            unitOfTimeSelector.appendChild(day);
-            unitOfTimeSelector.appendChild(week);
+            unitOfTimeSelector.addChild(min);
+            unitOfTimeSelector.addChild(hour);
+            unitOfTimeSelector.addChild(day);
+            unitOfTimeSelector.addChild(week);
         }
     }
     
@@ -439,7 +434,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      */
     public void populatePrnReasonSelector() {//TODO For demo only. In future, reference a knowledge base
         if (prnReasonSelector != null) {//prnReasonSelector will be null for medication administrations
-            prnReasonSelector.getItems().clear();
+            prnReasonSelector.clear();
             Comboitem pain = new Comboitem();
             pain.setValue("1");
             pain.setLabel("Pain");
@@ -458,12 +453,12 @@ public class SimpleMedicationAdministrationController extends PluginController {
             Comboitem anxiety = new Comboitem();
             anxiety.setValue("6");
             anxiety.setLabel("Anxiety");
-            prnReasonSelector.appendChild(pain);
-            prnReasonSelector.appendChild(hypertension);
-            prnReasonSelector.appendChild(fever);
-            prnReasonSelector.appendChild(heartburn);
-            prnReasonSelector.appendChild(indigestion);
-            prnReasonSelector.appendChild(anxiety);
+            prnReasonSelector.addChild(pain);
+            prnReasonSelector.addChild(hypertension);
+            prnReasonSelector.addChild(fever);
+            prnReasonSelector.addChild(heartburn);
+            prnReasonSelector.addChild(indigestion);
+            prnReasonSelector.addChild(anxiety);
         }
     }
     
@@ -475,10 +470,10 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * @see org.carewebframework.ui.FrameworkController#doAfterCompose(org.zkoss.zk.ui.Component)
      */
     @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
+    public void afterInitialized(BaseComponent comp) {
+        super.afterInitialized(comp);
         try {
-            MedicationRequest order = (MedicationRequest) arg.get(MedicationActionUtil.MED_ORDER_KEY);
+            MedicationRequest order = (MedicationRequest) comp.getAttribute(MedicationActionUtil.MED_ORDER_KEY);
             populateMedSelector(order);
             populateDoseUnitSelector(order);
             populateFrequencySelector(order);
@@ -492,39 +487,6 @@ public class SimpleMedicationAdministrationController extends PluginController {
         }
     }
     
-    /**
-     * @see org.carewebframework.shell.plugins.IPluginEvent#onLoad(org.carewebframework.shell.plugins.PluginContainer)
-     */
-    @Override
-    public void onLoad(PluginContainer container) {
-        super.onLoad(container);
-        //        container.registerProperties(this, "banner");
-    }
-    
-    /**
-     * @see org.carewebframework.shell.plugins.IPluginEvent#onUnload()
-     */
-    @Override
-    public void onUnload() {
-        super.onUnload();
-    }
-    
-    /**
-     * @see org.carewebframework.shell.plugins.IPluginEvent#onActivate()
-     */
-    @Override
-    public void onActivate() {
-        super.onActivate();
-    }
-    
-    /**
-     * @see org.carewebframework.shell.plugins.IPluginEvent#onInactivate()
-     */
-    @Override
-    public void onInactivate() {
-        super.onInactivate();
-    }
-    
     /******************************************************************
      * Event Handling Methods
      ******************************************************************/
@@ -532,10 +494,11 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * Creates a new medication administration entry if a selection has been made in the medication
      * combo box. If there is not medication selected or no active patient then the method will do
      * nothing.
-     * 
+     *
      * @param event
      */
-    public void onClick$btnMarAdminister(Event event) {
+    @EventHandler(value = "click", target = "btnMarAdminister")
+    private void onClick$btnMarAdminister(Event event) {
         
         Patient patient = PatientContext.getActivePatient();
         
@@ -550,7 +513,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
                     publishJsonPayloadToEpsTopic(administration, MainController.MED_TOPIC);
                 } catch (Exception e) {
                     log.error("Error Invoking EPS", e);
-                    PromptDialog.showWarning("EPS not reachable", "Please ensure EPS service is up and reachable");
+                    DialogUtil.showWarning("EPS not reachable", "Please ensure EPS service is up and reachable");
                 }
                 event.getTarget().getRoot().detach();
                 //initializeMar();
@@ -559,7 +522,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
             }
         } else {
             log.info("No patient context provided or medication selected");//TODO Button must be disabled if no patient has been selected.
-            PromptDialog.showWarning("You must first select a patient and/or a medication to administer",
+            DialogUtil.showWarning("You must first select a patient and/or a medication to administer",
                 "Please first select a patient and medication");
         }
     }
@@ -568,7 +531,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
      * Creates a new medication administration entry if a selection has been made in the medication
      * combo box. If there is not medication selected or no active patient then the method will do
      * nothing.
-     * 
+     *
      * @param event
      */
     public void onClick$btnOrderMedication(Event event) {
@@ -587,7 +550,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
             }
         } else {
             log.info("No patient context provided or medication selected");//TODO Button must be disabled if no patient has been selected.
-            PromptDialog.showWarning("You must first select a patient and/or a medication to administer",
+            DialogUtil.showWarning("You must first select a patient and/or a medication to administer",
                 "Please first select a patient and medication");
         }
         event.getTarget().getRoot().detach();
@@ -595,14 +558,14 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * Method builds and persists a medication administration entered into a form.
-     * 
+     *
      * @param formHelper
      * @param patient
      * @return
      */
     public MedicationAdministration buildMedicationAdministration(MedicationInterventionFormHelper formHelper,
                                                                   Patient patient) {
-        MedicationRequest order = (MedicationRequest) arg.get(MedicationActionUtil.MED_ORDER_KEY);
+        MedicationRequest order = (MedicationRequest) root.getAttribute(MedicationActionUtil.MED_ORDER_KEY);
         MedicationAdministration administration = new MedicationAdministration();
         administration.setPrescriptionTarget(order);
         administration.setMedication(formHelper.getSelectedMedication());
@@ -619,7 +582,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
     
     /**
      * Method builds and persists a medication order entered into a form.
-     * 
+     *
      * @param formHelper
      * @param patient
      * @return
@@ -652,7 +615,7 @@ public class SimpleMedicationAdministrationController extends PluginController {
     /**
      * Method marshals a Medication Administration resource to JSON and publishes it against an EPS
      * topic.
-     * 
+     *
      * @param medAdmin
      * @param epsTopic
      */

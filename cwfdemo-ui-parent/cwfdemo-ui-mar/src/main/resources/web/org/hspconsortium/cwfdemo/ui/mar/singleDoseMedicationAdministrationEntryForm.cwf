@@ -1,0 +1,53 @@
+<window title="${@msg.marplugin.button.medadmin.label}" width="400px"
+	height="250px" controller="${@cwfMarAdminController}"
+	class="flavor:panel-primary cwf-demoConfig">
+	<div name="medEntryForm">
+		<grid>
+			<columns>
+				<column style="text-align:right" />
+				<column />
+				<column style="text-align:right" />
+				<column />
+			</columns>
+			<rows>
+				<row style="background:#FFFFFF;">
+					<label label="Dispensable:" />
+					<rowcell colspan="3">
+						<combobox name="medSelector" readonly="true"
+							hint="Ordered medications" flex="1" />
+					</rowcell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label label="Dose Quantity:" />
+					<decimalbox name="doseQuantity" />
+					<label value="Dose Unit" />
+					<combobox name="doseUnitSelector" readonly="true"
+						hint="Dose unit">
+					</combobox>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label value="Route:" />
+					<combobox name="routeOfAdminSelector"
+						readonly="true" hint="Route of administration">
+					</combobox>
+					<rowcell colspan="2"></rowcell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<label value="Administration Notes:" />
+					<rowcell colspan="3">
+						<textbox name="txReason" />
+					</rowcell>
+				</row>
+				<row style="background:#FFFFFF;">
+					<rowcell colspan="4">
+						<span style="float:right;">
+							<button name="btnMarAdminister"
+								label="${@msg.marplugin.button.administer.label}"
+								hint="${@msg.marplugin.button.administer.tooltip}" />
+						</span>
+					</rowcell>
+				</row>
+			</rows>
+		</grid>
+	</div>
+</window>

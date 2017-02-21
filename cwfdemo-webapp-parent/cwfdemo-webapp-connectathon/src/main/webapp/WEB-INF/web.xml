@@ -111,7 +111,7 @@
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>zkLoader</servlet-name>
-    <url-pattern>*.zul</url-pattern>
+    <url-pattern>*.cwf</url-pattern>
   </servlet-mapping>
   <servlet-mapping>
     <servlet-name>zkLoader</servlet-name>
@@ -127,11 +127,11 @@
     Throwable exception-type handling in both web.xml and zk.xml causes IllegalStateException 
     (response already committed). -->
     <error-code>500</error-code>
-    <location>/zkau/web/org/carewebframework/ui/zk/errorLoading.zul</location>
+    <location>/zkau/web/org/carewebframework/ui/zk/errorLoading.cwf</location>
   </error-page>
   <error-page>
     <error-code>404</error-code>
-    <location>/zkau/web/org/carewebframework/ui/zk/errorLoading.zul</location>
+    <location>/zkau/web/org/carewebframework/ui/zk/errorLoading.cwf</location>
   </error-page>
   <!--
     MaxInactiveInterval (in minutes).
@@ -141,6 +141,6 @@
   </session-config>
 	
   <welcome-file-list>
-    <welcome-file>index.zul</welcome-file>
+    <welcome-file>index.cwf</welcome-file>
   </welcome-file-list>
 </web-app>

@@ -1,19 +1,19 @@
-<zk xmlns="http://www.zkoss.org/2005/zul"
+<zk xmlns="http://www.zkoss.org/2005/cwf"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:w="http://www.zkoss.org/2005/zk/client"
-	xsi:schemaLocation="http://www.zkoss.org/2005/zul http://www.zkoss.org/2005/zul/zul.xsd">
+	xsi:schemaLocation="http://www.zkoss.org/2005/cwf http://www.zkoss.org/2005/cwf/cwf.xsd">
 
-	<panel id="panel" height="100%" width="100%">
+	<panel name="panel" height="100%" width="100%">
 		<panelchildren>
-			<div id="printRoot" height="100%" width="100%" style="overflow:auto;padding:5px"/>
+			<div name="printRoot" height="100%" width="100%" style="overflow:auto;padding:5px"/>
 		</panelchildren>
 		<toolbar>
 			<span style="float:left">
-				<button id="btnPrint" disabled="true"
-					label="${labels.reporting.plugin.btn.print.label}"
-					tooltiptext="${labels.reporting.plugin.btn.print.tooltiptext}" />
+				<button name="btnPrint" disabled="true"
+					label="${@msg.reporting.plugin.btn.print.label}"
+					hint="${@msg.reporting.plugin.btn.print.hint}" />
 			</span>
-			<span id="toolbar" style="float:right" />
+			<span name="toolbar" style="float:right" />
 		</toolbar>
 	</panel>
 </zk>

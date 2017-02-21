@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -29,12 +29,18 @@ import java.util.TreeSet;
 import org.carewebframework.api.query.AbstractQueryFilter;
 import org.carewebframework.api.query.DateQueryFilter.DateType;
 import org.carewebframework.api.query.IQueryContext;
-import org.carewebframework.ui.zk.ListUtil;
-import org.carewebframework.ui.zk.PromptDialog;
+import org.carewebframework.ui.dialog.PromptDialog;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Combobox;
+import org.carewebframework.web.component.Comboitem;
+import org.carewebframework.web.component.Label;
+import org.carewebframework.web.component.Listitem;
+import org.carewebframework.web.component.Toolbar;
 import org.hl7.fhir.dstu3.model.DocumentReference;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Reference;
 import org.hspconsortium.cwf.api.patient.PatientContext;
+import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.hspconsortium.cwf.fhir.common.FhirTerminology;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
@@ -42,77 +48,66 @@ import org.hspconsortium.cwf.fhir.document.DocumentContent;
 import org.hspconsortium.cwf.fhir.document.DocumentListDataService;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
 import org.hspconsortium.cwf.ui.reporting.controller.AbstractListController;
-import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.DocumentAction;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
-import org.zkoss.zul.Label;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Toolbar;
 
 /**
  * Controller for the list-based display of clinical documents.
  */
 public class DocumentListController extends AbstractListController<Document, Document> {
-    
+
     /**
      * Handles filtering by document type.
      */
     private class DocumentTypeFilter extends AbstractQueryFilter<Document> {
-        
+
         @Override
         public boolean include(Document document) {
             String filter = getCurrentFilter();
             return filter == null || document.hasType(filter);
         }
-        
+
         @Override
         public boolean updateContext(IQueryContext context) {
             context.setParam("type", getCurrentFilter());
             return true;
         }
-        
+
     }
-    
-    private static final long serialVersionUID = 1L;
-    
+
     private Toolbar toolbar;
-    
+
     private Combobox cboFilter;
-    
+
     private Comboitem cbiSeparator;
-    
+
     private Label lblFilter;
-    
+
     private Label lblInfo;
-    
+
     private String fixedFilter;
-    
+
     private DocumentDisplayController displayController;
-    
+
     private Document selectedDocument;
-    
+
     private final Collection<String> allTypes;
-    
+
     private final DocumentService documentService;
-    
+
     public DocumentListController(DocumentService service) {
         super(new DocumentListDataService(service), "cwfdocuments", "DOCUMENT", "documentsPrint.css");
         this.documentService = service;
-        setPaging(false);
         registerQueryFilter(new DocumentTypeFilter());
         allTypes = service.getTypes();
     }
-    
+
     @Override
     public void initializeController() {
         super.initializeController();
-        getContainer().registerProperties(this, "fixedFilter");
+        getPlugin().registerProperties(this, "fixedFilter");
         addFilters(allTypes, null, null);
     }
-    
+
     /**
      * This is a good place to update the filter list.
      */
@@ -121,14 +116,14 @@ public class DocumentListController extends AbstractListController<Document, Doc
         if (queryResult != null) {
             updateListFilter(queryResult);
         }
-        
+
         return queryResult;
     }
-    
+
     protected void setDisplayController(DocumentDisplayController displayController) {
         this.displayController = displayController;
     }
-    
+
     /**
      * Presents a quick pick list limited to types present in the unfiltered document list.
      *
@@ -138,43 +133,43 @@ public class DocumentListController extends AbstractListController<Document, Doc
         if (fixedFilter != null) {
             return;
         }
-        
-        List<Comboitem> items = cboFilter.getItems();
-        Set<String> types = new TreeSet<String>(String.CASE_INSENSITIVE_ORDER);
+
+        List<BaseComponent> items = cboFilter.getChildren();
+        Set<String> types = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         String currentFilter = getCurrentFilter();
-        
+
         while (items.get(1) != cbiSeparator) {
             items.remove(1);
         }
-        
+
         cboFilter.setSelectedIndex(0);
-        
+
         if (documents != null) {
             for (Document doc : documents) {
                 types.addAll(doc.getTypes());
             }
         }
-        
+
         addFilters(types, cbiSeparator, currentFilter);
-        
+
         if (currentFilter != null && cboFilter.getSelectedIndex() < 1) {
             ListUtil.selectComboboxItem(cboFilter, currentFilter);
         }
     }
-    
-    private void addFilters(Collection<String> types, Component ref, String selected) {
+
+    private void addFilters(Collection<String> types, BaseComponent ref, String selected) {
         for (String type : types) {
             Comboitem item = new Comboitem(type);
             item.setValue(type);
-            
-            cboFilter.insertBefore(item, ref);
-            
+
+            cboFilter.addChild(item, ref);
+
             if (type.equals(selected)) {
                 cboFilter.setSelectedItem(item);
             }
         }
     }
-    
+
     /**
      * Returns the currently active type filter.
      *
@@ -184,27 +179,27 @@ public class DocumentListController extends AbstractListController<Document, Doc
         return fixedFilter != null ? fixedFilter
                 : cboFilter.getSelectedIndex() > 0 ? (String) cboFilter.getSelectedItem().getValue() : null;
     }
-    
+
     /**
      * Handle change in type filter selection.
      */
     public void onSelect$cboFilter() {
         applyFilters();
     }
-    
+
     /**
      * Selecting document displays view.
      */
-    public void onSelect$listBox() {
-        Listitem item = listBox.getSelectedItem();
-        setSelectedDocument(item == null ? null : (Document) item.getValue());
+    public void onSelect$listbox() {
+        Listitem item = listbox.getSelectedItem();
+        setSelectedDocument(item == null ? null : (Document) item.getData());
     }
-    
+
     public void onClick$btnNew() {
         if (!allowChange()) {
             return;
         }
-        
+
         List<String> itemNames = new ArrayList<>();
         List<Object> items = new ArrayList<>();
         itemNames.add("Lactation Assessment");
@@ -214,11 +209,11 @@ public class DocumentListController extends AbstractListController<Document, Doc
         itemNames.add("Procedure Request");
         items.add("procedure-request");
         String item = (String) PromptDialog.input("Select document type to create.", "New Document", null, itemNames, items);
-        
+
         if (item == null) {
             return;
         }
-        
+
         String displayName = itemNames.get(items.indexOf(item));
         DocumentReference ref = new DocumentReference();
         Patient patient = PatientContext.getActivePatient();
@@ -235,64 +230,64 @@ public class DocumentListController extends AbstractListController<Document, Doc
         refresh();
         setSelectedDocument(newDocument);
     }
-    
+
     private void setSelectedDocument(Document document) {
         if (document == selectedDocument || !allowChange()) {
             return;
         }
-        
+
         selectedDocument = document;
         highlightSelectedDocument();
         displayController.setDocument(document, DocumentAction.DISCARD);
     }
-    
+
     private void highlightSelectedDocument() {
         if (selectedDocument == null) {
-            listBox.clearSelection();
+            listbox.clearSelection();
             return;
         }
-        
-        Listitem item = listBox.getSelectedItem();
-        
+
+        Listitem item = listbox.getSelectedItem();
+
         if (item != null && item.getValue() == selectedDocument) {
             return;
         }
-        
+
         DocumentReference reference = selectedDocument.getReference();
-        
+
         for (Document doc : getFilteredModel()) {
             if (FhirUtil.areEqual(reference, doc.getReference(), true)) {
-                ListUtil.selectListboxData(listBox, doc);
+                ListUtil.selectListboxData(listbox, doc);
                 selectedDocument = doc;
                 return;
             }
         }
-        
+
         getFilteredModel().add(selectedDocument);
         highlightSelectedDocument();
     }
-    
+
     @Override
     protected void afterModelChanged() {
         highlightSelectedDocument();
     }
-    
+
     @Override
     protected void onPatientChanged(Patient patient) {
         toolbar.setVisible(patient != null);
         setSelectedDocument(null);
         super.onPatientChanged(patient);
     }
-    
+
     @Override
     protected String onPatientChanging(boolean silent) {
         return displayController.setDocument(null, silent ? DocumentAction.SAVE : null) ? null : "Edit in progress.";
     }
-    
+
     private boolean allowChange() {
         return displayController.setDocument(null, null);
     }
-    
+
     /**
      * Returns the fixed filter, if any.
      *
@@ -301,7 +296,7 @@ public class DocumentListController extends AbstractListController<Document, Doc
     public String getFixedFilter() {
         return fixedFilter;
     }
-    
+
     /**
      * Sets the fixed filter.
      *
@@ -314,17 +309,17 @@ public class DocumentListController extends AbstractListController<Document, Doc
         lblFilter.setValue(fixedFilter);
         refresh();
     }
-    
+
     @Override
     protected void setListModel(ListModel<Document> model) {
         super.setListModel(model);
         int docCount = model == null ? 0 : model.getSize();
         lblInfo.setValue(docCount + " document(s)");
     }
-    
+
     @Override
     public Date getDateByType(Document result, DateType dateMode) {
         return result.getDateTime();
     }
-    
+
 }

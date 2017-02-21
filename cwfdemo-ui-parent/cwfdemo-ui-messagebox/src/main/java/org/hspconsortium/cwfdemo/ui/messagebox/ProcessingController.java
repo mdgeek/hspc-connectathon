@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,19 +24,17 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.carewebframework.api.context.ISurveyResponse;
 import org.carewebframework.api.domain.DomainFactoryRegistry;
 import org.carewebframework.api.spring.SpringUtil;
 import org.carewebframework.common.StrUtil;
 import org.carewebframework.ui.FrameworkController;
-import org.carewebframework.ui.zk.PopupDialog;
-import org.carewebframework.ui.zk.PromptDialog;
-import org.carewebframework.ui.zk.ZKUtil;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zul.Caption;
-import org.zkoss.zul.Window;
-
+import org.carewebframework.ui.dialog.DialogUtil;
+import org.carewebframework.ui.util.CWFUtil;
+import org.carewebframework.web.annotation.EventHandler;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Window;
+import org.carewebframework.web.event.IEventListener;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hspconsortium.cwf.api.patient.PatientContext;
 import org.hspconsortium.cwf.api.patient.PatientContext.IPatientContextEvent;
@@ -48,11 +46,8 @@ import org.hspconsortium.cwfdemo.ui.messagebox.ViewerController.ActionEvent;
  * Controller for processing messages.
  */
 public class ProcessingController extends FrameworkController implements IPatientContextEvent {
-    
-    
-    private static final long serialVersionUID = 1L;
-    
-    private static final String DIALOG = ZKUtil.getResourcePath(ProcessingController.class) + "processing.zul";
+
+    private static final String DIALOG = CWFUtil.getResourcePath(ProcessingController.class) + "processing.cwf";
     
     private Iterator<MessageWrapper> iterator;
     
@@ -67,31 +62,26 @@ public class ProcessingController extends FrameworkController implements IPatien
     private ViewerController viewer;
     
     private MainController mainController;
-    
-    private Caption caption;
+
+    private Window window;
     
     /**
      * Listens and responds to action events originating from the viewer dialog.
      */
-    private final EventListener<ActionEvent> actionListener = new EventListener<ActionEvent>() {
-        
-        
-        @Override
-        public void onEvent(ActionEvent event) throws Exception {
-            viewerAction = event.getAction();
-            processAction(viewerAction, event.getMessage());
-        }
-        
+    private final IEventListener actionListener = (evt) -> {
+        ActionEvent event = (ActionEvent) evt;
+        viewerAction = event.getAction();
+        processAction(viewerAction, event.getMessage());
     };
     
     /**
      * Creates an amodal instance of the processing dialog.
-     * 
+     *
      * @param mainController The requesting controller.
      * @return The controller associated with the newly created dialog.
      */
     protected static ProcessingController create(MainController mainController) {
-        Window dlg = PopupDialog.popup(DIALOG, false, false, false);
+        Window dlg = DialogUtil.popup(DIALOG, false, false, false);
         ProcessingController controller = (ProcessingController) FrameworkController.getController(dlg);
         controller.mainController = mainController;
         return controller;
@@ -101,22 +91,25 @@ public class ProcessingController extends FrameworkController implements IPatien
      * Creates a message viewer instance for use by this controller.
      */
     @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
+    public void afterInitialized(BaseComponent comp) {
+        super.afterInitialized(comp);
+        window = (Window) comp;
         viewer = ViewerController.create(actionListener);
     }
     
     /**
      * Process the next message.
      */
-    public void onClick$btnNext() {
+    @EventHandler(value = "click", target = "btnNext")
+    private void onClick$btnNext() {
         doNext();
     }
     
     /**
      * Cancel all processing.
      */
-    public void onClick$btnStop() {
+    @EventHandler(value = "click", target = "btnStop")
+    private void onClick$btnStop() {
         cancelProcessing();
     }
     
@@ -131,7 +124,7 @@ public class ProcessingController extends FrameworkController implements IPatien
     
     /**
      * Returns true if message processing is underway.
-     * 
+     *
      * @return True if message processing is underway.
      */
     private boolean isProcessing() {
@@ -149,7 +142,7 @@ public class ProcessingController extends FrameworkController implements IPatien
     
     /**
      * Process the specified messages.
-     * 
+     *
      * @param messages The messages to process.
      */
     public void process(Collection<MessageWrapper> messages) {
@@ -164,7 +157,7 @@ public class ProcessingController extends FrameworkController implements IPatien
     
     /**
      * Handle a message action.
-     * 
+     *
      * @param action The action specified by the user.
      * @param message The message to be acted upon.
      */
@@ -202,8 +195,8 @@ public class ProcessingController extends FrameworkController implements IPatien
         }
         
         MessageWrapper message = iterator.next();
-        caption.setLabel(StrUtil.getLabel("cwfmessagebox.processing.caption", ++currentIndex, total));
-        caption.setTooltiptext(message.getDisplayText());
+        window.setTitle(StrUtil.getLabel("cwfmessagebox.processing.caption", ++currentIndex, total));
+        window.setHint(message.getDisplayText());
         
         if (!iterator.hasNext()) {
             close();
@@ -217,7 +210,7 @@ public class ProcessingController extends FrameworkController implements IPatien
     /**
      * Process a single message. If the message is actionable, an event of the appropriate type is
      * fired. If the event is information-only, it is displayed in the message viewer.
-     * 
+     *
      * @param message The message to process.
      */
     private void process(MessageWrapper message) {
@@ -251,7 +244,7 @@ public class ProcessingController extends FrameworkController implements IPatien
     
     /**
      * Changes the patient context to the patient associated with the message, if any.
-     * 
+     *
      * @param message A message.
      * @return False if a context change was requested and rejected. Otherwise, true.
      */
@@ -275,13 +268,19 @@ public class ProcessingController extends FrameworkController implements IPatien
      * change request originated from this controller.
      */
     @Override
-    public String pending(boolean silent) {
-        if (!requestingContextChange && !silent && isProcessing()
-                && !PromptDialog.confirm("@cwfmessagebox.processing.cancel.confirm.prompt")) {
-            return StrUtil.formatMessage("@cwfmessagebox.processing.cancel.rejected.message");
+    public void pending(ISurveyResponse response) {
+        if (!requestingContextChange && !response.isSilent() && isProcessing()) {
+            DialogUtil.confirm("@cwfmessagebox.processing.cancel.confirm.prompt", (confirm) -> {
+                if (confirm) {
+                    response.reject(StrUtil.formatMessage("@cwfmessagebox.processing.cancel.rejected.message"));
+                } else {
+                    response.accept();
+                }
+            });
+            response.defer();
+        } else {
+            response.accept();
         }
-        
-        return null;
     }
     
     /**

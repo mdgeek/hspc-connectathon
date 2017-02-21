@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,19 +20,19 @@
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import org.carewebframework.ui.FrameworkController;
-import org.carewebframework.ui.zk.PromptDialog;
-import org.carewebframework.ui.zk.ZKUtil;
+import org.carewebframework.ui.dialog.PromptDialog;
+import org.carewebframework.web.ancillary.MimeContent;
+import org.carewebframework.web.annotation.WiredComponent;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Button;
+import org.carewebframework.web.component.Div;
+import org.carewebframework.web.component.Html;
+import org.carewebframework.web.component.Iframe;
+import org.carewebframework.web.component.Import;
+import org.carewebframework.web.component.Label;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentContent;
 import org.hspconsortium.cwf.ui.reporting.Util;
-import org.zkoss.util.media.AMedia;
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.Div;
-import org.zkoss.zul.Html;
-import org.zkoss.zul.Iframe;
-import org.zkoss.zul.Include;
-import org.zkoss.zul.Label;
 
 /**
  * Controller for displaying the contents of selected documents.
@@ -49,17 +49,32 @@ public class DocumentDisplayController extends FrameworkController {
     }
     
     public enum DocumentAction {
-        SAVE, DISCARD, CANCEL, DELETED
-    };
-    
-    private static final long serialVersionUID = 1L;
+        SAVE("Save Changes"), DISCARD("Discard Changes"), CANCEL("Keep Editing"), DELETED("?");
+
+        private final String displayValue;
+
+        DocumentAction(String displayValue) {
+            this.displayValue = displayValue;
+        }
+
+        @Override
+        public String toString() {
+            return displayValue;
+        }
+    }
     
     public static final String QUESTIONNAIRE_CONTENT_TYPE = "application/xcwf-";
     
-    private Component toolbar;
+    private static final DocumentAction[] ACTION_OPTIONS = { DocumentAction.SAVE, DocumentAction.DISCARD,
+            DocumentAction.CANCEL };
     
+    @WiredComponent
+    private BaseComponent toolbar;
+    
+    @WiredComponent
     private Button btnPrint;
     
+    @WiredComponent
     private Div printRoot;
     
     private Document document;
@@ -74,38 +89,56 @@ public class DocumentDisplayController extends FrameworkController {
      * @param document The document to be displayed.
      * @param action The default action to take if document has been modified (if null, prompt for
      *            action).
-     * @return True if the document was set.
      */
-    protected boolean setDocument(Document document, DocumentAction action) {
+    protected void setDocument(Document document, DocumentAction action) {
         if (documentOperation != null && documentOperation.hasChanged()) {
-            action = action != null ? action
-                    : DocumentAction.values()[PromptDialog.show("What would you like to do?", "Pending Changes",
-                        "Save Changes|Discard Changes|Keep Editing")];
-            
-            switch (action) {
-                case SAVE: // Save
-                    documentOperation.saveChanges();
-                    break;
-                
-                case DISCARD: // Discard
-                    documentOperation.cancelChanges();
-                    break;
-                
-                case CANCEL: // Cancel
-                    return false;
-                
-                case DELETED:
-                    refreshListController();
-                    break;
+            if (action != null) {
+                if (doAction(action)) {
+                    updateDocument(document);
+                }
+
+                return;
             }
+            
+            PromptDialog.show("What would you like to do?", "Pending Changes", null, ACTION_OPTIONS, null, null, null,
+                (response) -> {
+                    if (doAction(response.getResponse())) {
+                        updateDocument(document);
+                    }
+                });
+        } else {
+            updateDocument(document);
+        }
+    }
+    
+    private boolean doAction(DocumentAction action) {
+        switch (action) {
+            case SAVE: // Save
+                documentOperation.saveChanges();
+                break;
+            
+            case DISCARD: // Discard
+                documentOperation.cancelChanges();
+                break;
+            
+            case CANCEL: // Cancel
+                return false;
+            
+            case DELETED:
+                refreshListController();
+                break;
         }
         
+        return true;
+    }
+    
+    private void updateDocument(Document document) {
         documentOperation = null;
         this.document = document;
         
         if (printRoot != null) {
-            ZKUtil.detachChildren(printRoot);
-            ZKUtil.detachChildren(toolbar);
+            printRoot.destroyChildren();
+            toolbar.destroyChildren();
             btnPrint.setDisabled(document == null);
         }
         
@@ -114,36 +147,32 @@ public class DocumentDisplayController extends FrameworkController {
                 String ctype = content.getContentType();
                 
                 if (ctype.startsWith(QUESTIONNAIRE_CONTENT_TYPE)) {
-                    String zul = "~./org/hspconsortium/cwfdemo/ui/mockuments/"
-                            + ctype.substring(QUESTIONNAIRE_CONTENT_TYPE.length()) + ".zul"; // Hack - need to register these somehow
-                    Include include = new Include();
+                    String cwf = "web/org/hspconsortium/cwfdemo/ui/mockuments/"
+                            + ctype.substring(QUESTIONNAIRE_CONTENT_TYPE.length()) + ".cwf"; // Hack - need to register these somehow
+                    Import include = new Import();
                     include.setAttribute("document", document);
                     include.setAttribute("displayController", this);
-                    include.setSrc(zul);
-                    printRoot.appendChild(include);
+                    include.setSrc(cwf);
+                    printRoot.addChild(include);
                 } else if (ctype.equals("text/html")) {
                     Html html = new Html();
                     html.setContent(content.toString());
-                    printRoot.appendChild(html);
+                    printRoot.addChild(html);
                 } else if (ctype.equals("text/plain")) {
                     Label lbl = new Label(content.toString());
-                    lbl.setMultiline(true);
-                    lbl.setPre(true);
-                    printRoot.appendChild(lbl);
+                    printRoot.addChild(lbl);
                 } else {
-                    AMedia media = new AMedia(null, null, content.getContentType(), content.getData());
+                    MimeContent mc = new MimeContent(content.getContentType(), content.getData());
                     Iframe frame = new Iframe();
-                    frame.setContent(media);
-                    printRoot.appendChild(frame);
+                    frame.setContent(mc);
+                    printRoot.addChild(frame);
                 }
             }
             
             if (printRoot.getFirstChild() == null) {
-                printRoot.appendChild(new Label("Document has no content."));
+                printRoot.addChild(new Label("Document has no content."));
             }
         }
-        
-        return true;
     }
     
     public void setListController(DocumentListController listController) {
@@ -154,11 +183,11 @@ public class DocumentDisplayController extends FrameworkController {
         Util.print(printRoot, document.getTitle(), "patient", null, false);
     }
     
-    protected void addToToolbar(Component source) {
+    protected void addToToolbar(BaseComponent source) {
         moveComponents(source, toolbar);
     }
     
-    protected void removeFromToolbar(Component target) {
+    protected void removeFromToolbar(BaseComponent target) {
         moveComponents(toolbar, target);
     }
     
@@ -170,8 +199,8 @@ public class DocumentDisplayController extends FrameworkController {
         listController.refresh();
     }
     
-    private void moveComponents(Component source, Component target) {
-        Component child;
+    private void moveComponents(BaseComponent source, BaseComponent target) {
+        BaseComponent child;
         
         while ((child = source.getFirstChild()) != null) {
             child.setParent(target);

@@ -1,0 +1,21 @@
+<div name="mar" controller="${cwfMarMainController}" class="cwf-layout-vertical">
+    <toolbar>
+        <button name="btnVerbalOrder" label="${@msg.marplugin.button.verbalorder.label}"
+            hint="${@msg.marplugin.button.verbalorder.hint}"/>
+        <div flex="1"/>
+        <button name="btnMarRefresh" label="${@msg.marplugin.button.refresh.label}"
+            hint="${@msg.marplugin.button.refresh.hint}"/>
+        <button name="btnMarClear" label="${@msg.marplugin.button.clear.label}"
+            hint="${@msg.marplugin.button.clear.hint}"/>
+        <button name="btnMarSepsis" label="${@msg.marplugin.button.sepsis.label}"
+            hint="${@msg.marplugin.button.sepsis.hint}"/>
+        <button name="btnMarGenTest" label="${@msg.marplugin.button.gentest.label}"
+            hint="${@msg.marplugin.button.gentest.hint}"/>
+    </toolbar>
+    <grid name="marGrid" width="100%">
+        <columns>
+            <column label="Medication"/>
+        </columns>
+        <rows/>
+    </grid>
+</div>

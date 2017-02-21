@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,28 +21,28 @@ package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import java.util.Date;
 
+import org.carewebframework.web.component.BaseComponent;
 import org.hl7.fhir.dstu3.model.Coding;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemAnswerComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseItemComponent;
 import org.hl7.fhir.dstu3.model.QuestionnaireResponse.QuestionnaireResponseStatus;
+import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
 import org.hspconsortium.cwf.fhir.common.FhirUtil;
 import org.hspconsortium.cwf.fhir.document.Document;
 import org.hspconsortium.cwf.fhir.document.DocumentService;
-import org.hspconsortium.cwf.api.scenario.ScenarioUtil;
-import org.zkoss.zk.ui.Component;
 
 public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
-    
+
     private final DocumentService service;
-    
+
     QuestionnaireResponseHandler(DocumentService service) {
         super("questionnaire-response");
         this.service = service;
     }
-    
+
     @Override
-    public void processResponses(Document document, final Component root, org.w3c.dom.Document responses) {
+    public void processResponses(Document document, final BaseComponent root, org.w3c.dom.Document responses) {
         final QuestionnaireResponse qr = new QuestionnaireResponse();
         ScenarioUtil.copyDemoTags(document.getReference(), qr);
         //String ref = (String) root.getAttribute("questionnaire_reference");
@@ -51,12 +51,13 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
         qr.setAuthor(FhirUtil.getFirst(document.getReference().getAuthor()));
         qr.setStatus(QuestionnaireResponseStatus.COMPLETED);
         qr.setAuthored(new Date());
-        
+
         processResponses(responses, new BaseQuestionnaireHandler.IResponseProcessor() {
-            
+
             @Override
             public void processResponse(String value, String targetId) {
-                Component target = root.getFellowIfAny(targetId);
+                BaseComponent target = root.findByName(targetId);
+
                 if (target.hasAttribute("linkId")) {
                     QuestionnaireResponseItemComponent item = new QuestionnaireResponseItemComponent();
                     qr.addItem(item);
@@ -73,8 +74,8 @@ public class QuestionnaireResponseHandler extends BaseQuestionnaireHandler {
                 }
             };
         });
-        
+
         service.createResource(qr);
     }
-    
+
 }

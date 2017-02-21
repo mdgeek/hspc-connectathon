@@ -7,9 +7,9 @@
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -21,19 +21,17 @@ package org.hspconsortium.cwfdemo.ui.messagebox;
 
 import org.carewebframework.api.event.IGenericEvent;
 import org.carewebframework.ui.FrameworkController;
-import org.carewebframework.ui.zk.AbstractListitemRenderer;
-import org.carewebframework.ui.zk.PopupDialog;
-import org.carewebframework.ui.zk.PromptDialog;
-import org.carewebframework.ui.zk.ZKUtil;
-
-import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zul.Button;
-import org.zkoss.zul.ListModel;
-import org.zkoss.zul.ListModelList;
-import org.zkoss.zul.Listbox;
-import org.zkoss.zul.Listitem;
-
+import org.carewebframework.ui.dialog.DialogUtil;
+import org.carewebframework.ui.render.AbstractRenderer;
+import org.carewebframework.ui.util.CWFUtil;
+import org.carewebframework.web.annotation.WiredComponent;
+import org.carewebframework.web.component.BaseComponent;
+import org.carewebframework.web.component.Button;
+import org.carewebframework.web.component.Grid;
+import org.carewebframework.web.component.Row;
+import org.carewebframework.web.event.ClickEvent;
+import org.carewebframework.web.event.DblclickEvent;
+import org.carewebframework.web.model.ListModel;
 import org.hspconsortium.cwfdemo.api.ucs.MessageService;
 import org.hspconsortium.cwfdemo.api.ucs.ScheduledMessage;
 
@@ -41,25 +39,23 @@ import org.hspconsortium.cwfdemo.api.ucs.ScheduledMessage;
  * Controller for viewing scheduled messages.
  */
 public class SchedulingController extends FrameworkController {
-    
-    
-    private static final long serialVersionUID = 1L;
-    
-    private static final String DIALOG = ZKUtil.getResourcePath(SchedulingController.class) + "scheduling.zul";
+
+    private static final String DIALOG = CWFUtil.getResourcePath(SchedulingController.class) + "scheduling.cwf";
     
     /**
      * Renders the scheduled messages.
      */
-    private final AbstractListitemRenderer<ScheduledMessage, Object> renderer = new AbstractListitemRenderer<ScheduledMessage, Object>() {
-        
-        
+    private final AbstractRenderer<Row, ScheduledMessage> renderer = new AbstractRenderer<Row, ScheduledMessage>() {
+
         @Override
-        protected void renderItem(Listitem item, ScheduledMessage message) {
-            createCell(item, null).setImage(UrgencyRenderer.getIconPath(message.getUrgency()));
-            createCell(item, message.getDeliveryDate());
-            createCell(item, message.getPatientName());
-            createCell(item, message.getSubject());
-            item.addForward(Events.ON_DOUBLE_CLICK, btnModify, Events.ON_CLICK);
+        public Row render(ScheduledMessage message) {
+            Row row = new Row();
+            createImage(row, UrgencyRenderer.getIconPath(message.getUrgency()));
+            createLabel(row, message.getDeliveryDate());
+            createLabel(row, message.getPatientName());
+            createLabel(row, message.getSubject());
+            row.addEventForward(DblclickEvent.TYPE, btnModify, ClickEvent.TYPE);
+            return row;
         }
     };
     
@@ -67,8 +63,7 @@ public class SchedulingController extends FrameworkController {
      * Listens to events related to scheduled messages.
      */
     private final IGenericEvent<String> alertEventListener = new IGenericEvent<String>() {
-        
-        
+
         @Override
         public void eventCallback(String eventName, String eventData) {
             refresh();
@@ -76,28 +71,31 @@ public class SchedulingController extends FrameworkController {
         
     };
     
-    private Listbox lstScheduled;
+    @WiredComponent
+    private Grid grdScheduled;
     
+    @WiredComponent
     private Button btnModify;
     
+    @WiredComponent
     private Button btnDelete;
     
     private MessageService service;
     
-    private final ListModelList<ScheduledMessage> model = new ListModelList<>();
+    private final ListModel<ScheduledMessage> model = new ListModel<>();
     
     /**
      * Displays the scheduling controller modally.
      */
     public static void show() {
-        PopupDialog.popup(DIALOG, true, false);
+        DialogUtil.popup(DIALOG, true, false);
     }
     
     /**
      * Update controls to reflect the current selection state.
      */
     private void updateControls() {
-        btnModify.setDisabled(lstScheduled.getSelectedItem() == null);
+        btnModify.setDisabled(grdScheduled.getRows().getSelectedRow() == null);
         btnDelete.setDisabled(btnModify.isDisabled());
     }
     
@@ -105,14 +103,14 @@ public class SchedulingController extends FrameworkController {
      * Adds a new scheduled message.
      */
     public void onClick$btnAdd() {
-        ScheduleController.show(null);
+        ScheduleController.show(null, null);
     }
     
     /**
      * Modifies an existing scheduled message.
      */
     public void onClick$btnModify() {
-        ScheduleController.show(getSelected());
+        ScheduleController.show(getSelected(), null);
     }
     
     /**
@@ -125,7 +123,7 @@ public class SchedulingController extends FrameworkController {
     /**
      * Update controls when the selection changes.
      */
-    public void onSelect$lstScheduled() {
+    public void onSelect$grdScheduled() {
         updateControls();
     }
     
@@ -133,33 +131,30 @@ public class SchedulingController extends FrameworkController {
      * Delete the selected scheduled message.
      */
     public void onClick$btnDelete() {
-        if (PromptDialog.confirm("@cwfmessagebox.scheduling.delete.confirm.prompt")) {
-            service.deleteScheduledMessage(getSelected());
-        }
+        DialogUtil.confirm("@cwfmessagebox.scheduling.delete.confirm.prompt", (confirm) -> {
+            if (confirm) {
+                service.deleteScheduledMessage(getSelected());
+            }
+        });
     }
     
     /**
      * Returns the currently selected message.
-     * 
+     *
      * @return The currently selected message.
      */
     private ScheduledMessage getSelected() {
-        return (ScheduledMessage) lstScheduled.getSelectedItem().getValue();
-    }
-    
-    @Override
-    public void doBeforeComposeChildren(Component comp) throws Exception {
-        super.doBeforeComposeChildren(comp);
-        comp.setAttribute("iconUrgency", Constants.ICON_URGENCY);
+        return (ScheduledMessage) grdScheduled.getRows().getSelectedRow().getData();
     }
     
     /**
      * Initialize the dialog.
      */
     @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
-        lstScheduled.setItemRenderer(renderer);
+    public void afterInitialized(BaseComponent comp) {
+        super.afterInitialized(comp);
+        comp.setAttribute("iconUrgency", Constants.ICON_URGENCY);
+        grdScheduled.getRows().setRenderer(renderer);
         refresh();
         getEventManager().subscribe("MESSAGE.SCHEDULE", alertEventListener);
     }
@@ -169,10 +164,10 @@ public class SchedulingController extends FrameworkController {
      */
     @Override
     public void refresh() {
-        lstScheduled.setModel((ListModel<?>) null);
+        grdScheduled.getRows().setModel(null);
         model.clear();
         model.addAll(service.getScheduledMessages());
-        lstScheduled.setModel(model);
+        grdScheduled.getRows().setModel(model);
         updateControls();
     }
     
@@ -185,7 +180,7 @@ public class SchedulingController extends FrameworkController {
     
     /**
      * Allows IOC container to inject message service.
-     * 
+     *
      * @param service Message service.
      */
     public void setMessageService(MessageService service) {

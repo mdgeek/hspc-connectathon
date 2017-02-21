@@ -1,0 +1,9 @@
+<window class="flavor:panel-info panel-sm" controller="${@cwfMessageboxProcessingController}"
+	visible="false">
+	<div style="text-align:center">
+		<button name="btnNext" class="flavor:btn-success size:btn-xs"
+			label="${@msg.cwfmessagebox.processing.button.next.label}"/>
+		<button name="btnStop" class="flavor:btn-danger size:btn-xs"
+			label="${@msg.cwfmessagebox.processing.button.stop.label}"/>
+	</div>
+</window>

@@ -11,7 +11,7 @@
 	<beans profile="root">
 
 		<cwp:plugin
-			url="~./org/hspconsortium/cwfdemo/ui/devices/devices.zul"
+			url="web/org/hspconsortium/cwfdemo/ui/devices/devices.cwf"
 			id="cwfDevices" name="Devices Display">
 			<cwp:resource>
 				<cwp:help-resource module="cwfDevicesHelp" />
@@ -29,7 +29,7 @@
 
 	</beans>
 
-	<beans profile="desktop">
+	<beans profile="child">
 
 		<!-- Controllers -->
 		<bean id="cwfDevicesMainController"

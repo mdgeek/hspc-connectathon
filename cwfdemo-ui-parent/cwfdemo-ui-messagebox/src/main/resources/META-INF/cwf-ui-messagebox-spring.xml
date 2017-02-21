@@ -9,7 +9,7 @@
 
 	<beans profile="root">
 
-		<cwp:plugin url="~./org/hspconsortium/cwfdemo/ui/messagebox/main.zul"
+		<cwp:plugin url="web/org/hspconsortium/cwfdemo/ui/messagebox/main.cwf"
 			id="cwfMessagebox" name="Message Viewer" lazyLoad="false">
 			<cwp:serialization>
 				<cwp:property id="caption" name="Title Caption" type="text"
@@ -50,13 +50,13 @@
 			</cwp:serialization>
 			<cwp:resource>
 				<cwp:help-resource module="cwfMessageboxHelp" />
-				<cwp:css-resource url="~./org/hspconsortium/cwfdemo/ui/messagebox/messagebox.css" />
+				<cwp:css-resource url="web/org/hspconsortium/cwfdemo/ui/messagebox/messagebox.css" />
 			</cwp:resource>
 		</cwp:plugin>
 
 	</beans>
 
-	<beans profile="desktop">
+	<beans profile="child">
 
 		<bean id="cwfMessageboxMainController" class="org.hspconsortium.cwfdemo.ui.messagebox.MainController"
 			scope="prototype">
