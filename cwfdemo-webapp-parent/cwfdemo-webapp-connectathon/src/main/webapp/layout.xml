@@ -3,15 +3,15 @@
     <_menubar>
         <menuitem label="Actions">
             <menuitem
-                action="zscript:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show();"
+                action="sscript-groovy:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show();"
                 hint="Show patient selection dialog."
                 label="Select a Patient" />
             <menuitem
-                action="zscript:org.carewebframework.api.event.EventManager.getInstance().fireLocalEvent(&quot;VIEW.REFRESH&quot;, null);"
+                action="sscript-groovy:org.carewebframework.api.event.EventManager.getInstance().fireLocalEvent(&quot;VIEW.REFRESH&quot;, null);"
                 hint="Refresh patient data."
                 label="Refresh" />
             <menuitem
-                action="zscript:org.hspconsortium.cwf.ui.scenario.ScenarioManagerController.show();"
+                action="sscript-groovy:org.hspconsortium.cwf.ui.scenario.ScenarioManagerController.show();"
                 hint="Manage scenario data."
                 label="Manage Scenarios" />
         </menuitem>
