@@ -52,53 +52,53 @@ import org.hspconsortium.cwfdemo.ui.mar.model.MarModel;
  * @author cnanjo
  */
 public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
-    
+
     /**
      * Formats dates to the form 12:05 PM
      */
     public static SimpleDateFormat hourMinuteFormatter = new SimpleDateFormat("hh:mm a");
-    
+
     /**
      * The placeholder to replace with the appropriate image
      */
     private String imagePlaceholder;
-    
+
     /**
      * The image to fill in the cell in place of the placeholder marker
      */
     private String imagePath;
-    
+
     private MainController marController;
-    
+
     public class SignMedAdminListener implements IEventListener {
-        
+
         private MedicationRequest prescription;
-        
+
         private final MainController marController;
-        
+
         public SignMedAdminListener(MainController marController, MedicationRequest prescription) {
             this.prescription = prescription;
             this.marController = marController;
         }
-        
+
         @Override
         public void onEvent(Event event) {
             MedicationActionUtil.show(false, prescription);
             marController.initializeMar();
         }
-        
+
         public MedicationRequest getPrescription() {
             return prescription;
         }
-        
+
         public void setPrescription(MedicationRequest prescription) {
             this.prescription = prescription;
         }
     }
-    
+
     public MarRenderer() {
     }
-    
+
     /**
      * Constructor
      *
@@ -112,14 +112,14 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
         this.imagePlaceholder = imagePlaceholder;
         this.marController = marController;
     }
-    
+
     /**
      * Renders a MAR in the grid
      */
     @Override
     public Row render(List<Object> data) {
         Row row = new Row();
-        
+
         for (Object s : data) {
             if (s instanceof MedicationRequest) {
                 //    			Button sign = new Button("Administer");
@@ -143,14 +143,14 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
             } else {
                 Image image = new Image();
                 image.setSrc(imagePath);
-                
+
                 row.addChild(image);
             }
         }
-
+        
         return row;
     }
-    
+
     /**
      * Returns the path to the image
      *
@@ -159,7 +159,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
     public String getImagePath() {
         return imagePath;
     }
-    
+
     /**
      * Sets the path to the image icon
      *
@@ -168,7 +168,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
     public void setImagePath(String imagePath) {
         this.imagePath = imagePath;
     }
-    
+
     /**
      * Returns the placeholder for the image
      *
@@ -177,7 +177,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
     public String getImagePlaceholder() {
         return this.imagePlaceholder;
     }
-    
+
     /**
      * Sets the image placeholder text
      *
@@ -186,7 +186,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
     public void setImagePlaceholder(String imagePlaceholder) {
         this.imagePlaceholder = imagePlaceholder;
     }
-    
+
     public static String getUnitLabel(String unit) {
         if (unit == null || !unit.equals("{tbl}")) {
             return unit;
@@ -194,7 +194,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
             return "tablet";
         }
     }
-    
+
     /**
      * Convenience method to initialize a ZK grid based on the information contained in this model.
      *
@@ -206,18 +206,18 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
         if (marRenderer != null) {
             grid.getRows().setRenderer(marRenderer);
         }
-        grid.getColumns().getChildren().clear();
+        grid.getColumns().destroyChildren();
         marModel.getHeaders();
         for (String header : marModel.getHeaders()) {
             grid.getColumns().addChild(new Column(header));
         }
         grid.getColumns().addChild(new Column("Current Time"));
         grid.getRows().setModel(marModel.getRows());
-        
+
         //Set width of medication column
         ((Column) grid.getColumns().getChildren().get(0)).setWidth("200px");
     }
-    
+
     /**
      * Method takes a list of valid medication orders and convert that list into a list of order
      * sentences for the given orders.
@@ -232,7 +232,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
         }
         return sentences;
     }
-    
+
     /**
      * Method takes a medication order and converts it into an order sentence of the form:
      * dispensable route frequency TODO Adjust template as necessary
@@ -265,7 +265,7 @@ public class MarRenderer implements IComponentRenderer<Row, List<Object>> {
         }
         return sentence.toString();
     }
-    
+
     public static void recordAdministrationNotes(List<Object> row, int index, MedicationAdministration medAdmin,
                                                  MedicationRequest order, String username) {
         String item = (String) row.get(index);

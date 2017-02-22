@@ -35,6 +35,7 @@ import org.apache.commons.logging.LogFactory;
 import org.carewebframework.api.context.ISurveyResponse;
 import org.carewebframework.shell.plugins.PluginController;
 import org.carewebframework.web.annotation.EventHandler;
+import org.carewebframework.web.annotation.WiredComponent;
 import org.carewebframework.web.component.BaseComponent;
 import org.carewebframework.web.component.Grid;
 import org.hl7.fhir.dstu3.model.Identifier;
@@ -53,53 +54,54 @@ import org.hspconsortium.cwfdemo.ui.mar.render.MarRenderer;
  * MARs) TODO: Add paging support. Add windows for limit displays.
  */
 public class MainController extends PluginController implements PatientContext.IPatientContextEvent {
-    
+
     /**
      * Topic where new medication administrations will be published.
      */
     public static final String MED_TOPIC = "/Meds";
-
+    
     private static final Log log = LogFactory.getLog(MainController.class);
-
+    
     /**
      * Service used to create, update, and/or delete medication-related resources from a FHIR server
      * to support MAR operations.
      */
     private final MedicationService medicationService;
-
+    
     /**
      * Event Publish Subscribe service for the publication of notifications against publication
      * topics.
      */
     private final EPSService epsService;
-
+    
     /**
      * Grid widget for representing medication administrations along a timeline.
      */
+    @WiredComponent
     private Grid marGrid;
-
+    
     /**
      * A dynamic MAR grid row renderer associated with this MAR
      */
     private final MarRenderer marRowRenderer = new MarRenderer(this, MarModel.checkboxPlaceholder, "checkmark.gif");
-
+    
     /**
      * Widget human-friendly title
      */
     private String title = "Medication Administration Record";
-
+    
     /**
      * Convenience identifier to group medication administrations created using the MAR. This
      * identifier can be useful for bulk updates and deletes.
      */
     private final Identifier generatedMedAdminsIdentifier = new Identifier()
             .setSystem("urn:cogmedsys:hsp:model:medicationadministration").setValue("gen");
-
+    
     public MainController(EPSService epsService, MedicationService medicationService) {
         this.epsService = epsService;
         this.medicationService = medicationService;
     }
-
+    
     /**
      * Returns the human-friendly name for this MAR plugin
      *
@@ -108,7 +110,7 @@ public class MainController extends PluginController implements PatientContext.I
     public String getTitle() {
         return title;
     }
-
+    
     /**
      * Sets the human-friendly name for this MAR plugin
      *
@@ -117,7 +119,7 @@ public class MainController extends PluginController implements PatientContext.I
     public void setTitle(String title) {
         this.title = title;
     }
-
+    
     /**
      * Fetches medication administrations for this patient and then initializes and refreshes the
      * MAR Grid widget. TODO: May need to add a time range or other criteria for the medication
@@ -134,7 +136,7 @@ public class MainController extends PluginController implements PatientContext.I
             log.info("No patient context defined at this time. Grid not initialized");
         }
     }
-
+    
     /**
      * Method marshals a Medication Administration resource to JSON and publishes it against an EPS
      * topic.
@@ -146,11 +148,11 @@ public class MainController extends PluginController implements PatientContext.I
         epsService.publishResourceToTopic(epsTopic, medAdmin, "New Medication Administration",
             "New Medication Administration");
     }
-
+    
     /******************************************************************
      * Overridden Supertype Methods
      ******************************************************************/
-
+    
     /**
      * @see org.carewebframework.ui.FrameworkController#doAfterCompose(org.zkoss.zk.ui.Component)
      */
@@ -160,7 +162,7 @@ public class MainController extends PluginController implements PatientContext.I
         initializeMar();
         log.trace("Controller composed");
     }
-
+    
     /**
      * @see org.carewebframework.shell.plugins.IPluginEvent#onActivate()
      */
@@ -170,7 +172,7 @@ public class MainController extends PluginController implements PatientContext.I
         //lblDate.setValue(new Date().toString());
         initializeMar();
     }
-
+    
     /**
      * @see org.carewebframework.shell.plugins.IPluginEvent#onInactivate()
      */
@@ -178,7 +180,7 @@ public class MainController extends PluginController implements PatientContext.I
     public void onInactivate() {
         super.onInactivate();
     }
-
+    
     /**
      * Fetches the latest patient medication administration records and refresh the view.
      */
@@ -186,7 +188,7 @@ public class MainController extends PluginController implements PatientContext.I
     private void onClick$btnMarRefresh() {
         initializeMar();
     }
-
+    
     /**
      * Clears the patient's medication administration records. Obviously for a demo on should not
      * remain if this demo plugin is adapted for production use cases.
@@ -196,7 +198,7 @@ public class MainController extends PluginController implements PatientContext.I
         medicationService.deleteResourcesByIdentifier(generatedMedAdminsIdentifier, MedicationAdministration.class);
         initializeMar();
     }
-
+    
     /**
      * Button handler for the addition of verbal orders. Each added verbal order will be displayed
      * as a row on the MAR.
@@ -206,21 +208,21 @@ public class MainController extends PluginController implements PatientContext.I
         MedicationActionUtil.show(true);
         initializeMar();
     }
-
+    
     @Override
     public void pending(ISurveyResponse response) {
         response.accept();
     }
-
+    
     @Override
     public void committed() {
         initializeMar();
-
+        
     }
-
+    
     @Override
     public void canceled() {
         // NOP
     }
-
+    
 }

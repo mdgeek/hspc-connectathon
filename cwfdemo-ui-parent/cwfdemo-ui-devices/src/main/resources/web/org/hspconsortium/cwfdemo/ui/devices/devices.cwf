@@ -1,35 +1,34 @@
 <div name="devicesWindow" controller="${@cwfDevicesMainController}" height="100%" width="100%">
     <paneview height="100%">
-        <pane size="10%" style="border:none" splittable="true">
+        <pane style="border:none" splittable="true">
             <div class="cwf-layout-horizontal" style="padding:20px">
                 <div class="cwf-layout-horizontal" style="padding:7px">
-                    <label class="name" value="Device:"/>
+                    <label class="name" label="Device:"/>
                     <combobox name="cboDevice"/>
                 </div>
                 <div class="cwf-layout-horizontal" style="padding:7px">
-                    <label class="name" value="Component:"/>
+                    <label class="name" label="Component:"/>
                     <combobox name="cboComponent"/>
                 </div>
             </div>
         </pane>
-        <pane style="border:none" splittable="true">
+        <pane flex="1" style="border:none" splittable="true">
             <hchart name="chart" height="100%" width="100%" type="line" title="Observations"/>
         </pane>
-        <pane size="10%" style="border:none" splittable="false">
+        <pane style="border:none" splittable="false">
             <div class="cwf-layout-horizontal" style="padding:20px">
                 <div class="cwf-layout-horizontal" style="padding:7px">
-                    <label value="Code:"/>
+                    <label label="Code:"/>
                     <textbox name="newObservationCodeTxt" value="ABC"/>
                 </div>
                 <div class="cwf-layout-horizontal" style="padding:7px">
-                    <label value="Value:"/>
+                    <label label="Value:"/>
                     <textbox name="newObservationTxt" value="10"/>
                 </div>
                 <div class="cwf-layout-horizontal" style="padding:7px">
-                    <label value="Timestamp:"/>
-                    <datebox name="newObservationDate" onCreate="self.value = new Date()"/>
-                    <timebox name="newObservationTime" cols="6" format="HH:mm:ss"
-                        onCreate="self.value = new Date()"/>
+                    <label label="Timestamp:"/>
+                    <datebox name="newObservationDate" value="T" />
+                    <timebox name="newObservationTime" value="N" />
                 </div>
                 <div class="cwf-layout-horizontal" style="padding:7px">
                     <button name="btnSendObservation" label="Send New Observation"/>

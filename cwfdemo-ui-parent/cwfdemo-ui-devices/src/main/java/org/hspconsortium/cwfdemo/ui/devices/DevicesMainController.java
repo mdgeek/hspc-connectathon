@@ -121,7 +121,7 @@ public class DevicesMainController extends PluginController {
     @WiredComponent
     private Chart chart;
     
-    private Map<String, Series> series = new HashMap<>();
+    private final Map<String, Series> series = new HashMap<>();
     
     public DevicesMainController() {
     }
@@ -369,7 +369,7 @@ public class DevicesMainController extends PluginController {
         chart.getYAxis().gridLineWidth = 1;
         chart.getYAxis().title.text = "Value";
         
-        series = new HashMap<>();
+        series.clear();
         
         chart.run();
     }

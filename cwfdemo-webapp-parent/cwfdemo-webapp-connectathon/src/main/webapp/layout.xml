@@ -3,7 +3,7 @@
     <_menubar>
         <menuitem label="Actions">
             <menuitem
-                action="sscript-groovy:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show();"
+                action="sscript-groovy:org.hspconsortium.cwf.ui.patientselection.PatientSelection.show(true, null);"
                 hint="Show patient selection dialog."
                 label="Select a Patient" />
             <menuitem
@@ -21,7 +21,7 @@
         <link action="cwf.shell.logout" color="gray" hint="Logout the application" label="Logout" size="TINY"/>
     </_toolbar>
     <splitterview orientation="vertical">
-        <splitterpane relative="false" size="30">
+        <splitterpane relative="false" size="60">
             <splitterview orientation="horizontal">
                 <splitterpane relative="false" size="27">
                     <cwfPatientPhoto/>
