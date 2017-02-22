@@ -21,9 +21,9 @@
         <link action="cwf.shell.logout" color="gray" hint="Logout the application" label="Logout" size="TINY"/>
     </_toolbar>
     <splitterview orientation="vertical">
-        <splitterpane relative="false" size="30.0">
+        <splitterpane relative="false" size="30">
             <splitterview orientation="horizontal">
-                <splitterpane relative="false" size="27.0">
+                <splitterpane relative="false" size="27">
                     <cwfPatientPhoto/>
                 </splitterpane>
                 <splitterpane relative="true" size="100">
@@ -88,10 +88,10 @@
                 </tabpane>
             </tabview>
         </splitterpane>
-        <splitterpane relative="false" size="26.0">
+        <splitterpane relative="false" size="26">
             <cwfStatusPanel/>
         </splitterpane>
-        <splitterpane relative="false" size="71.0">
+        <splitterpane relative="false" size="71">
             <frame url="/footer.html"/>
         </splitterpane>
     </splitterview>

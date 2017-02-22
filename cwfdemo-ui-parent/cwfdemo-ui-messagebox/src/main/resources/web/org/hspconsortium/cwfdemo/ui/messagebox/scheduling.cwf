@@ -20,7 +20,7 @@
 				</columns>
 				<rows />
 			</grid>
-			<toolbar orient="vertical" style="text-align:center" vflex="1"
+			<toolbar orientation="vertical" style="text-align:center" vflex="1"
 				width="75px">
 				<div flex="1" />
 				<button name="btnAdd" 

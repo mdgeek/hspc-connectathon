@@ -201,11 +201,13 @@
 			<artifactId>cwfdemo-ui-messagebox</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		<!--
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-mockuments</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwf-ui-scenario</artifactId>

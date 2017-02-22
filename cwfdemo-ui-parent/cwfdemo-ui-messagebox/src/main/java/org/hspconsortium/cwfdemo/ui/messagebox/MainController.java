@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.carewebframework.api.context.ISurveyResponse;
 import org.carewebframework.api.context.UserContext;
+import org.carewebframework.api.domain.IUser;
 import org.carewebframework.api.event.IGenericEvent;
 import org.carewebframework.common.NumUtil;
 import org.carewebframework.common.StrUtil;
@@ -227,7 +228,7 @@ public class MainController extends PluginController implements IPatientContextE
         grdMessages.getRows().setRenderer(new MessageRenderer(grdMessages));
         updatePatient(true);
         subscribe(true);
-        root.findByName("mnuRefresh").addEventForward(ClickEvent.TYPE, btnRefresh, null);
+        root.findByName("menupopup.mnuRefresh").addEventForward(ClickEvent.TYPE, btnRefresh, null);
     }
     
     @Override
@@ -252,7 +253,8 @@ public class MainController extends PluginController implements IPatientContextE
     }
     
     private void loadMessages(boolean currentPatientOnly) {
-        String userId = UserContext.getActiveUser().getLogicalId();
+        IUser user = UserContext.getActiveUser();
+        String userId = user == null ? null : user.getLogicalId();
         String patientId = currentPatientOnly && patient != null ? FhirUtil.getIdAsString(patient, true) : null;
         model.clear();
         

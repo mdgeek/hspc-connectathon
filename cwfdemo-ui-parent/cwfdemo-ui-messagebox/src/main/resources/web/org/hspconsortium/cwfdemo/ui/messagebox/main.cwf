@@ -11,10 +11,10 @@
 						<column name="isActionable" style="text-align:center" width="30px"
 							image="${iconType}"/>
 						<column name="getPatientName" flex="2">
-							<radiogroup name="rgFilter" orient="horizontal">
+							<radiogroup name="rgFilter" orientation="horizontal">
 								<radiobutton name="radAll"
 									label="${@msg.cwfmessagebox.main.button.all.label}"/>
-								<radiobutton name="radPatient" selected="true"/>
+								<radiobutton name="radPatient" checked="true"/>
 							</radiogroup>
 						</column>
 						<column name="getSender" flex="2"
@@ -40,7 +40,6 @@
 								label="${@msg.cwfmessagebox.urgency.label.MEDIUM}"/>
 							<a image="${iconUrgencyLow}" disabled="true"
 								label="${@msg.cwfmessagebox.urgency.label.LOW}"/>
-							<space/>
 						</div>
 						<a image="${iconType}" disabled="true"
 							label="${@msg.cwfmessagebox.main.legend.type}"/>
@@ -81,7 +80,7 @@
 			visible="false"/>
 	</div>
 
-	<menupopup>
+	<menupopup name="menupopup">
 		<menuitem name="mnuRefresh" label="${@msg.cwf.btn.refresh.label}"/>
 	</menupopup>
 </page>

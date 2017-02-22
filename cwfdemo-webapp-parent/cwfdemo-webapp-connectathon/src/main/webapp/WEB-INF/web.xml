@@ -9,10 +9,17 @@
 		
 		<init-param>
 			<param-name>contextConfigLocation</param-name>
-			<param-value>
-				classpath:/META-INF/cwf-dispatcher-servlet.xml
-				classpath*:/META-INF/*-spring.xml
-			</param-value>
+			<param-value>classpath:/META-INF/cwf-dispatcher-servlet.xml</param-value>
+		</init-param>
+
+		<init-param>
+			<param-name>contextClass</param-name>
+			<param-value>org.carewebframework.ui.spring.FrameworkAppContext</param-value>
+		</init-param>
+		
+		<init-param>
+			<param-name>contextInitializerClasses</param-name>
+			<param-value>org.carewebframework.ui.spring.AppContextInitializer</param-value>
 		</init-param>
 	</servlet>
 
@@ -23,6 +30,6 @@
 
 	<context-param>
 		<param-name>cwf.debug</param-name>
-		<param-value>false</param-value>
+		<param-value>true</param-value>
 	</context-param>
 </web-app>
