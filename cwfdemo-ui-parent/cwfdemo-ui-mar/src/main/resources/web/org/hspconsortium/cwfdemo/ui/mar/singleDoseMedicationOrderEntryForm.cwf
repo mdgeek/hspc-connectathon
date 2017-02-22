@@ -1,5 +1,5 @@
 <window title="${@msg.marplugin.button.verbalorder.label}" width="400px"
-	height="250px" controller="${cwfMarAdminController}"
+	height="250px" controller="${@cwfMarAdminController}"
 	class="flavor:panel-primary cwf-demoConfig">
 	<div name="medEntryForm">
 		<grid height="100%" width="100%">

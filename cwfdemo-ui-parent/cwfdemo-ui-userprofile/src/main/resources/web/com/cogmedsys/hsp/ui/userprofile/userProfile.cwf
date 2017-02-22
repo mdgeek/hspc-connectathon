@@ -10,7 +10,7 @@
 			<row style="background:#FFFFFF;">
 				<label label="Id:"/>
 				<rowcell colspan="3">
-					<listbox name="lbId" mold="select">
+					<listbox name="lbId">
 						<listitem label="eafry"/>
 						<listitem label="PatientId-1234"/>
 						<listitem label="PatientId-1235"/>

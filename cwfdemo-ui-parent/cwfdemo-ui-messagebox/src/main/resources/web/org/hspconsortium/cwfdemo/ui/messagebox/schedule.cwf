@@ -1,48 +1,42 @@
-<zk xmlns="http://www.zkoss.org/2005/cwf"
-	xmlns:h="http://www.w3.org/1999/xhtml"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.zkoss.org/2005/cwf http://www.zkoss.org/2005/cwf/cwf.xsd">
-
-	<window title="Schedule a Message" mode="modal" height="500px" width="500px"
-		controller="${cwfMessageboxScheduleController}" mold="bootstrap">
-		<vlayout hflex="1" vflex="1" style="padding: 10px">
-			<hlayout name="pnlAssociate">
+	<window title="Schedule a Message" height="500px" width="500px"
+		controller="${@cwfMessageboxScheduleController}">
+		<div class="cwf-layout-vertical" flex="1" style="padding: 10px">
+			<div class="cwf-layout-horizontal" name="pnlAssociate">
 				<checkbox name="chkAssociate" />
-				<label value="${@msg.cwfmessagebox.schedule.input.associate.label}" />
+				<label label="${@msg.cwfmessagebox.schedule.input.associate.label}" />
 				<label name="lblPatient" />
-			</hlayout>
-			<separator />
-			<hbox hflex="1" spacing="20px">
-				<cell hflex="2">
-					<label value="${@msg.cwfmessagebox.schedule.input.deliver.label}" />
+			</div>
+			<div width="20px" />
+			<div class="cwf-layout-horizontal">
+				<cell flex="2">
+					<label label="${@msg.cwfmessagebox.schedule.input.deliver.label}" />
 				</cell>
-				<cell hflex="1">
-					<label value="${@msg.cwfmessagebox.schedule.input.urgency.label}" />
+				<cell flex="1">
+					<label label="${@msg.cwfmessagebox.schedule.input.urgency.label}" />
 				</cell>
-			</hbox>
-			<hbox hflex="1" spacing="20px">
-				<cell hflex="2">
-					<datetimebox name="dtbDelivery" requireTime="true" hflex="1" />
+			</div>
+			<div class="cwf-layout-horizontal">
+				<cell flex="2">
+					<datetimebox name="dtbDelivery" requireTime="true" flex="1" />
 				</cell>
-				<cell hflex="1">
-					<combobox name="cboUrgency" readonly="true" hflex="1" />
+				<cell flex="1">
+					<combobox name="cboUrgency" readonly="true" flex="1" />
 				</cell>
-			</hbox>
-			<label value="${@msg.cwfmessagebox.schedule.input.subject.label}" />
-			<textbox name="txtSubject" hflex="1" focus="true" />
-			<label value="${@msg.cwfmessagebox.schedule.input.recipients.label}" />
-			<hlayout>
+			</div>
+			<label label="${@msg.cwfmessagebox.schedule.input.subject.label}" />
+			<textbox name="txtSubject" flex="1" focus="true" />
+			<label label="${@msg.cwfmessagebox.schedule.input.recipients.label}" />
+			<div class="cwf-layout-horizontal">
 				<textbox name="txtRecipients" readonly="true" hflex="1" />
-				<button name="btnRecipients" zclass="btn" sclass="btn-default btn-xs" label="..." />
-			</hlayout>
-			<label value="${@msg.cwfmessagebox.schedule.input.message.label}" />
-			<textbox name="txtMessage" multiline="true" hflex="1" vflex="1" />
-			<toolbar style="text-align:end">
-				<button name="btnOK" zclass="btn" sclass="btn-sm btn-success" 
+				<button name="btnRecipients" class="size:btn-xs" label="..." />
+			</div>
+			<label label="${@msg.cwfmessagebox.schedule.input.message.label}" />
+			<memobox name="txtMessage" flex="1" />
+			<toolbar alignment="end">
+				<button name="btnOK" class="flavor:btn-success" 
 					label="${@msg.cwfmessagebox.schedule.button.ok.label}" />
-				<button name="btnCancel" zclass="btn" sclass="btn-sm btn-danger"
-					label="${@msg.cwfmessagebox.schedule.button.cancel.label}" forward="onClick=onClose" />
+				<button name="btnCancel" class="flavor:btn-danger" forward="click=close"
+					label="${@msg.cwfmessagebox.schedule.button.cancel.label}" />
 			</toolbar>
-		</vlayout>
+		</div>
 	</window>
-</zk>

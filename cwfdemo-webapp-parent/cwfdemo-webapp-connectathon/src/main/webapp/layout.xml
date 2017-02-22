@@ -92,7 +92,7 @@
             <cwfStatusPanel/>
         </splitterpane>
         <splitterpane relative="false" size="71">
-            <frame url="/footer.html"/>
+            <frame url="footer.html"/>
         </splitterpane>
     </splitterview>
 </layout>

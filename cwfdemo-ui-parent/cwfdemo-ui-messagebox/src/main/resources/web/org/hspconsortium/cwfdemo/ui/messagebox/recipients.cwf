@@ -1,7 +1,7 @@
-<window title="${@msg.cwfmessagebox.recipients.title}" mode="modal" height="500px" width="500px"
-	mold="bootstrap" controller="${cwfMessageboxRecipientsController}">
-	<hbox spacing="0" vflex="1" style="text-align:center">
-		<vlayout vflex="1" spacing="1">
+<window title="${@msg.cwfmessagebox.recipients.title}" height="500px" width="500px"
+	controller="${@cwfMessageboxRecipientsController}">
+	<div layout="cwf-layout-horizontal" style="text-align:center">
+		<div class="cwf-layout-vertical">
 			<groupbox vflex="1">
 				<caption label="${@msg.cwfmessagebox.recipients.group.users.caption}"/>
 				<textbox name="txtUsers" width="100%"/>
@@ -12,29 +12,25 @@
 				<textbox name="txtGroups" width="100%"/>
 				<listbox name="lstGroups" vflex="1"/>
 			</groupbox>
-		</vlayout>
-		<vlayout vflex="1" sclass="text-center" spacing="1">
-			<space vflex="1"/>
-			<a name="btnAdd" zclass="btn" sclass="btn-link"
-				iconSclass="glyphicon glyphicon-chevron-right"/>
-			<a name="btnRemove" zclass="btn" sclass="btn-link"
-				iconSclass="glyphicon glyphicon-chevron-left"/>
-			<a name="btnRemoveAll" zclass="btn" sclass="btn-link"
-				iconSclass="glyphicon glyphicon-chevron-left-double"/>
-			<space vflex="1"/>
-		</vlayout>
-		<groupbox vflex="1">
-			<caption label="${@msg.cwfmessagebox.recipients.group.recipients.caption}"/>
-			<listbox name="lstRecipients" vflex="1" style="border:none"/>
+		</div>
+		<div class="cwf-layout-vertical text-center">
+			<div flex="1"/>
+			<a name="btnAdd" class="flavor:btn-link glyphicon glyphicon-chevron-right"/>
+			<a name="btnRemove" class="flavor:btn-link glyphicon glyphicon-chevron-left"/>
+			<a name="btnRemoveAll" class="flavor:btn-link glyphicon glyphicon-chevron-left-double"/>
+			<div flex="1"/>
+		</div>
+		<groupbox flex="1" title="${@msg.cwfmessagebox.recipients.group.recipients.caption}">
+			<listbox name="lstRecipients" flex="1" style="border:none"/>
 		</groupbox>
-	</hbox>
-	<hlayout sclass="text-right panel-footer" style="padding:5px">
-		<textbox name="txtComment" hflex="1"
+	</div>
+	<div class="text-right panel-footer cwf-layout-horizontal" style="padding:5px">
+		<textbox name="txtComment" flex="1"
 			placeholder="${@msg.cwfmessagebox.recipients.textbox.comment.placeholder}"/>
-		<space/>
+		<div width="20px"/>
 		<button name="btnOK" class="flavor:btn-success"
 			label="${@msg.cwfmessagebox.recipients.button.ok.label}"/>
-		<button class="flavor:btn-danger"
-			label="${@msg.cwfmessagebox.recipients.button.cancel.label}" forward="click=close"/>
-	</hlayout>
+		<button class="flavor:btn-danger" forward="click=close"
+			label="${@msg.cwfmessagebox.recipients.button.cancel.label}" />
+	</div>
 </window>

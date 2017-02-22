@@ -1,4 +1,4 @@
-<div name="mar" controller="${cwfMarMainController}" class="cwf-layout-vertical">
+<div name="mar" controller="${@cwfMarMainController}" class="cwf-layout-vertical">
     <toolbar>
         <button name="btnVerbalOrder" label="${@msg.marplugin.button.verbalorder.label}"
             hint="${@msg.marplugin.button.verbalorder.hint}"/>

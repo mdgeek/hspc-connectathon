@@ -1,46 +1,31 @@
-<zk xmlns="http://www.zkoss.org/2005/cwf"
-	xmlns:h="http://www.w3.org/1999/xhtml"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.zkoss.org/2005/cwf http://www.zkoss.org/2005/cwf/cwf.xsd">
-
-	<window title="Message Scheduling" height="500px" width="700px"
-		controller="${cwfMessageboxSchedulingController}" mold="bootstrap">
-		<div class="cwf-layout-horizontal">
-			<label label="${@msg.cwfmessagebox.scheduling.header.title}" />
-			<grid name="grdScheduled">
-				<columns>
-					<column width="30px" style="text-align:center"
-						image="${iconUrgency}" />
-					<column width="150px"
-						label="${@msg.cwfmessagebox.scheduling.header.schedule}" />
-					<column flex="1"
-						label="${@msg.cwfmessagebox.scheduling.header.patient}" />
-					<column flex="2"
-						label="${@msg.cwfmessagebox.scheduling.header.subject}" />
-				</columns>
-				<rows />
-			</grid>
-			<toolbar orientation="vertical" style="text-align:center" vflex="1"
-				width="75px">
-				<div flex="1" />
-				<button name="btnAdd" 
-					label="${@msg.cwfmessagebox.scheduling.button.add.label}"
-					width="90%" style="margin-bottom: 10px" />
-				<button name="btnDelete" 
-					label="${@msg.cwfmessagebox.scheduling.button.delete.label}"
-					width="90%" style="margin-bottom: 10px" />
-				<button name="btnModify" 
-					label="${@msg.cwfmessagebox.scheduling.button.modify.label}"
-					width="90%" style="margin-bottom: 10px" />
-				<button name="btnRefresh" 
-					label="${@msg.cwfmessagebox.scheduling.button.refresh.label}"
-					width="90%" />
-				<div width="20px" />
-				<button name="btnClose" class="flavor:btn-danger"
-					label="${@msg.cwfmessagebox.scheduling.button.close.label}"
-					width="90%" forward="click=close" />
-				<div flex="1" />
-			</toolbar>
-		</div>
-	</window>
-</zk>
+<window title="Message Scheduling" height="500px" width="700px"
+	controller="${@cwfMessageboxSchedulingController}">
+	<div class="cwf-layout-horizontal">
+		<label label="${@msg.cwfmessagebox.scheduling.header.title}"/>
+		<grid name="grdScheduled">
+			<columns>
+				<column width="30px" style="text-align:center" image="${iconUrgency}"/>
+				<column width="150px" label="${@msg.cwfmessagebox.scheduling.header.schedule}"/>
+				<column flex="1" label="${@msg.cwfmessagebox.scheduling.header.patient}"/>
+				<column flex="2" label="${@msg.cwfmessagebox.scheduling.header.subject}"/>
+			</columns>
+			<rows/>
+		</grid>
+		<toolbar orientation="vertical" style="text-align:center" flex="1" width="75px">
+			<div flex="1"/>
+			<button name="btnAdd" label="${@msg.cwfmessagebox.scheduling.button.add.label}"
+				width="90%" style="margin-bottom: 10px"/>
+			<button name="btnDelete" label="${@msg.cwfmessagebox.scheduling.button.delete.label}"
+				width="90%" style="margin-bottom: 10px"/>
+			<button name="btnModify" label="${@msg.cwfmessagebox.scheduling.button.modify.label}"
+				width="90%" style="margin-bottom: 10px"/>
+			<button name="btnRefresh" label="${@msg.cwfmessagebox.scheduling.button.refresh.label}"
+				width="90%"/>
+			<div width="20px"/>
+			<button name="btnClose" class="flavor:btn-danger"
+				label="${@msg.cwfmessagebox.scheduling.button.close.label}" width="90%"
+				forward="click=close"/>
+			<div flex="1"/>
+		</toolbar>
+	</div>
+</window>
