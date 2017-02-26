@@ -26,16 +26,21 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.carewebframework.api.context.ISurveyResponse;
 import org.carewebframework.api.query.AbstractQueryFilter;
 import org.carewebframework.api.query.DateQueryFilter.DateType;
 import org.carewebframework.api.query.IQueryContext;
+import org.carewebframework.ui.dialog.DialogControl;
+import org.carewebframework.ui.dialog.DialogResponse;
 import org.carewebframework.ui.dialog.PromptDialog;
+import org.carewebframework.web.ancillary.IResponseCallback;
 import org.carewebframework.web.component.BaseComponent;
 import org.carewebframework.web.component.Combobox;
 import org.carewebframework.web.component.Comboitem;
 import org.carewebframework.web.component.Label;
 import org.carewebframework.web.component.Listitem;
 import org.carewebframework.web.component.Toolbar;
+import org.carewebframework.web.model.IListModel;
 import org.hl7.fhir.dstu3.model.DocumentReference;
 import org.hl7.fhir.dstu3.model.Patient;
 import org.hl7.fhir.dstu3.model.Reference;
@@ -54,60 +59,60 @@ import org.hspconsortium.cwfdemo.ui.mockuments.DocumentDisplayController.Documen
  * Controller for the list-based display of clinical documents.
  */
 public class DocumentListController extends AbstractListController<Document, Document> {
-
+    
     /**
      * Handles filtering by document type.
      */
     private class DocumentTypeFilter extends AbstractQueryFilter<Document> {
-
+        
         @Override
         public boolean include(Document document) {
             String filter = getCurrentFilter();
             return filter == null || document.hasType(filter);
         }
-
+        
         @Override
         public boolean updateContext(IQueryContext context) {
             context.setParam("type", getCurrentFilter());
             return true;
         }
-
+        
     }
-
+    
     private Toolbar toolbar;
-
+    
     private Combobox cboFilter;
-
+    
     private Comboitem cbiSeparator;
-
+    
     private Label lblFilter;
-
+    
     private Label lblInfo;
-
+    
     private String fixedFilter;
-
+    
     private DocumentDisplayController displayController;
-
+    
     private Document selectedDocument;
-
+    
     private final Collection<String> allTypes;
-
+    
     private final DocumentService documentService;
-
+    
     public DocumentListController(DocumentService service) {
         super(new DocumentListDataService(service), "cwfdocuments", "DOCUMENT", "documentsPrint.css");
         this.documentService = service;
         registerQueryFilter(new DocumentTypeFilter());
         allTypes = service.getTypes();
     }
-
+    
     @Override
     public void initializeController() {
         super.initializeController();
         getPlugin().registerProperties(this, "fixedFilter");
         addFilters(allTypes, null, null);
     }
-
+    
     /**
      * This is a good place to update the filter list.
      */
@@ -116,14 +121,14 @@ public class DocumentListController extends AbstractListController<Document, Doc
         if (queryResult != null) {
             updateListFilter(queryResult);
         }
-
+        
         return queryResult;
     }
-
+    
     protected void setDisplayController(DocumentDisplayController displayController) {
         this.displayController = displayController;
     }
-
+    
     /**
      * Presents a quick pick list limited to types present in the unfiltered document list.
      *
@@ -133,43 +138,44 @@ public class DocumentListController extends AbstractListController<Document, Doc
         if (fixedFilter != null) {
             return;
         }
-
+        
         List<BaseComponent> items = cboFilter.getChildren();
         Set<String> types = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
         String currentFilter = getCurrentFilter();
-
+        
         while (items.get(1) != cbiSeparator) {
             items.remove(1);
         }
-
+        
         cboFilter.setSelectedIndex(0);
-
+        
         if (documents != null) {
             for (Document doc : documents) {
                 types.addAll(doc.getTypes());
             }
         }
-
+        
         addFilters(types, cbiSeparator, currentFilter);
-
+        
         if (currentFilter != null && cboFilter.getSelectedIndex() < 1) {
-            ListUtil.selectComboboxItem(cboFilter, currentFilter);
+            Comboitem item = (Comboitem) cboFilter.findChildByData(currentFilter);
+            cboFilter.setSelectedItem(item);
         }
     }
-
+    
     private void addFilters(Collection<String> types, BaseComponent ref, String selected) {
         for (String type : types) {
             Comboitem item = new Comboitem(type);
-            item.setValue(type);
-
+            item.setData(type);
+            
             cboFilter.addChild(item, ref);
-
+            
             if (type.equals(selected)) {
                 cboFilter.setSelectedItem(item);
             }
         }
     }
-
+    
     /**
      * Returns the currently active type filter.
      *
@@ -179,14 +185,14 @@ public class DocumentListController extends AbstractListController<Document, Doc
         return fixedFilter != null ? fixedFilter
                 : cboFilter.getSelectedIndex() > 0 ? (String) cboFilter.getSelectedItem().getValue() : null;
     }
-
+    
     /**
      * Handle change in type filter selection.
      */
     public void onSelect$cboFilter() {
         applyFilters();
     }
-
+    
     /**
      * Selecting document displays view.
      */
@@ -194,100 +200,109 @@ public class DocumentListController extends AbstractListController<Document, Doc
         Listitem item = listbox.getSelectedItem();
         setSelectedDocument(item == null ? null : (Document) item.getData());
     }
-
+    
     public void onClick$btnNew() {
-        if (!allowChange()) {
-            return;
-        }
+        allowChange((confirm) -> {
+            if (confirm) {
+                List<DialogResponse<String>> items = new ArrayList<>();
+                items.add(new DialogResponse<>("lactation_assessment", "Lactation Assessment"));
+                items.add(new DialogResponse<>("newborn-admission", "Newborn Admission"));
+                items.add(new DialogResponse<>("procedure-request", "Procedure Request"));
+                PromptDialog.show(
+                    new DialogControl<>("Select document type to create.", "New Document", null, items, null, (response) -> {
+                        if (response == null) {
+                            return;
+                        }
 
-        List<String> itemNames = new ArrayList<>();
-        List<Object> items = new ArrayList<>();
-        itemNames.add("Lactation Assessment");
-        items.add("lactation_assessment");
-        itemNames.add("Newborn Admission");
-        items.add("newborn-admission");
-        itemNames.add("Procedure Request");
-        items.add("procedure-request");
-        String item = (String) PromptDialog.input("Select document type to create.", "New Document", null, itemNames, items);
-
-        if (item == null) {
-            return;
-        }
-
-        String displayName = itemNames.get(items.indexOf(item));
-        DocumentReference ref = new DocumentReference();
-        Patient patient = PatientContext.getActivePatient();
-        ScenarioUtil.copyDemoTags(patient, ref);
-        String id = FhirUtil.getResourceIdPath(patient);
-        ref.setSubject(new Reference(id));
-        ref.setCreated(new Date());
-        ref.setType(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, item, displayName));
-        ref.setDocStatus(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, "status-draft", "Draft"));
-        DocumentContent content = new DocumentContent("<responses/>".getBytes(),
-                DocumentDisplayController.QUESTIONNAIRE_CONTENT_TYPE + item);
-        Document newDocument = new Document(ref, content);
-        documentService.updateDocument(newDocument);
-        refresh();
-        setSelectedDocument(newDocument);
+                        String displayName = response.getLabel();
+                        String item = response.getResponse();
+                        DocumentReference ref = new DocumentReference();
+                        Patient patient = PatientContext.getActivePatient();
+                        ScenarioUtil.copyDemoTags(patient, ref);
+                        String id = FhirUtil.getResourceIdPath(patient);
+                        ref.setSubject(new Reference(id));
+                        ref.setCreated(new Date());
+                        ref.setType(FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, item, displayName));
+                        ref.setDocStatus(
+                            FhirUtil.createCodeableConcept(FhirTerminology.SYS_COGMED, "status-draft", "Draft"));
+                        DocumentContent content = new DocumentContent("<responses/>".getBytes(),
+                                DocumentDisplayController.QUESTIONNAIRE_CONTENT_TYPE + item);
+                        Document newDocument = new Document(ref, content);
+                        documentService.updateDocument(newDocument);
+                        refresh();
+                        setSelectedDocument(newDocument);
+                    }));
+            }
+        });
     }
-
+    
     private void setSelectedDocument(Document document) {
-        if (document == selectedDocument || !allowChange()) {
-            return;
+        if (document != selectedDocument) {
+            allowChange((confirm) -> {
+                selectedDocument = document;
+                highlightSelectedDocument();
+                displayController.setDocument(document, DocumentAction.DISCARD, null);
+            });
         }
-
-        selectedDocument = document;
-        highlightSelectedDocument();
-        displayController.setDocument(document, DocumentAction.DISCARD);
     }
-
+    
     private void highlightSelectedDocument() {
         if (selectedDocument == null) {
-            listbox.clearSelection();
+            listbox.clearSelected();
             return;
         }
-
+        
         Listitem item = listbox.getSelectedItem();
-
-        if (item != null && item.getValue() == selectedDocument) {
+        
+        if (item != null && item.getData() == selectedDocument) {
             return;
         }
-
+        
         DocumentReference reference = selectedDocument.getReference();
-
+        
         for (Document doc : getFilteredModel()) {
             if (FhirUtil.areEqual(reference, doc.getReference(), true)) {
-                ListUtil.selectListboxData(listbox, doc);
+                Listitem itm = (Listitem) listbox.findChildByData(doc);
+                itm.setSelected(true);
                 selectedDocument = doc;
                 return;
             }
         }
-
+        
         getFilteredModel().add(selectedDocument);
         highlightSelectedDocument();
     }
-
+    
     @Override
     protected void afterModelChanged() {
         highlightSelectedDocument();
     }
-
+    
     @Override
     protected void onPatientChanged(Patient patient) {
+        super.onPatientChanged(patient);
         toolbar.setVisible(patient != null);
         setSelectedDocument(null);
         super.onPatientChanged(patient);
     }
-
+    
     @Override
-    protected String onPatientChanging(boolean silent) {
-        return displayController.setDocument(null, silent ? DocumentAction.SAVE : null) ? null : "Edit in progress.";
-    }
+    protected void onPatientChanging(ISurveyResponse response) {
+        response.defer();
 
-    private boolean allowChange() {
-        return displayController.setDocument(null, null);
+        displayController.setDocument(null, response.isSilent() ? DocumentAction.SAVE : null, (success) -> {
+            if (success) {
+                response.accept();
+            } else {
+                response.reject(null);
+            }
+        });
     }
-
+    
+    private void allowChange(IResponseCallback<Boolean> response) {
+        displayController.setDocument(null, null, response);
+    }
+    
     /**
      * Returns the fixed filter, if any.
      *
@@ -296,7 +311,7 @@ public class DocumentListController extends AbstractListController<Document, Doc
     public String getFixedFilter() {
         return fixedFilter;
     }
-
+    
     /**
      * Sets the fixed filter.
      *
@@ -306,20 +321,20 @@ public class DocumentListController extends AbstractListController<Document, Doc
         fixedFilter = name;
         cboFilter.setVisible(fixedFilter == null);
         lblFilter.setVisible(fixedFilter != null);
-        lblFilter.setValue(fixedFilter);
+        lblFilter.setLabel(fixedFilter);
         refresh();
     }
-
+    
     @Override
-    protected void setListModel(ListModel<Document> model) {
-        super.setListModel(model);
-        int docCount = model == null ? 0 : model.getSize();
-        lblInfo.setValue(docCount + " document(s)");
+    protected void setModel(IListModel<Document> model) {
+        super.setModel(model);
+        int docCount = model == null ? 0 : model.size();
+        lblInfo.setLabel(docCount + " document(s)");
     }
-
+    
     @Override
     public Date getDateByType(Document result, DateType dateMode) {
         return result.getDateTime();
     }
-
+    
 }

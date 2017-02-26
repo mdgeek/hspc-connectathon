@@ -19,8 +19,6 @@
  */
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.carewebframework.ui.render.AbstractRenderer;
 import org.carewebframework.web.component.Row;
 import org.hspconsortium.cwf.fhir.document.Document;
@@ -29,13 +27,11 @@ import org.hspconsortium.cwf.fhir.document.Document;
  * Renderer for the document list.
  */
 public class DocumentListRenderer extends AbstractRenderer<Row, Document> {
-
-    private static final Log log = LogFactory.getLog(DocumentListRenderer.class);
     
     public DocumentListRenderer() {
         super("background-color: white", null);
     }
-    
+
     @Override
     public Row render(Document doc) {
         Row row = new Row();
@@ -46,5 +42,5 @@ public class DocumentListRenderer extends AbstractRenderer<Row, Document> {
         createLabel(row, doc.getStatus());
         return row;
     }
-    
+
 }

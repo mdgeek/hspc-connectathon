@@ -33,6 +33,7 @@ import org.carewebframework.api.event.IGenericEvent;
 import org.carewebframework.common.NumUtil;
 import org.carewebframework.common.StrUtil;
 import org.carewebframework.shell.plugins.PluginController;
+import org.carewebframework.ui.dialog.DialogControl;
 import org.carewebframework.ui.dialog.DialogControl.IPromptCallback;
 import org.carewebframework.ui.dialog.PromptDialog;
 import org.carewebframework.ui.util.CWFUtil;
@@ -330,11 +331,11 @@ public class MainController extends PluginController implements IPatientContextE
      * @param callback Callback to report response.
      */
     private void getResponse(String prompt, IPromptCallback<Response> callback, Response... responses) {
-        PromptDialog.show(prompt, null, null, responses, null, null, null, (response) -> {
+        PromptDialog.show(new DialogControl<>(prompt, null, null, responses, null, null, null, (response) -> {
             if (callback != null) {
                 callback.onComplete(response);
             }
-        });
+        }));
     }
     
     protected void addMessage(Message message) {

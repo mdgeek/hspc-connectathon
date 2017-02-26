@@ -20,7 +20,9 @@
 package org.hspconsortium.cwfdemo.ui.mockuments;
 
 import org.carewebframework.ui.FrameworkController;
+import org.carewebframework.ui.dialog.DialogControl;
 import org.carewebframework.ui.dialog.PromptDialog;
+import org.carewebframework.web.ancillary.IResponseCallback;
 import org.carewebframework.web.ancillary.MimeContent;
 import org.carewebframework.web.annotation.WiredComponent;
 import org.carewebframework.web.component.BaseComponent;
@@ -89,28 +91,39 @@ public class DocumentDisplayController extends FrameworkController {
      * @param document The document to be displayed.
      * @param action The default action to take if document has been modified (if null, prompt for
      *            action).
+     * @param callback Callback to report result
      */
-    protected void setDocument(Document document, DocumentAction action) {
+    protected void setDocument(Document document, DocumentAction action, IResponseCallback<Boolean> callback) {
         if (documentOperation != null && documentOperation.hasChanged()) {
             if (action != null) {
                 if (doAction(action)) {
                     updateDocument(document);
                 }
-
+            } else {
+                PromptDialog.show(new DialogControl<>("What would you like to do?", "Pending Changes", null, ACTION_OPTIONS,
+                        null, null, null, (response) -> {
+                            if (doAction(response.getResponse())) {
+                                updateDocument(document);
+                                doCallback(callback, true);
+                            } else {
+                                doCallback(callback, false);
+                            }
+                        }));
                 return;
             }
-            
-            PromptDialog.show("What would you like to do?", "Pending Changes", null, ACTION_OPTIONS, null, null, null,
-                (response) -> {
-                    if (doAction(response.getResponse())) {
-                        updateDocument(document);
-                    }
-                });
         } else {
             updateDocument(document);
         }
+
+        doCallback(callback, true);
     }
     
+    private void doCallback(IResponseCallback<Boolean> callback, boolean result) {
+        if (callback != null) {
+            callback.onComplete(result);
+        }
+    }
+
     private boolean doAction(DocumentAction action) {
         switch (action) {
             case SAVE: // Save
