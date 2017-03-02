@@ -11,15 +11,6 @@
 	<artifactId>cwfdemo-parent</artifactId>
 	<packaging>pom</packaging>
 	
-	<!--
-	<scm>
-		<connection>${scm.scm}:${scm.base}</connection>
-		<developerConnection>${scm.scm}:${scm.base}</developerConnection>
-		<url>${scm.base}</url>
-		<tag>HEAD</tag>
-	</scm>
-	-->
-	
 	<modules>
 		<module>cwfdemo-api-parent</module>
 		<module>cwfdemo-ui-parent</module>
@@ -31,13 +22,6 @@
 		<ucs-api.version>0.1.0-SNAPSHOT</ucs-api.version>
 		<ucs-nifi.version>0.5-SNAPSHOT</ucs-nifi.version>
 		<eps.version>0.1.4-SNAPSHOT</eps.version>
-
-		<project.scm.id>github</project.scm.id>
-		<scm.scm>scm:git</scm.scm>
-		<scm.root>https://github.com/mdgeek</scm.root>
-		<scm.parent>hspc-carewebframework</scm.parent>
-		<scm.base>${scm.root}/${scm.parent}</scm.base>
-		<project.name>${project.artifactId}</project.name>
 
 		<!-- Maven Plugin Properties -->
 		<tomcat.manager.url>http://localhost:8080/manager</tomcat.manager.url>
