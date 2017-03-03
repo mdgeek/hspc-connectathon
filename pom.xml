@@ -3,7 +3,7 @@
 	
 	<parent>
 		<groupId>org.hspconsortium.carewebframework</groupId>
-		<artifactId>cwf-parent</artifactId>
+		<artifactId>cwf-root</artifactId>
 		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	
