@@ -23,11 +23,17 @@ import ca.uhn.fhir.model.dstu2.composite.CodingDt;
 import ca.uhn.fhir.model.dstu2.resource.*;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
-import ca.uhn.fhir.rest.gclient.*;
+import ca.uhn.fhir.rest.gclient.IQuery;
 import ca.uhn.fhir.rest.server.EncodingEnum;
+import org.carewebframework.ui.util.RequestUtil;
 import org.hl7.fhir.instance.model.api.IBaseCoding;
 import org.hl7.fhir.instance.model.api.IBaseResource;
+import org.hspconsortium.cwf.api.patient.PatientContext;
+import org.zkoss.zk.ui.ComponentNotFoundException;
+import org.zkoss.zkplus.embed.Bridge;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -56,8 +62,13 @@ public class FhirServiceDstu2 {
         clientDstu2 = fhirContextDstu2.newRestfulGenericClient(FHIR_DSTU2_SERVER);
     }
 
+    public static IGenericClient getClient() {
+        return clientDstu2;
+    }
+
     /**
      * Create a fhir resource from json string
+     *
      * @param json
      * @return
      */
@@ -70,6 +81,7 @@ public class FhirServiceDstu2 {
 
     /**
      * Create a fhir resource
+     *
      * @param resource
      * @return
      */
@@ -77,6 +89,19 @@ public class FhirServiceDstu2 {
         MethodOutcome outcome = clientDstu2.create().resource(resource).execute();
 
         return outcome.getId().getValueAsString();
+    }
+
+    public static <T extends IBaseResource> T searchResource(Class<T> clazz, String id) {
+        IQuery iquery = clientDstu2.search().forResource(clazz);
+        iquery.where(BaseResource.RES_ID.matchesExactly().value(id));
+        Bundle bundle = (Bundle) iquery.returnBundle(Bundle.class).execute();
+
+        List<Bundle.Entry> entries = bundle.getEntry();
+        if (entries.isEmpty()) {
+            return null;
+        } else {
+            return clazz.cast(entries.get(0).getResource());
+        }
     }
 
     /**
@@ -104,29 +129,31 @@ public class FhirServiceDstu2 {
 
     /**
      * Convert resource to String based on encoding
+     *
      * @param encoding
      * @param resource
      * @return
      */
-    public static String getReasourceAsString(EncodingEnum encoding, IBaseResource resource){
+    public static String getReasourceAsString(EncodingEnum encoding, IBaseResource resource) {
         return encoding.newParser(fhirContextDstu2).encodeResourceToString(resource);
     }
 
     /**
      * Convert resource list to String based on encoding
+     *
      * @param encoding
      * @param resources
      * @return
      */
-    public static String getResourcesAsStringList(EncodingEnum encoding, List resources){
+    public static String getResourcesAsStringList(EncodingEnum encoding, List resources) {
         StringBuilder builder = new StringBuilder();
 
-        if(!resources.isEmpty()) {
+        if (!resources.isEmpty()) {
             builder.append("[");
             for (int i = 0; i < resources.size(); i++) {
                 IBaseResource resource = (IBaseResource) resources.get(i);
                 builder.append(encoding.newParser(fhirContextDstu2).encodeResourceToString(resource));
-                if(i < resources.size() - 1){
+                if (i < resources.size() - 1) {
                     builder.append(",");
                 }
             }
@@ -136,39 +163,40 @@ public class FhirServiceDstu2 {
         return builder.toString();
     }
 
-    public static Patient getPatientModel(String patientId){
+    public static Patient getPatientModel(String patientId) {
         IQuery iquery = clientDstu2.search().forResource(Patient.class);
         iquery.where(Patient.RES_ID.matchesExactly().value(patientId));
 
         Bundle bundle = (Bundle) iquery.returnBundle(Bundle.class).execute();
         List<Bundle.Entry> entries = bundle.getEntry();
 
-        if(entries.size() > 1) {
+        if (entries.size() > 1) {
             throw new RuntimeException("...");
-        }else if(entries.size() > 0) {
+        } else if (entries.size() > 0) {
             return (Patient) entries.get(0).getResource();
-        }else{
+        } else {
             return null;
         }
     }
 
     /**
      * Get DiagnostirReport list from Fhir server
+     *
      * @param patientId
      * @param startTime
      * @param endTime
      * @return
      */
-    public static List<DiagnosticReport> getLabsModel(String patientId, String startTime, String endTime){
+    public static List<DiagnosticReport> getLabsModel(String patientId, String startTime, String endTime) {
         Date startDate = formatTime(startTime, "startTime");
         Date endDate = formatTime(endTime, "endTime");
 
         IQuery iquery = clientDstu2.search().forResource(DiagnosticReport.class);
         iquery.where(DiagnosticReport.PATIENT.hasId(getFormattedId(patientId)));
-        if(startDate != null){
+        if (startDate != null) {
             iquery.and(DiagnosticReport.DATE.afterOrEquals().second(startDate));
         }
-        if(endDate != null){
+        if (endDate != null) {
             iquery.and(DiagnosticReport.DATE.beforeOrEquals().second(endDate));
         }
 
@@ -181,21 +209,22 @@ public class FhirServiceDstu2 {
 
     /**
      * Get Medication and MedicationAdministration list from Fhir server
+     *
      * @param patientId
      * @param startTime
      * @param endTime
      * @return
      */
-    public static List getMedicationAdministrationModel(String patientId, String startTime, String endTime){
+    public static List getMedicationAdministrationModel(String patientId, String startTime, String endTime) {
         Date startDate = formatTime(startTime, "startTime");
         Date endDate = formatTime(endTime, "endTime");
 
         IQuery iquery = clientDstu2.search().forResource(MedicationAdministration.class);
         iquery.where(MedicationAdministration.PATIENT.hasId(getFormattedId(patientId)));
-        if(startDate != null){
+        if (startDate != null) {
             iquery.and(MedicationAdministration.EFFECTIVETIME.afterOrEquals().second(startDate));
         }
-        if(endDate != null){
+        if (endDate != null) {
             iquery.and(MedicationAdministration.EFFECTIVETIME.beforeOrEquals().second(endDate));
         }
 
@@ -203,13 +232,14 @@ public class FhirServiceDstu2 {
 
         Bundle bundle = (Bundle) iquery.returnBundle(Bundle.class).execute();
         List<Bundle.Entry> entries = bundle.getEntry();
-        List medicationAdministrations= getResourcesFromEntries(entries);
+        List medicationAdministrations = getResourcesFromEntries(entries);
 
         return medicationAdministrations;
     }
 
     /**
      * Get observation list from fhir server
+     *
      * @param patientId
      * @param startTime
      * @param endTime
@@ -221,10 +251,10 @@ public class FhirServiceDstu2 {
 
         IQuery iquery = clientDstu2.search().forResource(Observation.class);
         iquery.where(Observation.PATIENT.hasId(getFormattedId(patientId)));
-        if(startDate != null){
+        if (startDate != null) {
             iquery.and(Observation.DATE.afterOrEquals().second(startDate));
         }
-        if(endDate != null){
+        if (endDate != null) {
             iquery.and(Observation.DATE.beforeOrEquals().second(endDate));
         }
 
@@ -237,13 +267,14 @@ public class FhirServiceDstu2 {
 
     /**
      * Get resources from bundle entry as a simple list
+     *
      * @param entries
      * @return
      */
-    public static List getResourcesFromEntries(List<Bundle.Entry> entries){
+    public static List getResourcesFromEntries(List<Bundle.Entry> entries) {
         List resources = null;
 
-        if(entries != null && !entries.isEmpty()) {
+        if (entries != null && !entries.isEmpty()) {
             resources = new ArrayList<>();
             for (Bundle.Entry entry : entries) {
                 resources.add(entry.getResource());
@@ -255,13 +286,14 @@ public class FhirServiceDstu2 {
 
     /**
      * Get resources from bundle entry as a generic list
+     *
      * @param entries
      * @return
      */
-    public static <T extends IBaseResource> List<T> getResourcesFromEntries(List<Bundle.Entry> entries, Class<T> clazz){
+    public static <T extends IBaseResource> List<T> getResourcesFromEntries(List<Bundle.Entry> entries, Class<T> clazz) {
         List<T> resources = null;
 
-        if(entries != null && !entries.isEmpty()) {
+        if (entries != null && !entries.isEmpty()) {
             resources = new ArrayList<>();
             for (Bundle.Entry entry : entries) {
                 resources.add(clazz.cast(entry.getResource()));
@@ -273,11 +305,12 @@ public class FhirServiceDstu2 {
 
     /**
      * Parse date String with specific format
+     *
      * @param time
      * @param fieldName
      * @return
      */
-    public static Date formatTime(String time, String fieldName){
+    public static Date formatTime(String time, String fieldName) {
         if (time != null) {
             try {
                 return dateFormat.parse(time);
@@ -290,17 +323,18 @@ public class FhirServiceDstu2 {
 
     /**
      * Checking and update for id
+     *
      * @param id
      * @return
      */
-    public static String getFormattedId(String id){
-        if(!id.startsWith("Patient/")){
+    public static String getFormattedId(String id) {
+        if (!id.startsWith("Patient/")) {
             id = "Patient/" + id;
         }
 
         Pattern idPattern = Pattern.compile(AUTOGENERATED_FHIR_ID_PATTERN);
         Matcher idMatcher = idPattern.matcher(id);
-        if (idMatcher.find( )) {
+        if (idMatcher.find()) {
             return FhirServiceDstu2.FHIR_DSTU2_SERVER + "/" + id;
         }
 
@@ -309,6 +343,7 @@ public class FhirServiceDstu2 {
 
     /**
      * Returns the displayName, prefers LOINC display names
+     *
      * @param codingList
      * @return
      */
@@ -321,5 +356,41 @@ public class FhirServiceDstu2 {
             }
         }
         return displayName;
+    }
+
+    /**
+     * Returns the currently selected patient or null if the patient hasn't been selected
+     * @param desktopId
+     * @param request
+     * @param response
+     * @return
+     */
+    public static org.hl7.fhir.dstu3.model.Patient getPatientFromContext(
+            String desktopId,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+        org.hl7.fhir.dstu3.model.Patient patient = null;
+
+        if (desktopId == null || desktopId.trim().length() == 0) {
+            throw new IllegalArgumentException("Desktop id parameter is empty");
+        }
+
+        Bridge bridge = null;
+        try {
+            bridge = RequestUtil.startExecution(request, response, desktopId);
+            if (bridge == null) {
+                throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
+            }
+            if (PatientContext.getPatientContext() != null) {
+                patient = PatientContext.getActivePatient();
+            }
+        } catch (ComponentNotFoundException e) {
+            throw new IllegalArgumentException("Invalid desktop id, desktop not found: " + desktopId);
+        } finally {
+            if (bridge != null) {
+                bridge.close();
+            }
+        }
+        return patient;
     }
 }

@@ -48,7 +48,7 @@ public class FlowsheetController {
 
     private static final Log log = LogFactory.getLog(FlowsheetController.class);
 
-    private final static Map<String, String> registry = new HashMap<String, String>();
+    private final static Map<String, String> registry = new HashMap<>();
 
     public FlowsheetController() {
     }
@@ -120,23 +120,26 @@ public class FlowsheetController {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Medication Administration");
 
+        org.hl7.fhir.dstu3.model.Patient patient = null;
         Bridge bridge = RequestUtil.startExecution(request, response, desktopId);
         if (bridge == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        org.hl7.fhir.dstu3.model.Patient patient = null;
-        if (PatientContext.getPatientContext() != null) {
-            patient = PatientContext.getActivePatient();
+        try {
+            if (PatientContext.getPatientContext() != null) {
+                patient = PatientContext.getActivePatient();
+            }
+            if (patient == null) {
+                log.info("No patient has been set in the patient context");
+                map.put("data", new ArrayList<>());
+                return Response.ok(map).build();
+            } else {
+                log.info("Current patient has id " + patient.getIdElement().getIdPart());
+            }
+        } finally {
+            bridge.close();
         }
-        if (patient == null) {
-            log.info("No patient has been set in the patient context");
-            map.put("data", new ArrayList<>());
-            return Response.ok(map).build();
-        } else {
-            log.info("Current patient has id " + patient.getIdElement().getIdPart());
-        }
-        bridge.close();
 
         String id = patient.getIdElement().getIdPart();
         List medicationAdministrationsAndMedications = FhirServiceDstu2.getMedicationAdministrationModel(id, startTime, endTime);
@@ -235,20 +238,26 @@ public class FlowsheetController {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Vital Sign");
 
+        org.hl7.fhir.dstu3.model.Patient patient = null;
         Bridge bridge = RequestUtil.startExecution(request, response, desktopId);
         if (bridge == null) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        org.hl7.fhir.dstu3.model.Patient patient = PatientContext.getActivePatient();
-        if (patient == null) {
-            log.info("No patient has been set in the patient context");
-            map.put("data", new ArrayList<>());
-            return Response.ok(map).build();
-        } else {
-            log.info("Current patient has id " + patient.getIdElement().getIdPart());
+        try {
+            if (PatientContext.getPatientContext() != null) {
+                patient = PatientContext.getActivePatient();
+            }
+            if (patient == null) {
+                log.info("No patient has been set in the patient context");
+                map.put("data", new ArrayList<>());
+                return Response.ok(map).build();
+            } else {
+                log.info("Current patient has id " + patient.getIdElement().getIdPart());
+            }
+        } finally {
+            bridge.close();
         }
-        bridge.close();
 
         String id = patient.getIdElement().getIdPart();
         List<Observation> observations = FhirServiceDstu2.getObservationModel(id, startTime, endTime);
@@ -268,7 +277,7 @@ public class FlowsheetController {
                     String displayName = FhirServiceDstu2.getDisplayName(component.getCode().getCoding());
                     String name = parseDisplayName(displayName);
 
-                    List details = getWraperElement(data, name.toString());
+                    List details = getWraperElement(data, name);
                     details.add(detail);
                 }
             }
