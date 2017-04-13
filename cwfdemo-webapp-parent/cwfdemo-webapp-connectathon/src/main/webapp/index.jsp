@@ -18,8 +18,8 @@
 
     <script type="text/javascript">
         function createWebSocket() {
-            var wsEndpoint = document.getElementById('wsEndpoint').value;
             var desktopId = document.getElementById('desktopId').value;
+            var wsEndpoint = document.getElementById('wsEndpoint').value + '?dtid=' + desktopId;
 
             var ws = new WebSocket(wsEndpoint);
 

@@ -38,6 +38,8 @@ public class FlowsheetSubscriptionController {
 
     private static final Log log = LogFactory.getLog(FlowsheetSubscriptionController.class);
     private SubscriptionService subscriptionService;
+    //need to store in global maps because FHIR notifiations won't be in the user's session
+    //need to notify by desktop id
     private static final HashMap<String, DataSubscription> vitalsSubscriptionLookup = new HashMap<>();
     private static final HashMap<String, String> ioSubscriptionLookup = new HashMap<>();
     private static final HashMap<String, IGenericEvent<Patient>> patientContextListenerMap = new HashMap<>();
@@ -78,7 +80,7 @@ public class FlowsheetSubscriptionController {
             if (!userContextListenerMap.containsKey(desktopId)) {
                 addUserContextListener(desktopId, request, response);
             }
-            return Response.ok(getWebsocketUrl(request)).build();
+            return Response.ok(getWebsocketUrl(request, desktopId)).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -134,7 +136,7 @@ public class FlowsheetSubscriptionController {
                 dataSubscription.setSubscriptionId(null);
             }
             vitalsSubscriptionLookup.put(desktopId, dataSubscription);
-            return Response.ok(getWebsocketUrl(request)).build();
+            return Response.ok(getWebsocketUrl(request, desktopId)).build();
         } catch (IllegalArgumentException e) {
             return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
         }
@@ -188,15 +190,39 @@ public class FlowsheetSubscriptionController {
         return Response.ok().build();
     }
 
+    /**
+     * Get the base websocket url
+     * @param request
+     * @return
+     */
     public static String getWebsocketUrl(HttpServletRequest request) {
+        return getWebsocketUrl(request, null);
+    }
+
+    /**
+     * Get the websocket url with the dtid parameter
+     * @param request
+     * @param dtid
+     * @return
+     */
+    public static String getWebsocketUrl(HttpServletRequest request, String dtid) {
         String host = request.getServerName();
         int port = request.getServerPort();
 
         String websocketUrl = "ws://" + host + ":" + port + request.getServletContext().getContextPath() + WEBSOCKET_URL_PATH;
+        if (dtid != null) {
+            websocketUrl += "?dtid=" + dtid;
+        }
         log.info(websocketUrl);
         return websocketUrl;
     }
 
+    /**
+     * Listens for when the user changes the currently selected patient
+     * @param desktopId
+     * @param request
+     * @param response
+     */
     private void addPatientContextListener(
             final String desktopId,
             HttpServletRequest request,
@@ -207,6 +233,7 @@ public class FlowsheetSubscriptionController {
 
         Bridge bridge = null;
         try {
+            //Note: unable to get the bridge from a request from Java
             bridge = RequestUtil.startExecution(request, response, desktopId);
             if (bridge == null) {
                 throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
@@ -214,7 +241,7 @@ public class FlowsheetSubscriptionController {
             IGenericEvent<Patient> patientChangeListener = new IGenericEvent<Patient>() {
                 @Override
                 public void eventCallback(String eventName, Patient patient) {
-                    //todo can a user unselect a patient?
+                    //a user cannot unselect a patient with the UI, unless done programatically
                     if (patient == null) {
                         log.warn("User has unselected a patient");
                         return;
@@ -248,6 +275,12 @@ public class FlowsheetSubscriptionController {
         }
     }
 
+    /**
+     * Used for getting notification when a user has logged out or timed out
+     * @param desktopId
+     * @param request
+     * @param response
+     */
     private void addUserContextListener(
             final String desktopId,
             HttpServletRequest request,
@@ -285,6 +318,12 @@ public class FlowsheetSubscriptionController {
         }
     }
 
+    /**
+     * Cleanup the listeners
+     * @param desktopId
+     * @param request
+     * @param response
+     */
     private void deletePatientAndUserContext(String desktopId, HttpServletRequest request, HttpServletResponse response) {
         //only delete the patient context listener and user context listener if there are no other subscriptions (io) for that desktop id
         if (!ioSubscriptionLookup.containsKey(desktopId)) {

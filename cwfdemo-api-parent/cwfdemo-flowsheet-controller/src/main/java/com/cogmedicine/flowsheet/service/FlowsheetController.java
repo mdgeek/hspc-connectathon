@@ -47,9 +47,6 @@ import java.util.*;
 public class FlowsheetController {
 
     private static final Log log = LogFactory.getLog(FlowsheetController.class);
-
-    private final static Map<String, String> registry = new HashMap<>();
-
     public FlowsheetController() {
     }
 
@@ -145,7 +142,21 @@ public class FlowsheetController {
         List medicationAdministrationsAndMedications = FhirServiceDstu2.getMedicationAdministrationModel(id, startTime, endTime);
 
         List<Map<String, Object>> data = new ArrayList<>();
+        //list currently contains both Medication objects and MedicationAdministration objects
+        //todo test
         if (medicationAdministrationsAndMedications != null) {
+            //create a map of medication ids and their display names
+            HashMap<String, String> medicationDisplayNameMap = new HashMap<>();
+            for (Object object : medicationAdministrationsAndMedications) {
+                if (object instanceof Medication) {
+                    Medication medication = (Medication) object;
+                    String medId = medication.getId().getIdPart();
+                    String medName = medication.getCode().getCoding().get(0).getDisplay();
+                    medicationDisplayNameMap.put(medId, medName);
+                }
+            }
+
+            //create a list of medication administrations
             for (Object object : medicationAdministrationsAndMedications) {
                 if (object instanceof MedicationAdministration) {
                     MedicationAdministration medicationAdministration = (MedicationAdministration) object;
@@ -156,21 +167,11 @@ public class FlowsheetController {
                     medicationDetail.put("timestamp", FhirServiceDstu2.dateFormat.format(timestamp));
 
                     ResourceReferenceDt medicationReference = (ResourceReferenceDt) medicationAdministration.getMedication();
-                    String tempKey = medicationReference.getReference().getIdPart();
+                    String medId = medicationReference.getReference().getIdPart();
+                    String medName = medicationDisplayNameMap.get(medId);
 
-                    List details = getWraperElement(data, tempKey);
+                    List details = getWraperElement(data, medName);
                     details.add(medicationDetail);
-                }
-            }
-            for (Object object : medicationAdministrationsAndMedications) {
-                if (object instanceof Medication) {
-                    Medication medication = (Medication) object;
-                    String tempKey = medication.getId().getIdPart();
-                    Map<String, Object> medicationMap = getMedicationMap(tempKey, data);
-                    if (medicationMap != null) {
-                        String key = medication.getCode().getCoding().get(0).getDisplay();
-                        medicationMap.put(key, medicationMap.remove(tempKey));
-                    }
                 }
             }
         }
@@ -179,13 +180,18 @@ public class FlowsheetController {
 
     }
 
+    /**
+     *
+     * @param tempKey
+     * @param data
+     * @return
+     */
     public Map<String, Object> getMedicationMap(String tempKey, List<Map<String, Object>> data) {
         for (Map<String, Object> medicationMap : data) {
             if (medicationMap.containsKey(tempKey)) {
                 return medicationMap;
             }
         }
-
         return null;
     }
 

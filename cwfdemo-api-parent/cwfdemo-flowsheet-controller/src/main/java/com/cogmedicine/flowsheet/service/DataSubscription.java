@@ -16,7 +16,7 @@
 package com.cogmedicine.flowsheet.service;
 
 /**
- * Created by Jeff on 4/11/2017.
+ * Class that holds FHIR subscription information
  */
 public class DataSubscription {
     private boolean enabled;

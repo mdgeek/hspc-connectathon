@@ -26,6 +26,9 @@
 	<beans>
 		<websocket:handlers allowed-origins="*">
 			<websocket:mapping path="#{T(com.cogmedicine.flowsheet.service.FlowsheetSubscriptionController).WEBSOCKET_URL_PATH}" handler="desktopIdSocketHandler"/>
+			<websocket:handshake-interceptors>
+				<bean class="com.cogmedicine.flowsheet.socket.DesktopIdSocketInterceptor"/>
+			</websocket:handshake-interceptors>
 		</websocket:handlers>
 
 		<bean id="desktopIdSocketHandler" class="com.cogmedicine.flowsheet.socket.DesktopIdSocketHandler"/>
