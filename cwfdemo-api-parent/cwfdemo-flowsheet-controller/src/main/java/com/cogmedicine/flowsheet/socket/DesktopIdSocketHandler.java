@@ -15,6 +15,8 @@
 
 package com.cogmedicine.flowsheet.socket;
 
+import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
+import com.cogmedicine.flowsheet.util.Utilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.web.socket.CloseStatus;
@@ -22,134 +24,98 @@ import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
+import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
 
 public class DesktopIdSocketHandler extends TextWebSocketHandler {
 
     private static final Log log = LogFactory.getLog(DesktopIdSocketHandler.class);
-    private static final Map<String, WebSocketSession> socketSessions = new HashMap<>();
 
     /**
      * Stores the socket session with the desktop id
+     *
      * @param session
      */
     @Override
     public void afterConnectionEstablished(WebSocketSession session) {
-        //requires the DesktopIdSocketInterceptor to add the dtid request parameter into the websocket session attributes
-        Object desktopIdObject = session.getAttributes().get("dtid");
-        if(desktopIdObject == null) {
-            String message = "Websocket url must contain the dtid parameter";
-            try {
-                session.sendMessage(new TextMessage(message));
-            }catch(IOException e){
-                e.printStackTrace();
-            } finally {
-                try {
-                    session.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-            log.info(message);
-        } else {
-            String desktopId = (String) desktopIdObject;
-            //check to see if the socket already exists for that desktop id
-            if (socketSessions.containsKey(desktopId)) {
-                WebSocketSession mappedSession = socketSessions.get(desktopId);
-                if (mappedSession.isOpen()) {
-                    try {
-                        session.sendMessage(new TextMessage("Session already exists"));
-                    } catch (IOException e) {
-                        throw new RuntimeException("Unable to send message to the client with desktopId: " + desktopId + ". " + e.getMessage());
-                    }
-                } else {
-                    log.info("Recreating websocket session for desktop id " + desktopId);
-                    socketSessions.remove(desktopId);
-                    socketSessions.put(desktopId, session);
-                }
-            } else {
-                log.info("Creating websocket session for desktop id " + desktopId);
-                socketSessions.put(desktopId, session);
-            }
-        }
+        saveWebSocketSession(session);
     }
 
     /**
      * If a session is closed, remove it from the socket sessions map
-     * @param session
+     *
      * @param status
      * @throws Exception
      */
     @Override
-    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        super.afterConnectionClosed(session, status);
-        log.info("Connection closed");
-        for (String desktopId : socketSessions.keySet()) {
-            if (socketSessions.get(desktopId).getId().equals(session.getId())) {
-                log.info("Removed session for desktop id " + desktopId);
-                socketSessions.remove(desktopId);
-            }
-        }
+    public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
+        HttpSession httpSession = getHttpSession(socketSession);
+        httpSession.setAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION, null);
     }
 
     /**
      * Listen for client messages.  Currently not used
+     *
      * @param session
      * @param wrappedMessage
      */
     @Override
     public void handleTextMessage(WebSocketSession session, TextMessage wrappedMessage) {
         String message = wrappedMessage.getPayload();
+        String response = "hello from server";
         log.info("Received message: " + message);
 
-        try {
-            session.sendMessage(new TextMessage("message received"));
-        } catch (IOException e) {
-            throw new RuntimeException("Unable to send message to the client. " + e.getMessage());
-        }
+        sendMessage(session, response);
     }
 
     /**
-     * Closes the socket session
-     * @param desktopId
+     * Gets for the desktop id parameter and adds the websocket session into the http session
+     *
+     * @param socketSession
      */
-    public static void clearSession(String desktopId){
-        if(socketSessions.containsKey(desktopId)) {
-            WebSocketSession socketSession = socketSessions.get(desktopId);
-            if (socketSession.isOpen()) {
+    public void saveWebSocketSession(WebSocketSession socketSession) {
+        HttpSession httpSession = getHttpSession(socketSession);
+        Object desktopIdObject = httpSession.getAttribute(FlowsheetSessionListener.DESKTOP_ID);
+
+        if (desktopIdObject == null) {
+            String host = Utilities.getParameter(FlowsheetSessionListener.HOST, httpSession, String.class);
+            String port = Utilities.getParameter(FlowsheetSessionListener.PORT, httpSession, String.class);
+            String servicePath = "/service/flowsheet/subscription/patientContext";
+            String parameter = "?dtid={your-desktop-id}";
+            String url = "http://" + host + ":" + port + httpSession.getServletContext().getContextPath() + servicePath + parameter;
+            String message = "Register a desktop id first. Call: " + url;
+            log.info(message);
+
+            try {
+                sendMessage(socketSession, message);
+            } finally {
                 try {
                     socketSession.close();
                 } catch (IOException e) {
-                    throw new RuntimeException("Unable to close session with desktop id: " + desktopId);
+                    e.printStackTrace();
                 }
             }
+        } else {
+            Object storedSocketSession = httpSession.getAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION);
 
-            socketSessions.remove(desktopId);
-        }else{
-            throw new RuntimeException("Cannot find desktop id: " + desktopId);
+            if (storedSocketSession != null) {
+                String message = "Web socket session already exists";
+                log.info(message);
+                sendMessage(socketSession, message);
+                throw new IllegalArgumentException(message);
+            } else {
+                httpSession.setAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION, socketSession);
+            }
         }
-    }
-
-    /**
-     * Gets the socket session by desktop id
-     * @param desktopId
-     * @return
-     */
-    public static WebSocketSession getSocketSession(String desktopId) {
-        return socketSessions.get(desktopId);
     }
 
     /**
      * Sends a message to the client
-     * @param desktopId
+     *
+     * @param socketSession
      * @param message
      */
-    public static void sendMessage(String desktopId, String message) {
-        WebSocketSession socketSession = DesktopIdSocketHandler.getSocketSession(desktopId);
+    public static void sendMessage(WebSocketSession socketSession, String message) {
         if (socketSession != null) {
             try {
                 socketSession.sendMessage(new TextMessage(message));
@@ -157,5 +123,16 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
                 throw new RuntimeException("Unable to send the message to the client. " + e.getMessage());
             }
         }
+    }
+
+    /**
+     * Get the current http session
+     *
+     * @param socketSession
+     * @return
+     */
+    public HttpSession getHttpSession(WebSocketSession socketSession) {
+        Object httpSessionObject = socketSession.getAttributes().get("httpSession");
+        return (HttpSession) httpSessionObject;
     }
 }

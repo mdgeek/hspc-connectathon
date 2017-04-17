@@ -28,11 +28,12 @@
     </listener>
 
     <listener>
-        <listener-class>
-            org.springframework.web.context.request.RequestContextListener
-        </listener-class>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
     </listener>
 
+    <listener>
+        <listener-class>com.cogmedicine.flowsheet.listener.FlowsheetSessionListener</listener-class>
+    </listener>
     <!--
     - Spring Security Filter Chains
     -->
@@ -129,7 +130,7 @@
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>jersey.config.server.provider.packages</param-name>
-            <param-value>com.cogmedicine.flowsheet.service</param-value>
+            <param-value>com.cogmedicine.flowsheet.controller</param-value>
         </init-param>
         <init-param>
             <param-name>jersey.config.server.provider.classnames</param-name>

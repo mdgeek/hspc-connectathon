@@ -15,6 +15,7 @@
 
 package com.cogmedicine.flowsheet.socket;
 
+import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.http.server.ServletServerHttpRequest;
@@ -22,6 +23,7 @@ import org.springframework.web.socket.WebSocketHandler;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.Map;
 
 /**
@@ -37,12 +39,13 @@ public class DesktopIdSocketInterceptor extends HttpSessionHandshakeInterceptor 
             Map<String, Object> attributes) throws Exception {
 
         ServletServerHttpRequest ssreq = (ServletServerHttpRequest) request;
-        HttpServletRequest req =  ssreq.getServletRequest();
+        HttpServletRequest req = ssreq.getServletRequest();
 
-        String dtid = req.getParameter("dtid");
-        if(dtid != null) {
-            attributes.put("dtid", dtid);
-        }
+        HttpSession httpSession = req.getSession();
+        attributes.put("httpSession", httpSession);
+
+        httpSession.setAttribute(FlowsheetSessionListener.HOST, req.getServerName());
+        httpSession.setAttribute(FlowsheetSessionListener.PORT, req.getServerPort() + "");
 
         return super.beforeHandshake(request, response, wsHandler, attributes);
     }

@@ -1,4 +1,4 @@
-<%@ page import="com.cogmedicine.flowsheet.service.FlowsheetSubscriptionController" %><%--
+<%@ page import="com.cogmedicine.flowsheet.controller.FlowsheetSubscriptionController" %><%--
   ~ Copyright 2017 Cognitive Medical Systems, Inc (http://www.cognitivemedicine.com).
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -18,19 +18,18 @@
 
     <script type="text/javascript">
         function createWebSocket() {
-            var desktopId = document.getElementById('desktopId').value;
-            var wsEndpoint = document.getElementById('wsEndpoint').value + '?dtid=' + desktopId;
+            var wsEndpoint = document.getElementById('wsEndpoint').value;
 
             var ws = new WebSocket(wsEndpoint);
 
             ws.onopen = function(){
-                ws.send("bind " + desktopId);
-                console.log("Sent bind request for desktop id" + desktopId);
+                ws.send("hello from client");
+                console.log("Sent hello message to the server");
             };
 
             ws.onmessage = function (evt){
                 var received_msg = evt.data;
-                console.log("Received message:" + received_msg);
+                console.log("Received message: " + received_msg);
             };
 
             ws.onclose = function(){
@@ -48,12 +47,6 @@
             <td>WebSocket endpoint:</td>
             <td>
                 <input id="wsEndpoint" type="text" value="<%= FlowsheetSubscriptionController.getWebsocketUrl(request)%>"/>
-            </td>
-        </tr>
-        <tr>
-            <td>Desktop id:</td>
-            <td>
-                <input id="desktopId" type="text" />
             </td>
         </tr>
         <tr>

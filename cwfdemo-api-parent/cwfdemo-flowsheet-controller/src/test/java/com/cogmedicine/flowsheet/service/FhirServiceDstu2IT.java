@@ -29,10 +29,11 @@ import java.util.List;
 public class FhirServiceDstu2IT {
 
     private static long dayAsMilis = 1000 * 60 * 60 * 24;
+    private static  String FHIR_DSTU2_SERVER = "http://localhost:9092/baseDstu2";
 
     @Test
     public void getObservationModel() {
-        String patientId = FhirServiceDstu2.FHIR_DSTU2_SERVER + "/Patient/1";
+        String patientId = FHIR_DSTU2_SERVER + "/Patient/1";
 
         ResourceReferenceDt patientReference = new ResourceReferenceDt();
         patientReference.setReference(patientId);

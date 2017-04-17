@@ -1,23 +1,18 @@
-/*-
- * #%L
- * Registry API
- * %%
- * Copyright (C) 2014 - 2017 Healthcare Services Platform Consortium
- * %%
+/*
+ * Copyright 2017 Cognitive Medical Systems, Inc (http://www.cognitivemedicine.com).
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- * #L%
+ *
+ * @author Jeff Chung
  */
-package com.cogmedicine.flowsheet.service;
+package com.cogmedicine.flowsheet.controller;
 
 import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
@@ -26,11 +21,11 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.*;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.server.EncodingEnum;
+import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
+import com.cogmedicine.flowsheet.service.FhirServiceDstu2;
+import com.cogmedicine.flowsheet.util.Utilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.carewebframework.ui.util.RequestUtil;
-import org.hspconsortium.cwf.api.patient.PatientContext;
-import org.zkoss.zkplus.embed.Bridge;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -47,11 +42,13 @@ import java.util.*;
 public class FlowsheetController {
 
     private static final Log log = LogFactory.getLog(FlowsheetController.class);
+
     public FlowsheetController() {
     }
 
     /**
      * Rest interface for {@link FhirServiceDstu2#getPatientModel(String)}
+     *
      * @param patientId
      * @return
      */
@@ -70,6 +67,7 @@ public class FlowsheetController {
 
     /**
      * Rest interface for {@link FhirServiceDstu2#getLabsModel(String, String, String)}
+     *
      * @param patientId
      * @param startTime
      * @param endTime
@@ -93,6 +91,7 @@ public class FlowsheetController {
 
     /**
      * Rest interface for {@link FhirServiceDstu2#getMedicationAdministrationModel(String, String, String)}
+     *
      * @param desktopId
      * @param startTime
      * @param endTime
@@ -109,7 +108,6 @@ public class FlowsheetController {
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
-
         if (desktopId == null || desktopId.trim().length() == 0) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
@@ -117,33 +115,18 @@ public class FlowsheetController {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Medication Administration");
 
-        org.hl7.fhir.dstu3.model.Patient patient = null;
-        Bridge bridge = RequestUtil.startExecution(request, response, desktopId);
-        if (bridge == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        if (patientId == null) {
+            log.info("No patient has been set in the patient context");
+            map.put("data", new ArrayList<>());
+            return Response.ok(map).build();
+        } else {
+            log.info("Current patient has id " + patientId);
         }
 
-        try {
-            if (PatientContext.getPatientContext() != null) {
-                patient = PatientContext.getActivePatient();
-            }
-            if (patient == null) {
-                log.info("No patient has been set in the patient context");
-                map.put("data", new ArrayList<>());
-                return Response.ok(map).build();
-            } else {
-                log.info("Current patient has id " + patient.getIdElement().getIdPart());
-            }
-        } finally {
-            bridge.close();
-        }
-
-        String id = patient.getIdElement().getIdPart();
-        List medicationAdministrationsAndMedications = FhirServiceDstu2.getMedicationAdministrationModel(id, startTime, endTime);
-
+        List medicationAdministrationsAndMedications = FhirServiceDstu2.getMedicationAdministrationModel(patientId, startTime, endTime);
         List<Map<String, Object>> data = new ArrayList<>();
         //list currently contains both Medication objects and MedicationAdministration objects
-        //todo test
         if (medicationAdministrationsAndMedications != null) {
             //create a map of medication ids and their display names
             HashMap<String, String> medicationDisplayNameMap = new HashMap<>();
@@ -181,22 +164,8 @@ public class FlowsheetController {
     }
 
     /**
-     *
-     * @param tempKey
-     * @param data
-     * @return
-     */
-    public Map<String, Object> getMedicationMap(String tempKey, List<Map<String, Object>> data) {
-        for (Map<String, Object> medicationMap : data) {
-            if (medicationMap.containsKey(tempKey)) {
-                return medicationMap;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Rest interface for {@link FhirServiceDstu2#getObservationModel(String, String, String)}
+     *
      * @param patientId
      * @param startTime
      * @param endTime
@@ -221,6 +190,7 @@ public class FlowsheetController {
 
     /**
      * Rest interface for vitals}
+     *
      * @param desktopId
      * @param startTime
      * @param endTime
@@ -244,31 +214,18 @@ public class FlowsheetController {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Vital Sign");
 
-        org.hl7.fhir.dstu3.model.Patient patient = null;
-        Bridge bridge = RequestUtil.startExecution(request, response, desktopId);
-        if (bridge == null) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
+        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        if (patientId == null) {
+            log.info("No patient has been set in the patient context");
+            map.put("data", new ArrayList<>());
+            return Response.ok(map).build();
+        } else {
+            log.info("Current patient has id " + patientId);
         }
 
-        try {
-            if (PatientContext.getPatientContext() != null) {
-                patient = PatientContext.getActivePatient();
-            }
-            if (patient == null) {
-                log.info("No patient has been set in the patient context");
-                map.put("data", new ArrayList<>());
-                return Response.ok(map).build();
-            } else {
-                log.info("Current patient has id " + patient.getIdElement().getIdPart());
-            }
-        } finally {
-            bridge.close();
-        }
-
-        String id = patient.getIdElement().getIdPart();
-        List<Observation> observations = FhirServiceDstu2.getObservationModel(id, startTime, endTime);
-
+        List<Observation> observations = FhirServiceDstu2.getObservationModel(patientId, startTime, endTime);
         List<Map<String, Object>> data = new ArrayList<>();
+
         if (observations != null) {
             for (Observation observation : observations) {
                 for (Observation.Component component : observation.getComponent()) {
@@ -292,7 +249,7 @@ public class FlowsheetController {
         return Response.ok(map).build();
     }
 
-    public Date getDateFromEffectiveTime(IDatatype datatype){
+    public Date getDateFromEffectiveTime(IDatatype datatype) {
         Date timestamp = null;
 
         if (datatype instanceof DateTimeDt) {
