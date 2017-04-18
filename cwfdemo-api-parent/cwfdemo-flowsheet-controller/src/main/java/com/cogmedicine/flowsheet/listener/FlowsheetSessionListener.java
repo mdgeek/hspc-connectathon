@@ -15,12 +15,12 @@
 
 package com.cogmedicine.flowsheet.listener;
 
-import ca.uhn.fhir.model.dstu2.resource.Subscription;
 import com.cogmedicine.flowsheet.service.DataSubscription;
-import com.cogmedicine.flowsheet.service.FhirServiceDstu2;
+import com.cogmedicine.flowsheet.service.FhirServiceDstu3;
 import com.cogmedicine.flowsheet.util.Utilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hl7.fhir.dstu3.model.Subscription;
 import org.springframework.web.socket.WebSocketSession;
 
 import javax.servlet.http.HttpSession;
@@ -80,7 +80,7 @@ public class FlowsheetSessionListener implements HttpSessionListener {
             String subscriptionId = subscription.getSubscriptionId();
             if (subscriptionId != null && subscriptionId.isEmpty()) {
                 if (subscription.isEnabled()) {
-                    FhirServiceDstu2.removeResource(Subscription.class, subscription.getSubscriptionId());
+                    FhirServiceDstu3.removeResource(Subscription.class, subscription.getSubscriptionId());
                 }
             }
             httpSession.setAttribute(VITAL_SUBSCRIPTION, null);

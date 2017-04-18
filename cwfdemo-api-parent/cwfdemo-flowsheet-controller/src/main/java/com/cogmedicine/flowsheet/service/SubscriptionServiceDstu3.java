@@ -15,12 +15,10 @@
 
 package com.cogmedicine.flowsheet.service;
 
-import ca.uhn.fhir.model.dstu2.resource.Subscription;
-import ca.uhn.fhir.model.dstu2.valueset.SubscriptionChannelTypeEnum;
-import ca.uhn.fhir.model.dstu2.valueset.SubscriptionStatusEnum;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import org.hl7.fhir.dstu3.model.Subscription;
 
-public class SubscriptionService {
+public class SubscriptionServiceDstu3 {
 
     /**
      * Returns the subscriptionId
@@ -29,7 +27,7 @@ public class SubscriptionService {
      * @return
      */
     public String createSubscription(Subscription subscription) {
-        MethodOutcome methodOutcome = FhirServiceDstu2.getClient().create().resource(subscription).execute();
+        MethodOutcome methodOutcome = FhirServiceDstu3.getClient().create().resource(subscription).execute();
         return methodOutcome.getId().getIdPart();
     }
 
@@ -40,7 +38,7 @@ public class SubscriptionService {
      * @return
      */
     public void updateSubscription(Subscription subscription) {
-        FhirServiceDstu2.getClient().update().resource(subscription).execute();
+        FhirServiceDstu3.getClient().update().resource(subscription).execute();
     }
 
     /**
@@ -49,7 +47,7 @@ public class SubscriptionService {
      * @param subscriptionId
      */
     public void deleteSubscription(String subscriptionId) {
-        FhirServiceDstu2.getClient().delete().resourceById(Subscription.class.getSimpleName(), subscriptionId).execute();
+        FhirServiceDstu3.getClient().delete().resourceById(Subscription.class.getSimpleName(), subscriptionId).execute();
     }
 
     /**
@@ -60,9 +58,9 @@ public class SubscriptionService {
      */
     public String createVitalSubscription(String patientId, String tminusTime) {
         Subscription subscription = new Subscription();
-        subscription.getChannel().setType(SubscriptionChannelTypeEnum.REST_HOOK);
+        subscription.getChannel().setType(Subscription.SubscriptionChannelType.RESTHOOK);
         subscription.setCriteria("Observation?subject=Patient/" + patientId + "&effectiveDate=Tminus" + tminusTime);
-        subscription.setStatus(SubscriptionStatusEnum.REQUESTED);
+        subscription.setStatus(Subscription.SubscriptionStatus.REQUESTED);
 
         return createSubscription(subscription);
     }
@@ -74,7 +72,7 @@ public class SubscriptionService {
      * @return
      */
     public void updateVitalSubscription(String subscriptionId, String patientId) {
-        Subscription subscription = FhirServiceDstu2.searchResource(Subscription.class, subscriptionId);
+        Subscription subscription = FhirServiceDstu3.searchResource(Subscription.class, subscriptionId);
         subscription.setCriteria("Observation?subject=Patient/" + patientId);
         updateSubscription(subscription);
     }

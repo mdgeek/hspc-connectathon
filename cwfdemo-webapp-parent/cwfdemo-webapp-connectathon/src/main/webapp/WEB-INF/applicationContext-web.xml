@@ -25,7 +25,7 @@
          http://www.springframework.org/schema/websocket/spring-websocket.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
 	<beans>
 		<websocket:handlers allowed-origins="*">
-			<websocket:mapping path="#{T(com.cogmedicine.flowsheet.controller.FlowsheetSubscriptionController).WEBSOCKET_URL_PATH}" handler="desktopIdSocketHandler"/>
+			<websocket:mapping path="#{T(com.cogmedicine.flowsheet.controller.FlowsheetSubscriptionControllerDstu3).WEBSOCKET_URL_PATH}" handler="desktopIdSocketHandler"/>
 			<websocket:handshake-interceptors>
 				<bean class="com.cogmedicine.flowsheet.socket.DesktopIdSocketInterceptor"/>
 			</websocket:handshake-interceptors>

@@ -1,4 +1,5 @@
-<%@ page import="com.cogmedicine.flowsheet.controller.FlowsheetSubscriptionController" %><%--
+<%@ page import="com.cogmedicine.flowsheet.controller.FlowsheetSubscriptionControllerDstu3" %>
+<%--
   ~ Copyright 2017 Cognitive Medical Systems, Inc (http://www.cognitivemedicine.com).
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -15,7 +16,6 @@
 
 <html>
 <head>
-
     <script type="text/javascript">
         function createWebSocket() {
             var wsEndpoint = document.getElementById('wsEndpoint').value;
@@ -46,7 +46,7 @@
         <tr>
             <td>WebSocket endpoint:</td>
             <td>
-                <input id="wsEndpoint" type="text" value="<%= FlowsheetSubscriptionController.getWebsocketUrl(request)%>"/>
+                <input id="wsEndpoint" type="text" value="<%= FlowsheetSubscriptionControllerDstu3.getWebsocketUrl(request)%>"/>
             </td>
         </tr>
         <tr>

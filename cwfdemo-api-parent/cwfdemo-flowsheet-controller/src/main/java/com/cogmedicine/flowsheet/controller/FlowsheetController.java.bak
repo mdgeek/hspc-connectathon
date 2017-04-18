@@ -38,7 +38,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.util.*;
 
-@Path("/")
+@Path("/dstu2/")
 public class FlowsheetController {
 
     private static final Log log = LogFactory.getLog(FlowsheetController.class);
@@ -103,14 +103,10 @@ public class FlowsheetController {
     @Path("/medicationAdministrations")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMedicationAdministrationModel(
-            @QueryParam("dtid") String desktopId,
             @QueryParam("startTime") String startTime,
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
-        if (desktopId == null || desktopId.trim().length() == 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Medication Administration");
@@ -191,7 +187,6 @@ public class FlowsheetController {
     /**
      * Rest interface for vitals}
      *
-     * @param desktopId
      * @param startTime
      * @param endTime
      * @param request
@@ -202,14 +197,10 @@ public class FlowsheetController {
     @Path("/vitals")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVitalsModel(
-            @QueryParam("dtid") String desktopId,
             @QueryParam("startTime") String startTime,
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
-        if (desktopId == null || desktopId.trim().length() == 0) {
-            return Response.status(Response.Status.BAD_REQUEST).build();
-        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Vital Sign");
