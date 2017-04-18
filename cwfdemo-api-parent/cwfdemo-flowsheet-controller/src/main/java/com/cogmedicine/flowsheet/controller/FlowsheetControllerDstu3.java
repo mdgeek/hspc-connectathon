@@ -234,6 +234,63 @@ public class FlowsheetControllerDstu3 {
         return Response.ok(map).build();
     }
 
+    /**
+     * Rest interface for vitals}
+     *
+     * @param startTime
+     * @param endTime
+     * @param request
+     * @param response
+     * @return
+     */
+    @GET
+    @Path("/I_O")
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getIOModel(
+            @QueryParam("startTime") String startTime,
+            @QueryParam("endTime") String endTime,
+            @Context HttpServletRequest request,
+            @Context HttpServletResponse response) {
+
+        //todo mocked to use return vitals as I and O until the FHIR model is determined
+        Map<String, Object> map = new HashMap<>();
+        map.put("type", "I_O");
+
+        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        if (patientId == null) {
+            log.info("No patient has been set in the patient context");
+            map.put("data", new ArrayList<>());
+            return Response.ok(map).build();
+        } else {
+            log.info("Current patient has id " + patientId);
+        }
+
+        List<Observation> observations = FhirServiceDstu3.getObservationModel(patientId, startTime, endTime);
+        List<Map<String, Object>> data = new ArrayList<>();
+
+        if (observations != null) {
+            for (Observation observation : observations) {
+                for (Observation.ObservationComponentComponent component : observation.getComponent()) {
+                    Date timestamp = getDateFromEffectiveTime(observation.getEffective());
+                    Quantity quantity = (Quantity) component.getValue();
+                    String value = quantity.getValue().toString();
+
+                    Map<String, Object> detail = new HashMap<>();
+                    detail.put("timestamp", FhirServiceDstu3.dateFormat.format(timestamp));
+                    detail.put("value", value);
+
+                    String displayName = FhirServiceDstu3.getDisplayName(component.getCode().getCoding());
+                    String name = parseDisplayName(displayName);
+
+                    List details = getWraperElement(data, name);
+                    details.add(detail);
+                }
+            }
+        }
+        map.put("data", data);
+        return Response.ok(map).build();
+    }
+
     public Date getDateFromEffectiveTime(Type datatype) {
         Date timestamp = null;
 
