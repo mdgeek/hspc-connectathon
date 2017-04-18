@@ -72,7 +72,6 @@ public class FlowsheetSubscriptionControllerDstu3 {
             return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
         }
 
-        try {
             HttpSession httpSession = request.getSession();
             Object patientChangeListener = httpSession.getAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER);
 
@@ -99,13 +98,6 @@ public class FlowsheetSubscriptionControllerDstu3 {
                     }
                 }
             }
-        } catch (Throwable e) {
-            //debugging
-            log.error("----------------------------------" + e.getMessage());
-            e.printStackTrace();
-            throw e;
-        }
-
         return Response.ok(getWebsocketUrl(request)).build();
     }
 

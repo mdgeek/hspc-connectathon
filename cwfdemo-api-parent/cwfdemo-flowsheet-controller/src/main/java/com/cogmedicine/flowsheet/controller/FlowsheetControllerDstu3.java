@@ -21,6 +21,7 @@ import com.cogmedicine.flowsheet.util.Utilities;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hl7.fhir.dstu3.model.*;
+import org.hl7.fhir.exceptions.FHIRException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -213,6 +214,7 @@ public class FlowsheetControllerDstu3 {
 
         if (observations != null) {
             for (Observation observation : observations) {
+                //Some observations are made up of multiple quantities which are stored as components
                 for (Observation.ObservationComponentComponent component : observation.getComponent()) {
                     Date timestamp = getDateFromEffectiveTime(observation.getEffective());
                     Quantity quantity = (Quantity) component.getValue();
@@ -223,10 +225,25 @@ public class FlowsheetControllerDstu3 {
                     detail.put("value", value);
 
                     String displayName = FhirServiceDstu3.getDisplayName(component.getCode().getCoding());
-                    String name = parseDisplayName(displayName);
 
-                    List details = getWraperElement(data, name);
+                    List details = getWraperElement(data, displayName);
                     details.add(detail);
+                }
+                //Some observations have a single quantity
+                try {
+                    if (observation.hasValueQuantity() && observation.getValueQuantity().hasValue()) {
+                        Quantity quantity = observation.getValueQuantity();
+                        String value = quantity.getValue().toString();
+                        String displayName = FhirServiceDstu3.getDisplayName(observation.getCode().getCoding());
+                        Map<String, Object> detail = new HashMap<>();
+                        Date timestamp = getDateFromEffectiveTime(observation.getEffective());
+                        detail.put("timestamp", FhirServiceDstu3.dateFormat.format(timestamp));
+                        detail.put("value", value);
+                        List details = getWraperElement(data, displayName);
+                        details.add(detail);
+                    }
+                } catch (FHIRException e) {
+                    //skip as some observations use multipe quantities as components instead of a single quantity
                 }
             }
         }
@@ -280,9 +297,8 @@ public class FlowsheetControllerDstu3 {
                     detail.put("value", value);
 
                     String displayName = FhirServiceDstu3.getDisplayName(component.getCode().getCoding());
-                    String name = parseDisplayName(displayName);
 
-                    List details = getWraperElement(data, name);
+                    List details = getWraperElement(data, displayName);
                     details.add(detail);
                 }
             }
@@ -303,6 +319,11 @@ public class FlowsheetControllerDstu3 {
         return timestamp;
     }
 
+    /**
+     * Sets the first letter to lower case and the rest to upper case for sBP and dBP
+     * @param displayName
+     * @return
+     */
     public String parseDisplayName(String displayName) {
         String[] words = displayName.split(" ");
         StringBuilder name = new StringBuilder();
