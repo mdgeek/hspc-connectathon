@@ -60,7 +60,11 @@ public class RestUtilities {
 	 * @throws IOException
 	 */
 	public static String getResponse(String url, MethodRequest typeRequest) throws IOException {
-		return getResponse(url, null, typeRequest);
+		return getResponse(url, null, typeRequest, null);
+	}
+
+	public static String getResponse(String url, Object parameter, MethodRequest typeRequest) throws IOException {
+		return getResponse(url, null, typeRequest, null);
 	}
 
 	/**
@@ -72,7 +76,7 @@ public class RestUtilities {
 	 * @return
 	 * @throws IOException
 	 */
-	public static String getResponse(String url, Object parameter, MethodRequest typeRequest) throws IOException {
+	public static String getResponse(String url, Object parameter, MethodRequest typeRequest, HttpClientContext httpClientContext) throws IOException {
 		StringEntity parameterEntity = new StringEntity(new ObjectMapper().writeValueAsString(parameter));
 
 		HttpClient httpclient = new DefaultHttpClient();
@@ -105,22 +109,11 @@ public class RestUtilities {
 			HttpGet httpGet = new HttpGet(url);
 			httpGet.setHeader("Content-type", MediaType.APPLICATION_JSON);
 
-			/*
-			HttpClientContext httpClientContext = new HttpClientContext();
-			CookieStore cookieStore = new BasicCookieStore();
-			httpClientContext.setAttribute(ClientContext.COOKIE_STORE, cookieStore);
-			*/
-
-			//response = httpclient.execute(httpGet, httpClientContext);
-			response = httpclient.execute(httpGet);
-
-			/*
-			Object aaa = httpClientContext.getCookieStore();
-			List<Cookie> cookies = httpClientContext.getCookieStore().getCookies();
-			for(Cookie cookie : cookies){
-				System.out.println(cookie.getName() + " === " + cookie.getValue());
+			if(httpClientContext != null){
+				response = httpclient.execute(httpGet, httpClientContext);
+			}else{
+				response = httpclient.execute(httpGet);
 			}
-			*/
 
 			System.out.println("...");
 			break;
