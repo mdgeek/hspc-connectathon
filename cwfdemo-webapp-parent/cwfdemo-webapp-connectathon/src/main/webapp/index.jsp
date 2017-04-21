@@ -19,6 +19,8 @@
     <script type="text/javascript">
         function createWebSocket() {
             var wsEndpoint = document.getElementById('wsEndpoint').value;
+            var desktopId = document.getElementById('desktopId').value;
+            wsEndpoint = wsEndpoint + '?dtid=' + desktopId;
 
             var ws = new WebSocket(wsEndpoint);
 
@@ -47,6 +49,12 @@
             <td>WebSocket endpoint:</td>
             <td>
                 <input id="wsEndpoint" type="text" value="<%= FlowsheetSubscriptionControllerDstu3.getWebsocketUrl(request)%>"/>
+            </td>
+        </tr>
+        <tr>
+            <td>Desktop id:</td>
+            <td>
+                <input id="desktopId" type="text"/>
             </td>
         </tr>
         <tr>

@@ -15,6 +15,7 @@
 
 package com.cogmedicine.flowsheet.listener;
 
+import com.cogmedicine.flowsheet.bean.DesktopSession;
 import com.cogmedicine.flowsheet.service.DataSubscription;
 import com.cogmedicine.flowsheet.service.FhirServiceDstu3;
 import com.cogmedicine.flowsheet.util.Utilities;
@@ -27,23 +28,21 @@ import javax.servlet.http.HttpSession;
 import javax.servlet.http.HttpSessionEvent;
 import javax.servlet.http.HttpSessionListener;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class FlowsheetSessionListener implements HttpSessionListener {
 
     private static final Log log = LogFactory.getLog(FlowsheetSessionListener.class);
 
-    public final static String VITAL_SUBSCRIPTION = "vitalSubscription";
-    public final static String PATIENT_CHANGE_LISTENER = "patientChangeListener";
-    public final static String WEB_SOCKET_SESSION = "webSocketSession";
-
-    public final static String PATIENT_ID = "patientId";
-    public final static String DESKTOP_ID = "desktopId";
+    public final static String DESKTOP_SESSION_MAP = "desktopSessionMap";
     public final static String HOST = "host";
     public final static String PORT = "port";
     public static final String PATIENT_CHANGE_EVENT = "CONTEXT.CHANGED.Patient";
 
     public void sessionCreated(HttpSessionEvent httpSessionEvent) {
-        log.debug("session created ...");
+        HttpSession httpSession = httpSessionEvent.getSession();
+        httpSession.setAttribute(DESKTOP_SESSION_MAP, new HashMap<String, DesktopSession>());
     }
 
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
@@ -51,25 +50,30 @@ public class FlowsheetSessionListener implements HttpSessionListener {
         destroyFlowsheetSessionValues(httpSession);
     }
 
-    public static void destroyFlowsheetSessionValues(HttpSession httpSession){
-        clearVitalSubscription(httpSession);
-        //patient change listener will be set to null automatically by Careweb when the session is destroyed
-        //clearPatientChangeListener(httpSession);
-        clearWebSocketSession(httpSession);
+    public static void destroyFlowsheetSessionValues(HttpSession httpSession) {
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(DESKTOP_SESSION_MAP, httpSession, Map.class);
+        DesktopSession desktopSession;
+        for (Map.Entry<String, DesktopSession> entry : desktopSessionMap.entrySet()) {
+            desktopSession = entry.getValue();
 
-        httpSession.setAttribute(PATIENT_ID, null);
-        httpSession.setAttribute(DESKTOP_ID, null);
+            clearWebSocketSession(desktopSession);
+            clearVitalSubscription(desktopSession);
+        }
+
+        desktopSessionMap.clear();
+
         httpSession.setAttribute(HOST, null);
         httpSession.setAttribute(PORT, null);
+        httpSession.setAttribute(DESKTOP_SESSION_MAP, null);
     }
 
-    public static void clearWebSocketSession(HttpSession httpSession) {
-        WebSocketSession socketSession = Utilities.getParameter(WEB_SOCKET_SESSION, httpSession, WebSocketSession.class);
+    public static void clearWebSocketSession(DesktopSession desktopSession) {
+        WebSocketSession socketSession = desktopSession.getWebsocketSession();
         if (socketSession != null) {
             if (socketSession.isOpen()) {
                 try {
                     socketSession.close();
-                    httpSession.setAttribute(WEB_SOCKET_SESSION, null);
+                    desktopSession.setWebsocketSession(null);
                 } catch (IOException e) {
                     log.error("Unable to close the web socket session");
                 }
@@ -77,8 +81,8 @@ public class FlowsheetSessionListener implements HttpSessionListener {
         }
     }
 
-    public static void clearVitalSubscription(HttpSession httpSession) {
-        DataSubscription subscription = Utilities.getParameter(VITAL_SUBSCRIPTION, httpSession, DataSubscription.class);
+    public static void clearVitalSubscription(DesktopSession desktopSession) {
+        DataSubscription subscription = desktopSession.getVitalSubscription();
         if (subscription != null) {
             String subscriptionId = subscription.getSubscriptionId();
             if (subscriptionId != null && subscriptionId.isEmpty()) {
@@ -86,7 +90,17 @@ public class FlowsheetSessionListener implements HttpSessionListener {
                     FhirServiceDstu3.removeResource(Subscription.class, subscription.getSubscriptionId());
                 }
             }
-            httpSession.setAttribute(VITAL_SUBSCRIPTION, null);
+
+            desktopSession.setVitalSubscription(null);
         }
+    }
+
+    public static String getNoDesktopIdMessage(HttpSession httpSession) {
+        String host = Utilities.getParameter(FlowsheetSessionListener.HOST, httpSession, String.class);
+        String port = Utilities.getParameter(FlowsheetSessionListener.PORT, httpSession, String.class);
+        String servicePath = "/service/flowsheet/subscription/context";
+        String parameter = "?dtid={your-desktop-id}";
+        String url = "http://" + host + ":" + port + httpSession.getServletContext().getContextPath() + servicePath + parameter;
+        return "Register the context id first. Call: " + url;
     }
 }

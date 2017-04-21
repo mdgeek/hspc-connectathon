@@ -19,9 +19,9 @@ import javax.servlet.http.HttpSession;
 
 public class Utilities {
 
-    public static <T> T getParameter(String parameterName, HttpSession session, Class<T> clazz){
+    public static <T> T getParameter(String parameterName, HttpSession session, Class<T> clazz) {
         Object objectValue = session.getAttribute(parameterName);
-        if(objectValue != null){
+        if (objectValue != null) {
             return clazz.cast(objectValue);
         }
 

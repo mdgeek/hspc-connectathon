@@ -15,6 +15,7 @@
 package com.cogmedicine.flowsheet.controller;
 
 import ca.uhn.fhir.rest.server.EncodingEnum;
+import com.cogmedicine.flowsheet.bean.DesktopSession;
 import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
 import com.cogmedicine.flowsheet.service.FhirServiceDstu3;
 import com.cogmedicine.flowsheet.util.Utilities;
@@ -25,6 +26,7 @@ import org.hl7.fhir.exceptions.FHIRException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -98,15 +100,28 @@ public class FlowsheetControllerDstu3 {
     @Path("/medicationAdministrations")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMedicationAdministrationModel(
+            @QueryParam("dtid") String desktopId,
             @QueryParam("startTime") String startTime,
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
+        if (desktopId == null || desktopId.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
+        }
 
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Medication Administration");
 
-        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        HttpSession httpSession = request.getSession();
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        DesktopSession desktopSession = desktopSessionMap.get(desktopId);
+
+        if (desktopSession == null) {
+            String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
+            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+        }
+
+        String patientId = desktopSession.getPatientId();
         if (patientId == null) {
             log.info("No patient has been set in the patient context");
             map.put("data", new ArrayList<>());
@@ -192,6 +207,7 @@ public class FlowsheetControllerDstu3 {
     @Path("/vitals")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVitalsModel(
+            @QueryParam("dtid") String desktopId,
             @QueryParam("startTime") String startTime,
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
@@ -200,7 +216,20 @@ public class FlowsheetControllerDstu3 {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "Vital Sign");
 
-        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        if (desktopId == null || desktopId.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
+        }
+
+        HttpSession httpSession = request.getSession();
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        DesktopSession desktopSession = desktopSessionMap.get(desktopId);
+
+        if (desktopSession == null) {
+            String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
+            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+        }
+
+        String patientId = desktopSession.getPatientId();
         if (patientId == null) {
             log.info("No patient has been set in the patient context");
             map.put("data", new ArrayList<>());
@@ -264,6 +293,7 @@ public class FlowsheetControllerDstu3 {
     @Path("/I_O")
     @Produces(MediaType.APPLICATION_JSON)
     public Response getIOModel(
+            @QueryParam("dtid") String desktopId,
             @QueryParam("startTime") String startTime,
             @QueryParam("endTime") String endTime,
             @Context HttpServletRequest request,
@@ -273,7 +303,21 @@ public class FlowsheetControllerDstu3 {
         Map<String, Object> map = new HashMap<>();
         map.put("type", "I_O");
 
-        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, request.getSession(), String.class);
+        //copied from getVitals
+        if (desktopId == null || desktopId.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
+        }
+
+        HttpSession httpSession = request.getSession();
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        DesktopSession desktopSession = desktopSessionMap.get(desktopId);
+
+        if (desktopSession == null) {
+            String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
+            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+        }
+
+        String patientId = desktopSession.getPatientId();
         if (patientId == null) {
             log.info("No patient has been set in the patient context");
             map.put("data", new ArrayList<>());
@@ -287,6 +331,7 @@ public class FlowsheetControllerDstu3 {
 
         if (observations != null) {
             for (Observation observation : observations) {
+                //Some observations are made up of multiple quantities which are stored as components
                 for (Observation.ObservationComponentComponent component : observation.getComponent()) {
                     Date timestamp = getDateFromEffectiveTime(observation.getEffective());
                     Quantity quantity = (Quantity) component.getValue();
@@ -300,6 +345,22 @@ public class FlowsheetControllerDstu3 {
 
                     List details = getWraperElement(data, displayName);
                     details.add(detail);
+                }
+                //Some observations have a single quantity
+                try {
+                    if (observation.hasValueQuantity() && observation.getValueQuantity().hasValue()) {
+                        Quantity quantity = observation.getValueQuantity();
+                        String value = quantity.getValue().toString();
+                        String displayName = FhirServiceDstu3.getDisplayName(observation.getCode().getCoding());
+                        Map<String, Object> detail = new HashMap<>();
+                        Date timestamp = getDateFromEffectiveTime(observation.getEffective());
+                        detail.put("timestamp", FhirServiceDstu3.dateFormat.format(timestamp));
+                        detail.put("value", value);
+                        List details = getWraperElement(data, displayName);
+                        details.add(detail);
+                    }
+                } catch (FHIRException e) {
+                    //skip as some observations use multipe quantities as components instead of a single quantity
                 }
             }
         }
@@ -321,6 +382,7 @@ public class FlowsheetControllerDstu3 {
 
     /**
      * Sets the first letter to lower case and the rest to upper case for sBP and dBP
+     *
      * @param displayName
      * @return
      */

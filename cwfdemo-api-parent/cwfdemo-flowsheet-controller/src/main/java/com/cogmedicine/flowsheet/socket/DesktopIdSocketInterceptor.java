@@ -44,6 +44,11 @@ public class DesktopIdSocketInterceptor extends HttpSessionHandshakeInterceptor 
         HttpSession httpSession = req.getSession();
         attributes.put("httpSession", httpSession);
 
+        String dtid = req.getParameter("dtid");
+        if (dtid != null) {
+            attributes.put("dtid", dtid);
+        }
+
         httpSession.setAttribute(FlowsheetSessionListener.HOST, req.getServerName());
         httpSession.setAttribute(FlowsheetSessionListener.PORT, req.getServerPort() + "");
 

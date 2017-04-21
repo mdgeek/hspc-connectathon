@@ -15,6 +15,7 @@
 
 package com.cogmedicine.flowsheet.socket;
 
+import com.cogmedicine.flowsheet.bean.DesktopSession;
 import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
 import com.cogmedicine.flowsheet.util.Utilities;
 import org.apache.commons.logging.Log;
@@ -26,6 +27,7 @@ import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Map;
 
 public class DesktopIdSocketHandler extends TextWebSocketHandler {
 
@@ -34,11 +36,14 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
     /**
      * Stores the socket session with the desktop id
      *
-     * @param session
+     * @param socketSession
      */
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) {
-        saveWebSocketSession(session);
+    public void afterConnectionEstablished(WebSocketSession socketSession) {
+        String desktopId = getDesktopId(socketSession);
+        DesktopSession desktopSession = getDesktopSession(socketSession, desktopId);
+
+        saveWebSocketSession(socketSession, desktopSession);
     }
 
     /**
@@ -49,8 +54,7 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
      */
     @Override
     public void afterConnectionClosed(WebSocketSession socketSession, CloseStatus status) throws Exception {
-        HttpSession httpSession = getHttpSession(socketSession);
-        httpSession.setAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION, null);
+
     }
 
     /**
@@ -73,39 +77,16 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
      *
      * @param socketSession
      */
-    public void saveWebSocketSession(WebSocketSession socketSession) {
-        HttpSession httpSession = getHttpSession(socketSession);
-        Object desktopIdObject = httpSession.getAttribute(FlowsheetSessionListener.DESKTOP_ID);
+    public void saveWebSocketSession(WebSocketSession socketSession, DesktopSession desktopSession) {
+        WebSocketSession storedSocketSession = desktopSession.getWebsocketSession();
 
-        if (desktopIdObject == null) {
-            String host = Utilities.getParameter(FlowsheetSessionListener.HOST, httpSession, String.class);
-            String port = Utilities.getParameter(FlowsheetSessionListener.PORT, httpSession, String.class);
-            String servicePath = "/service/flowsheet/subscription/patientContext";
-            String parameter = "?dtid={your-desktop-id}";
-            String url = "http://" + host + ":" + port + httpSession.getServletContext().getContextPath() + servicePath + parameter;
-            String message = "Register a desktop id first. Call: " + url;
+        if (storedSocketSession != null) {
+            String message = "Web socket session already exists";
             log.info(message);
-
-            try {
-                sendMessage(socketSession, message);
-            } finally {
-                try {
-                    socketSession.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
+            sendMessage(socketSession, message);
+            throw new IllegalArgumentException(message);
         } else {
-            Object storedSocketSession = httpSession.getAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION);
-
-            if (storedSocketSession != null) {
-                String message = "Web socket session already exists";
-                log.info(message);
-                sendMessage(socketSession, message);
-                throw new IllegalArgumentException(message);
-            } else {
-                httpSession.setAttribute(FlowsheetSessionListener.WEB_SOCKET_SESSION, socketSession);
-            }
+            desktopSession.setWebsocketSession(socketSession);
         }
     }
 
@@ -125,6 +106,22 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    public static void sendMessageAndClose(WebSocketSession socketSession, String message) {
+        if (socketSession != null) {
+            try {
+                socketSession.sendMessage(new TextMessage(message));
+            } catch (IOException e) {
+                throw new RuntimeException("Unable to send the message to the client. " + e.getMessage());
+            } finally {
+                try {
+                    socketSession.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
     /**
      * Get the current http session
      *
@@ -134,5 +131,31 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
     public HttpSession getHttpSession(WebSocketSession socketSession) {
         Object httpSessionObject = socketSession.getAttributes().get("httpSession");
         return (HttpSession) httpSessionObject;
+    }
+
+    public String getDesktopId(WebSocketSession socketSession) {
+        Object desktopIdObject = socketSession.getAttributes().get("dtid");
+        if (desktopIdObject == null) {
+            String message = "Websocket url must contain the dtid parameter";
+            log.info(message);
+
+            sendMessageAndClose(socketSession, message);
+            throw new IllegalArgumentException(message);
+        }
+        return (String) desktopIdObject;
+    }
+
+    public DesktopSession getDesktopSession(WebSocketSession socketSession, String desktopId) {
+        HttpSession httpSession = getHttpSession(socketSession);
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        if (desktopSessionMap.containsKey(desktopId)) {
+            return desktopSessionMap.get(desktopId);
+        } else {
+            String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
+            log.info(message);
+
+            sendMessageAndClose(socketSession, message);
+            throw new IllegalArgumentException(message);
+        }
     }
 }

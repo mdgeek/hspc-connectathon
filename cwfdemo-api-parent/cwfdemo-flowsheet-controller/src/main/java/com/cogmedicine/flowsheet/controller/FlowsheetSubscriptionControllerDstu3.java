@@ -14,6 +14,7 @@
  */
 package com.cogmedicine.flowsheet.controller;
 
+import com.cogmedicine.flowsheet.bean.DesktopSession;
 import com.cogmedicine.flowsheet.listener.FlowsheetSessionListener;
 import com.cogmedicine.flowsheet.service.DataSubscription;
 import com.cogmedicine.flowsheet.service.SubscriptionServiceDstu3;
@@ -39,6 +40,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.util.Map;
 
 @Path("/subscription")
 public class FlowsheetSubscriptionControllerDstu3 {
@@ -62,7 +64,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
      * @return
      */
     @GET
-    @Path("/patientContext")
+    @Path("/context")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPatientContextSubscription(
             @QueryParam("dtid") String desktopId,
@@ -73,42 +75,32 @@ public class FlowsheetSubscriptionControllerDstu3 {
         }
 
         HttpSession httpSession = request.getSession();
-        Bridge bridge = null;
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        if (!desktopSessionMap.containsKey(desktopId)) {
+            Bridge bridge = null;
 
-        try {
-            bridge = RequestUtil.startExecution(request, response, desktopId);
-            if (bridge == null) {
-                throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
-            }
-
-            //Object patientChangeListener = httpSession.getAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER);
-            String sessionDesktopId = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_ID, httpSession, String.class);
-            IGenericEvent patientChangeListener = Utilities.getParameter(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER, httpSession, IGenericEvent.class);
-
-            //check to see if there is change in the desktop id which signifies that a user may have closed the window and another user may have logged in
-            if(sessionDesktopId != null && !sessionDesktopId.equals(desktopId)){
-                FlowsheetSessionListener.destroyFlowsheetSessionValues(httpSession);
-
-                if (patientChangeListener != null) {
-                    EventManager.getInstance().unsubscribe(FlowsheetSessionListener.PATIENT_CHANGE_EVENT, patientChangeListener);
-                    httpSession.setAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER, null);
-                    patientChangeListener = null;
+            try {
+                bridge = RequestUtil.startExecution(request, response, desktopId);
+                if (bridge == null) {
+                    throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
                 }
-            }
 
-            if (patientChangeListener == null) {
-                addPatientContextListener(httpSession);
-            }
+                DesktopSession desktopSession = new DesktopSession();
+                desktopSession.setDesktopId(desktopId);
 
-            httpSession.setAttribute(FlowsheetSessionListener.DESKTOP_ID, desktopId);
-        } catch (ComponentNotFoundException e) {
-            e.printStackTrace();
-            log.error(e.getMessage());
-            String message = "Invalid desktop id, desktop not found: " + desktopId;
-            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-        } finally {
-            if (bridge != null) {
-                bridge.close();
+                addPatientContextListener(desktopSession);
+                //addUserContextListener(desktopSession);
+
+                desktopSessionMap.put(desktopId, desktopSession);
+            } catch (ComponentNotFoundException e) {
+                e.printStackTrace();
+                log.error(e.getMessage());
+                String message = "Invalid desktop id, desktop not found: " + desktopId;
+                return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+            } finally {
+                if (bridge != null) {
+                    bridge.close();
+                }
             }
         }
 
@@ -127,25 +119,31 @@ public class FlowsheetSubscriptionControllerDstu3 {
     @Path("/vitals")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createVitalsSubscription(
+            @QueryParam("dtid") String desktopId,
             @QueryParam("tminus") String tminus,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
-
-        HttpSession httpSession = request.getSession();
-        Object dataSubscriptionObject = httpSession.getAttribute(FlowsheetSessionListener.VITAL_SUBSCRIPTION);
-        if (dataSubscriptionObject != null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Vitals subscription already exists").build();
-        }
-
-        Object patientChangeListener = httpSession.getAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER);
-        if (patientChangeListener == null) {
-            return Response.status(Response.Status.BAD_REQUEST).entity("Create a context subscription first").build();
+        if (desktopId == null || desktopId.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
         }
         if (tminus == null || tminus.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("tminus is a required parameter").build();
         }
 
-        String patientId = Utilities.getParameter(FlowsheetSessionListener.PATIENT_ID, httpSession, String.class);
+        HttpSession httpSession = request.getSession();
+        Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
+        DesktopSession desktopSession = desktopSessionMap.get(desktopId);
+
+        if (desktopSession == null) {
+            String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
+            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+        }
+        if (desktopSession.getVitalSubscription() != null) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("Vitals subscription already exists").build();
+        }
+
+
+        String patientId = desktopSession.getPatientId();
         DataSubscription dataSubscription = new DataSubscription();
         //save the tminus variable
         dataSubscription.setTminus(tminus);
@@ -163,7 +161,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
             dataSubscription.setSubscriptionId(null);
         }
 
-        httpSession.setAttribute(FlowsheetSessionListener.VITAL_SUBSCRIPTION, dataSubscription);
+        desktopSession.setVitalSubscription(dataSubscription);
         return Response.ok("ok").build();
     }
 
@@ -183,7 +181,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
         return websocketUrl;
     }
 
-    private void addPatientContextListener(final HttpSession httpSession) {
+    private void addPatientContextListener(final DesktopSession desktopSession) {
         IGenericEvent<Patient> patientChangeListener = new IGenericEvent<Patient>() {
             @Override
             public void eventCallback(String eventName, Patient patient) {
@@ -194,7 +192,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
 
                 log.info("Patient Context Change: Patient " + patient.getId());
                 String patientId = patient.getIdElement().getIdPart();
-                DataSubscription subscription = Utilities.getParameter(FlowsheetSessionListener.VITAL_SUBSCRIPTION, httpSession, DataSubscription.class);
+                DataSubscription subscription = desktopSession.getVitalSubscription();
                 if (subscription != null) {
                     if (subscription.isEnabled()) {
                         //subscription was already created, just update the existing one
@@ -210,17 +208,18 @@ public class FlowsheetSubscriptionControllerDstu3 {
                     }
                 }
 
-                WebSocketSession socketSession = Utilities.getParameter(FlowsheetSessionListener.WEB_SOCKET_SESSION, httpSession, WebSocketSession.class);
-                if (socketSession != null) {
+                WebSocketSession socketSession = desktopSession.getWebsocketSession();
+                if (socketSession != null && socketSession.isOpen()) {
                     DesktopIdSocketHandler.sendMessage(socketSession, "patient change");
                 } else {
                     log.warn("Unable to notify to get the web socket session for the patient change notification");
                 }
 
-                httpSession.setAttribute(FlowsheetSessionListener.PATIENT_ID, patientId);
+                desktopSession.setPatientId(patientId);
             }
         };
+
         EventManager.getInstance().subscribe(FlowsheetSessionListener.PATIENT_CHANGE_EVENT, patientChangeListener);
-        httpSession.setAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER, patientChangeListener);
+        desktopSession.setPatientChangeListener(patientChangeListener);
     }
 }
