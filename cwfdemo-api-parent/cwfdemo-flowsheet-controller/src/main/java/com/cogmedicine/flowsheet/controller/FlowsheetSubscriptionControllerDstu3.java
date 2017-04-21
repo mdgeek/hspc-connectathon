@@ -72,32 +72,46 @@ public class FlowsheetSubscriptionControllerDstu3 {
             return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
         }
 
-            HttpSession httpSession = request.getSession();
-            Object patientChangeListener = httpSession.getAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER);
+        HttpSession httpSession = request.getSession();
+        Bridge bridge = null;
 
-            if (patientChangeListener == null) {
-                Bridge bridge = null;
-                try {
-                    bridge = RequestUtil.startExecution(request, response, desktopId);
-                    if (bridge == null) {
-                        throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
-                    }
+        try {
+            bridge = RequestUtil.startExecution(request, response, desktopId);
+            if (bridge == null) {
+                throw new IllegalArgumentException("Unable to create the bridge with desktop id: " + desktopId);
+            }
 
-                    if (patientChangeListener == null) {
-                        addPatientContextListener(httpSession);
-                        httpSession.setAttribute(FlowsheetSessionListener.DESKTOP_ID, desktopId);
-                    }
-                } catch (ComponentNotFoundException e) {
-                    e.printStackTrace();
-                    log.error(e.getMessage());
-                    String message = "Invalid desktop id, desktop not found: " + desktopId;
-                    return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
-                } finally {
-                    if (bridge != null) {
-                        bridge.close();
-                    }
+            //Object patientChangeListener = httpSession.getAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER);
+            String sessionDesktopId = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_ID, httpSession, String.class);
+            IGenericEvent patientChangeListener = Utilities.getParameter(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER, httpSession, IGenericEvent.class);
+
+            //check to see if there is change in the desktop id which signifies that a user may have closed the window and another user may have logged in
+            if(sessionDesktopId != null && !sessionDesktopId.equals(desktopId)){
+                FlowsheetSessionListener.destroyFlowsheetSessionValues(httpSession);
+
+                if (patientChangeListener != null) {
+                    EventManager.getInstance().unsubscribe(FlowsheetSessionListener.PATIENT_CHANGE_EVENT, patientChangeListener);
+                    httpSession.setAttribute(FlowsheetSessionListener.PATIENT_CHANGE_LISTENER, null);
+                    patientChangeListener = null;
                 }
             }
+
+            if (patientChangeListener == null) {
+                addPatientContextListener(httpSession);
+            }
+
+            httpSession.setAttribute(FlowsheetSessionListener.DESKTOP_ID, desktopId);
+        } catch (ComponentNotFoundException e) {
+            e.printStackTrace();
+            log.error(e.getMessage());
+            String message = "Invalid desktop id, desktop not found: " + desktopId;
+            return Response.status(Response.Status.BAD_REQUEST).entity(message).build();
+        } finally {
+            if (bridge != null) {
+                bridge.close();
+            }
+        }
+
         return Response.ok(getWebsocketUrl(request)).build();
     }
 

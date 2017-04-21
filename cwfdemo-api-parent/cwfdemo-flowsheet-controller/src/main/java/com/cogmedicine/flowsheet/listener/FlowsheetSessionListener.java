@@ -48,7 +48,10 @@ public class FlowsheetSessionListener implements HttpSessionListener {
 
     public void sessionDestroyed(HttpSessionEvent httpSessionEvent) {
         HttpSession httpSession = httpSessionEvent.getSession();
+        destroyFlowsheetSessionValues(httpSession);
+    }
 
+    public static void destroyFlowsheetSessionValues(HttpSession httpSession){
         clearVitalSubscription(httpSession);
         //patient change listener will be set to null automatically by Careweb when the session is destroyed
         //clearPatientChangeListener(httpSession);
@@ -60,7 +63,7 @@ public class FlowsheetSessionListener implements HttpSessionListener {
         httpSession.setAttribute(PORT, null);
     }
 
-    public void clearWebSocketSession(HttpSession httpSession) {
+    public static void clearWebSocketSession(HttpSession httpSession) {
         WebSocketSession socketSession = Utilities.getParameter(WEB_SOCKET_SESSION, httpSession, WebSocketSession.class);
         if (socketSession != null) {
             if (socketSession.isOpen()) {
@@ -74,7 +77,7 @@ public class FlowsheetSessionListener implements HttpSessionListener {
         }
     }
 
-    public void clearVitalSubscription(HttpSession httpSession) {
+    public static void clearVitalSubscription(HttpSession httpSession) {
         DataSubscription subscription = Utilities.getParameter(VITAL_SUBSCRIPTION, httpSession, DataSubscription.class);
         if (subscription != null) {
             String subscriptionId = subscription.getSubscriptionId();
