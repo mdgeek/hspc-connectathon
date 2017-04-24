@@ -64,7 +64,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
      * @return
      */
     @GET
-    @Path("/context")
+    @Path("/patientContext")
     @Produces(MediaType.APPLICATION_JSON)
     public Response createPatientContextSubscription(
             @QueryParam("dtid") String desktopId,
