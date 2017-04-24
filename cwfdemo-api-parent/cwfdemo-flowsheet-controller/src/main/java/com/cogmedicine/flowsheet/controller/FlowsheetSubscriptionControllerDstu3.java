@@ -104,7 +104,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
             }
         }
 
-        return Response.ok(getWebsocketUrl(request)).build();
+        return Response.ok(getWebsocketUrl(request, desktopId)).build();
     }
 
     /**
@@ -165,18 +165,24 @@ public class FlowsheetSubscriptionControllerDstu3 {
         return Response.ok("ok").build();
     }
 
+    public static String getWebsocketUrl(HttpServletRequest request) {
+        return getWebsocketUrl(request, null);
+    }
+
     /**
      * Get the websocket url with the dtid parameter
      *
      * @param request
      * @return
      */
-    public static String getWebsocketUrl(HttpServletRequest request) {
+    public static String getWebsocketUrl(HttpServletRequest request, String desktopId) {
         String host = request.getServerName();
         int port = request.getServerPort();
 
         String websocketUrl = "ws://" + host + ":" + port + request.getServletContext().getContextPath() + WEBSOCKET_URL_PATH;
-
+        if(desktopId != null) {
+            websocketUrl = websocketUrl + "?dtdid=" + desktopId;
+        }
         log.info(websocketUrl);
         return websocketUrl;
     }
