@@ -181,7 +181,7 @@ public class FlowsheetSubscriptionControllerDstu3 {
 
         String websocketUrl = "ws://" + host + ":" + port + request.getServletContext().getContextPath() + WEBSOCKET_URL_PATH;
         if(desktopId != null) {
-            websocketUrl = websocketUrl + "?dtdid=" + desktopId;
+            websocketUrl = websocketUrl + "?dtid=" + desktopId;
         }
         log.info(websocketUrl);
         return websocketUrl;
