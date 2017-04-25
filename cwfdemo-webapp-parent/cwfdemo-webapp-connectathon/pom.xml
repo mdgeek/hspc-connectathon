@@ -186,11 +186,11 @@
 			<artifactId>cwf-ui-procedures</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		<!--dependency>
+		<dependency>
 			<groupId>com.cognitivemedicine</groupId>
 			<artifactId>com.cognitivemedicine.plugin.flowsheet</artifactId>
 			<version>0.1-SNAPSHOT</version>
-		</dependency-->
+		</dependency>
 		<dependency>
 			<groupId>org.hspconsortium.carewebframework</groupId>
 			<artifactId>cwfdemo-ui-mar</artifactId>
