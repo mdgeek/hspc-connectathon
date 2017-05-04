@@ -76,8 +76,8 @@ public class FlowsheetControllerDstu3 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getLabsModel(
             @QueryParam("patientId") String patientId,
-            @QueryParam("startTime") String startTime,
-            @QueryParam("endTime") String endTime) {
+            @QueryParam("starttime") String startTime,
+            @QueryParam("endtime") String endTime) {
         try {
             List<DiagnosticReport> diagnosticReports = FhirServiceDstu3.getLabsModel(patientId, startTime, endTime);
             String response = FhirServiceDstu3.getResourcesAsStringList(EncodingEnum.JSON, diagnosticReports);
@@ -101,8 +101,8 @@ public class FlowsheetControllerDstu3 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getMedicationAdministrationModel(
             @QueryParam("dtid") String desktopId,
-            @QueryParam("startTime") String startTime,
-            @QueryParam("endTime") String endTime,
+            @QueryParam("starttime") String startTime,
+            @QueryParam("endtime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
         if (desktopId == null || desktopId.trim().isEmpty()) {
@@ -182,8 +182,8 @@ public class FlowsheetControllerDstu3 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getObservationModel(
             @QueryParam("patientId") String patientId,
-            @QueryParam("startTime") String startTime,
-            @QueryParam("endTime") String endTime) {
+            @QueryParam("starttime") String startTime,
+            @QueryParam("endtime") String endTime) {
         try {
             List<Observation> observations = FhirServiceDstu3.getObservationModel(patientId, startTime, endTime);
             String response = FhirServiceDstu3.getResourcesAsStringList(EncodingEnum.JSON, observations);
@@ -208,8 +208,8 @@ public class FlowsheetControllerDstu3 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getVitalsModel(
             @QueryParam("dtid") String desktopId,
-            @QueryParam("startTime") String startTime,
-            @QueryParam("endTime") String endTime,
+            @QueryParam("starttime") String startTime,
+            @QueryParam("endtime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
 
@@ -294,18 +294,18 @@ public class FlowsheetControllerDstu3 {
     @Produces(MediaType.APPLICATION_JSON)
     public Response getIOModel(
             @QueryParam("dtid") String desktopId,
-            @QueryParam("startTime") String startTime,
-            @QueryParam("endTime") String endTime,
+            @QueryParam("starttime") String startTime,
+            @QueryParam("endtime") String endTime,
             @Context HttpServletRequest request,
             @Context HttpServletResponse response) {
-
-        //todo mocked to use return vitals as I and O until the FHIR model is determined
-        Map<String, Object> map = new HashMap<>();
-        map.put("type", "I_O");
-
-        //copied from getVitals
         if (desktopId == null || desktopId.trim().isEmpty()) {
             return Response.status(Response.Status.BAD_REQUEST).entity("dtid is a required parameter").build();
+        }
+        if (startTime == null || startTime.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("starttime is a required parameter").build();
+        }
+        if (endTime == null || endTime.trim().isEmpty()) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("endtime is a required parameter").build();
         }
 
         HttpSession httpSession = request.getSession();
@@ -320,52 +320,20 @@ public class FlowsheetControllerDstu3 {
         String patientId = desktopSession.getPatientId();
         if (patientId == null) {
             log.info("No patient has been set in the patient context");
+
+            Map<String, Object> map = new HashMap<>();
+            map.put("type", "I_O");
             map.put("data", new ArrayList<>());
+
             return Response.ok(map).build();
         } else {
             log.info("Current patient has id " + patientId);
         }
 
-        List<Observation> observations = FhirServiceDstu3.getObservationModel(patientId, startTime, endTime);
-        List<Map<String, Object>> data = new ArrayList<>();
+        Map data = FhirServiceDstu3.getIOData(patientId, startTime, endTime);
+        data.put("type", "I_O");
 
-        if (observations != null) {
-            for (Observation observation : observations) {
-                //Some observations are made up of multiple quantities which are stored as components
-                for (Observation.ObservationComponentComponent component : observation.getComponent()) {
-                    Date timestamp = getDateFromEffectiveTime(observation.getEffective());
-                    Quantity quantity = (Quantity) component.getValue();
-                    String value = quantity.getValue().toString();
-
-                    Map<String, Object> detail = new HashMap<>();
-                    detail.put("timestamp", FhirServiceDstu3.dateFormat.format(timestamp));
-                    detail.put("value", value);
-
-                    String displayName = FhirServiceDstu3.getDisplayName(component.getCode().getCoding());
-
-                    List details = getWraperElement(data, displayName);
-                    details.add(detail);
-                }
-                //Some observations have a single quantity
-                try {
-                    if (observation.hasValueQuantity() && observation.getValueQuantity().hasValue()) {
-                        Quantity quantity = observation.getValueQuantity();
-                        String value = quantity.getValue().toString();
-                        String displayName = FhirServiceDstu3.getDisplayName(observation.getCode().getCoding());
-                        Map<String, Object> detail = new HashMap<>();
-                        Date timestamp = getDateFromEffectiveTime(observation.getEffective());
-                        detail.put("timestamp", FhirServiceDstu3.dateFormat.format(timestamp));
-                        detail.put("value", value);
-                        List details = getWraperElement(data, displayName);
-                        details.add(detail);
-                    }
-                } catch (FHIRException e) {
-                    //skip as some observations use multipe quantities as components instead of a single quantity
-                }
-            }
-        }
-        map.put("data", data);
-        return Response.ok(map).build();
+        return Response.ok(data).build();
     }
 
     public Date getDateFromEffectiveTime(Type datatype) {

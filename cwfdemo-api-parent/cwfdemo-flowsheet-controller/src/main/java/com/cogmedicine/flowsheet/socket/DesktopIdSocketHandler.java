@@ -84,7 +84,8 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
             String message = "Web socket session already exists";
             log.info(message);
             sendMessage(socketSession, message);
-            throw new IllegalArgumentException(message);
+            //commented out so it will not close the existing websocket connection
+            //throw new IllegalArgumentException(message);
         } else {
             desktopSession.setWebsocketSession(socketSession);
         }
@@ -148,8 +149,13 @@ public class DesktopIdSocketHandler extends TextWebSocketHandler {
     public DesktopSession getDesktopSession(WebSocketSession socketSession, String desktopId) {
         HttpSession httpSession = getHttpSession(socketSession);
         Map<String, DesktopSession> desktopSessionMap = Utilities.getParameter(FlowsheetSessionListener.DESKTOP_SESSION_MAP, httpSession, Map.class);
-        if (desktopSessionMap.containsKey(desktopId)) {
-            return desktopSessionMap.get(desktopId);
+
+        //if (desktopSessionMap.containsKey(desktopId)) {
+        //    return desktopSessionMap.get(desktopId);
+
+        DesktopSession desktopSession = desktopSessionMap.get(desktopId);
+        if(desktopSession != null){
+            return desktopSession;
         } else {
             String message = FlowsheetSessionListener.getNoDesktopIdMessage(httpSession);
             log.info(message);

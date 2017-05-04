@@ -98,7 +98,7 @@ public class FlowsheetSessionListener implements HttpSessionListener {
     public static String getNoDesktopIdMessage(HttpSession httpSession) {
         String host = Utilities.getParameter(FlowsheetSessionListener.HOST, httpSession, String.class);
         String port = Utilities.getParameter(FlowsheetSessionListener.PORT, httpSession, String.class);
-        String servicePath = "/service/flowsheet/subscription/context";
+        String servicePath = "/service/flowsheet/subscription/patientContext";
         String parameter = "?dtid={your-desktop-id}";
         String url = "http://" + host + ":" + port + httpSession.getServletContext().getContextPath() + servicePath + parameter;
         return "Register the context id first. Call: " + url;
